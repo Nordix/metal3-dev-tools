@@ -2,10 +2,9 @@
 
 set -ue
 
-pushd
 SCRIPTPATH=$( cd $(dirname $0) >/dev/null 2>&1 ; pwd -P )
 
-cd ${SCRIPTPATH}
+pushd ${SCRIPTPATH}
 cd ..
 
 setup_repo () {
