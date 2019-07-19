@@ -2,7 +2,7 @@
 
 set -ue
 
-SCRIPTPATH=$( cd $(dirname $0) >/dev/null 2>&1 ; pwd -P )
+SCRIPTPATH=$( cd $(dirname $(readlink -f $0)) >/dev/null 2>&1 ; pwd -P )
 
 cd ${SCRIPTPATH}
 cd ..

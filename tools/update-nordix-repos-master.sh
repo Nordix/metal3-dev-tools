@@ -7,6 +7,11 @@
 
 set -ue
 
+SCRIPTPATH=$( cd $(dirname $(readlink -f $0)) >/dev/null 2>&1 ; pwd -P )
+
+pushd ${SCRIPTPATH}
+cd ..
+
 UPDATE_REPO=${1:-cluster-api metal3-dev-env cluster-api-provider-baremetal baremetal-operator}
 UPDATE_BRANCH=${2:-master}
 
@@ -24,3 +29,5 @@ do
   cd ..
   echo -e "\n"
 done
+
+popd
