@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
 
 RUN apt-get update && \
     apt-get install -y software-properties-common
@@ -11,7 +11,9 @@ RUN add-apt-repository -y ppa:longsleep/golang-backports && \
     curl \
     gnupg-agent \
     golang-go \
-    go-dep
+    golint
+RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
+    mkdir -p /root/go/bin && chmod +x install.sh && ./install.sh && rm install.sh
 RUN curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && \
     chmod +x operator-sdk-v0.9.0-x86_64-linux-gnu && cp operator-sdk-v0.9.0-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-v0.9.0-x86_64-linux-gnu
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
@@ -37,4 +39,4 @@ RUN curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-barem
 RUN mkdir /data
 WORKDIR /data
 
-ENTRYPOINT ["/bin/bash"]
+CMD ["/bin/bash"]
