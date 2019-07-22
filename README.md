@@ -19,3 +19,7 @@ $ ./tools/update-nordix-repos-master.sh
 ```
 $ ./container/run-workspace.sh
 ```
+
+## Ways of working
+
+* [Github Workflow](wow/github-workflow.md)
