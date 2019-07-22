@@ -20,6 +20,22 @@ $ ./tools/update-nordix-repos-master.sh
 $ ./container/run-workspace.sh
 ```
 
+### Running the tests
+
+All the following actions take place in the container. Otherwise
+check you have installed everything properly (go 1.12, bazel, operator-sdk etc.)
+
+If you want to run the metal3 tests, you first need to fetch the dependencies.
+
+```
+$ dep ensure
+```
+
+Then for all repositories :
+```
+$ make test
+```
+
 ## Ways of working
 
 * [Github Workflow](wow/github-workflow.md)
