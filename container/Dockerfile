@@ -1,42 +1,56 @@
 FROM ubuntu:18.04
 
+# Install the minimum dependencies
+# (software-properties-common for add-apt-repository)
 RUN apt-get update && \
-    apt-get install -y software-properties-common
-
-RUN add-apt-repository -y ppa:longsleep/golang-backports && \
-    apt-get update && apt-get install -y \
+    apt-get install -y \
     git \
     apt-transport-https \
     ca-certificates \
     curl \
     gnupg-agent \
-    golang-go \
-    golint
-RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
-    mkdir -p /root/go/bin && chmod +x install.sh && ./install.sh && rm install.sh
-RUN curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && \
-    chmod +x operator-sdk-v0.9.0-x86_64-linux-gnu && cp operator-sdk-v0.9.0-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-v0.9.0-x86_64-linux-gnu
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    software-properties-common
+
+#Add repos and install Go, Docker and Bazel
+RUN add-apt-repository -y ppa:longsleep/golang-backports && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     add-apt-repository \
     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) \
-    stable" && \
-    apt-get update && apt-get install docker-ce-cli
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
+    $(lsb_release -cs) stable" && \
+    add-apt-repository \
+    "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" && \
+    apt-get update && apt-get install -y \
+    docker-ce-cli \
+    bazel \
+    golang-go \
+    golint
+
+ENV GOPATH=/data/go
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/data/go/bin
+ENV GO111MODULE=on
+
+#Install Golang dep, operator-sdk, Kubectl, Kustomize and kubebuilder
+RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
+    mkdir -p /data/go/bin && chmod +x install.sh && ./install.sh && rm install.sh && \
+    mv /data/go/bin/dep /usr/local/bin && \
+    \
+    curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && \
+    chmod +x operator-sdk-v0.9.0-x86_64-linux-gnu && cp operator-sdk-v0.9.0-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-v0.9.0-x86_64-linux-gnu && \
+    \
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/kubectl
-
-ENV GOPATH=/root/go
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/go/bin
-
-RUN curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kustomize.sh && \
+    mv ./kubectl /usr/local/bin/kubectl && \
+    \
+    curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kustomize.sh && \
     chmod +x ./install_kustomize.sh && ./install_kustomize.sh && rm install_kustomize.sh && \
+    \
     curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
     chmod +x ./install_kubebuilder.sh && ./install_kubebuilder.sh && rm install_kubebuilder.sh && \
-    mv kubebuilder /usr/local
+    mv kubebuilder /usr/local && \
+    \
+    mkdir -p /data
 
-
-RUN mkdir /data
 WORKDIR /data
 
 CMD ["/bin/bash"]

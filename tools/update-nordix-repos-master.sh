@@ -12,13 +12,13 @@ SCRIPTPATH=$( cd $(dirname $(readlink -f $0)) >/dev/null 2>&1 ; pwd -P )
 pushd ${SCRIPTPATH}
 cd ..
 
-UPDATE_REPO=${1:-cluster-api metal3-dev-env cluster-api-provider-baremetal baremetal-operator}
+UPDATE_REPO=${1:-go/src/sigs.k8s.io/cluster-api metal3-dev-env go/src/github.com/metal3-io/cluster-api-provider-baremetal go/src/github.com/metal3-io/baremetal-operator}
 UPDATE_BRANCH=${2:-master}
 
 for repo in $UPDATE_REPO
 do
   echo "Updating $repo"
-  cd $repo
+  pushd $repo
   # Update "master" on Nordix
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
   git checkout $UPDATE_BRANCH
@@ -26,7 +26,7 @@ do
   git rebase upstream/master
   git push
   git checkout $BRANCH
-  cd ..
+  popd
   echo -e "\n"
 done
 

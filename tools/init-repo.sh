@@ -20,10 +20,16 @@ setup_repo () {
   cd ..
 }
 
-setup_repo cluster-api kubernetes-sigs
-for repo in metal3-dev-env cluster-api-provider-baremetal baremetal-operator
-do
-    setup_repo ${repo} metal3-io
-done
+setup_go_repo () {
+  mkdir -p ${3}
+  pushd ${3}
+  setup_repo ${1} ${2}
+  popd
+}
+
+setup_go_repo cluster-api kubernetes-sigs go/src/sigs.k8s.io
+setup_repo metal3-dev-env metal3-io
+setup_go_repo cluster-api-provider-baremetal metal3-io go/src/github.com/metal3-io
+setup_go_repo baremetal-operator metal3-io go/src/github.com/metal3-io
 
 popd
