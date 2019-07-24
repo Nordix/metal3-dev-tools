@@ -21,3 +21,9 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+#ignore the go path, populated with other repositories through init
+go/
+
+#ignore metal3 dev env folder, git repo on its own
+metal3-dev-env
