@@ -24,11 +24,12 @@ RUN add-apt-repository -y ppa:longsleep/golang-backports && \
     docker-ce-cli \
     bazel \
     golang-go \
-    golint
+    golint \
+    shellcheck
 
 ENV GOPATH=/data/go
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/data/go/bin
-ENV GO111MODULE=on
+
 
 #Install Golang dep, operator-sdk, Kubectl, Kustomize and kubebuilder
 RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
@@ -44,10 +45,14 @@ RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     \
     curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kustomize.sh && \
     chmod +x ./install_kustomize.sh && ./install_kustomize.sh && rm install_kustomize.sh && \
+    mv /data/go/bin/kustomize /usr/local/bin && \
     \
     curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
     chmod +x ./install_kubebuilder.sh && ./install_kubebuilder.sh && rm install_kubebuilder.sh && \
     mv kubebuilder /usr/local && \
+    \
+    go get github.com/securego/gosec/cmd/gosec && \
+    mv /data/go/bin/gosec /usr/local/bin && \
     \
     mkdir -p /data
 
