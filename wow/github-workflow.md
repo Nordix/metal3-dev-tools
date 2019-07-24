@@ -33,7 +33,15 @@ Capitalized, short (50 chars or less or as subjected by open source repo practis
 
 More detailed explainatory text, if necessary. Wrap it to about 72 characters or so.
 Write your commit message in the imperative: "Fix bug" and not "Fixed bug" or "Fixes bug".
+
+Co-authored-by: My Name <my.name@est.tech>
 ```
+
+If your commit includes contributions from someone else, add this person as
+co-author by adding the Co-authored-by trailer at the end of your commit.
+
+Note that the email address might be protected by Github, then you need to
+use the address provided by Github.
 
 ## git workflow for a Github repo through Nordix
 
