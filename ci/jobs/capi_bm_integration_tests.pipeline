@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello, Tom'
+                sh 'echo "Hello world"'
+            }
+        }
+        stage('Example Test') {
+            steps {
+                echo 'Hello, Harry'
+                sh 'env'
+            }
+        }
+    }
+}
