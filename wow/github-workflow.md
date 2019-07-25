@@ -18,7 +18,9 @@ Feature development and bug fixing are done in topic branches, branched of `mast
 
 ### Topic branches (features and bug fixes)
 
-Topic branches need to be branched off `master` and named `type/name`, where  type is `feature` or `fix`.
+Topic branches need to be branched off `master` and named `type/name-username`,
+where  type is `feature` or `fix` and `username` the Github username or the name
+of the person creating the branch, to mark ownership of the branch.
 
 For example, a branch name for a feature called `Add support for policies` would be `feature/policy-support` or similar, where a `User cannot login` bug would be `fix/user-cannot-login` or similar.
 
@@ -162,6 +164,14 @@ usually done through the web interface. Once merged, you can
 ```sh
 git fetch
 git checkout <topic-branch>
+```
+
+### 12. Delete the branch when needed
+
+To avoid leaving unneeded branches in the repository, delete your branch if you
+don't use it anymore.
+
+```sh
 git push origin :<topic-branch>
 ```
 
