@@ -7,7 +7,7 @@
 
 set -ue
 
-SCRIPTPATH="$( cd "$(dirname "$(readlink -f "${0}")")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
 pushd "${SCRIPTPATH}"
 cd ..
