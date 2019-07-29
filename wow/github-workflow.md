@@ -74,7 +74,9 @@ git checkout <topic-branch>
 git rebase upstream/master
 ```
 
+<!-- markdownlint-disable MD026 -->
 ### 3. Code, test ....
+<!-- markdownlint-enable MD026 -->
 
 Do your magic :)
 

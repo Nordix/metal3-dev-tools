@@ -5,19 +5,19 @@ Set of internal tools for Airship and metal3 development
 ## Setup
 
 ```sh
-$ make setup-repos
+make setup-repos
 ```
 
 ## Update the nordix master branches
 
 ```sh
-$ make update-repos
+make update-repos
 ```
 
 ## Run a development container
 
 ```sh
-$ make workspace
+make workspace
 ```
 
 ### Running the tests
@@ -28,13 +28,13 @@ check you have installed everything properly (go 1.12, bazel, operator-sdk etc.)
 If you want to run the metal3 tests, you first need to fetch the dependencies.
 
 ```sh
-$ dep ensure
+dep ensure
 ```
 
 Then for all repositories :
 
 ```sh
-$ make test
+make test
 ```
 
 ## Ways of working

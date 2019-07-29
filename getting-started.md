@@ -17,7 +17,7 @@ services.
 
 * Follow this [link](https://accounts.google.com/signup/v2/webcreateaccount?hl=en&flowName=GlifWebSignIn&flowEntry=SignUp)
 * Click on "Use my current email address instead".
-* Create an account using <user>@est.tech.
+* Create an account using `<user>@est.tech`.
 * When logging into Nordix services, click on "Connect with Google" after
   clicking on "Log in".
 * Click on the relevant @est.tech account, enter your password (it also may
@@ -36,6 +36,7 @@ email address.
 
 We require signing the commits, here is how to set up GPG keys for signing with
 Github:
+
 * [Create a GPG key](https://help.github.com/en/articles/generating-a-new-gpg-key)
 * [Add the key in Github](https://help.github.com/en/articles/telling-git-about-your-signing-key)
 * [Use the key to sign commits](https://help.github.com/en/articles/signing-commits)
