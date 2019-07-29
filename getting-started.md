@@ -3,6 +3,10 @@
 ## Pre-requisites
 
 This walk-through assumes that you have an EST email address set up.
+Any question or issue related to the Nordix setup should be addressed to
+discuss@lists.nordix.org
+
+There is a [Nordix getting started](https://wiki.nordix.org/display/DEV/Getting+Started)
 
 ## Google account
 
@@ -14,8 +18,10 @@ services.
 * Follow this [link](https://accounts.google.com/signup/v2/webcreateaccount?hl=en&flowName=GlifWebSignIn&flowEntry=SignUp)
 * Click on "Use my current email address instead".
 * Create an account using <user>@est.tech.
-* When logging into Nordix services, click on "Connect with Google" after clicking on "Log in".
-* Click on the relevant @est.tech account, enter your password (it also may automatically log you in)
+* When logging into Nordix services, click on "Connect with Google" after
+  clicking on "Log in".
+* Click on the relevant @est.tech account, enter your password (it also may
+  automatically log you in)
 
 You should be good to go.
 
@@ -45,7 +51,14 @@ We have some guidelines related to the Ways of Working with Github in our
 
 ## Openstack
 
-TBA
+We have a tenant on Citycloud. The control panel is at
+[City cloud control panel](https://citycontrolpanel.com). You can ask for an
+account on the Nordix discuss mailing list or within the team.
+
+## Artifactory
+
+You need a specific account in [Artifactory](https://artifactory.nordix.org).
+Ask for an account on the Nordix discuss mailing list.
 
 ## Harbour
 
