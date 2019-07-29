@@ -22,9 +22,9 @@ Topic branches need to be branched off `master` and named `type/name-username`,
 where  type is `feature` or `fix` and `username` the Github username or the name
 of the person creating the branch, to mark ownership of the branch.
 
-For example, a branch name for a feature called `Add support for policies` would be `feature/policy-support` or similar, where a `User cannot login` bug would be `fix/user-cannot-login` or similar.
+For example, a branch name for a feature called `Add support for policies` by user xyz would be `feature/policy-support-xyz` or similar, where a `User cannot login` bug would be `fix/user-cannot-login-xyz` or similar.
 
-If applicable, branch name should also contain Github Issue ID, for example `fix/13-userr-cannot-login`.
+If applicable, branch name should also contain Github Issue ID, for example `fix/13-userr-cannot-login-xyz`.
 
 ## Commit Message
 
