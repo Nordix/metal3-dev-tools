@@ -1,24 +1,28 @@
 # Openstack Infrastructure
 
-
 This folder contain scripts to create/delete/interact with openstack infrastructure for CI and DEV environments.
 
-### Prerequisites
+## Prerequisites
 
 - Install jq
 - Install Openstack Python Client. (pip install python-openstackclient)
 - Source Openstack stackrc
 
-### CI Infrastructure
+## CI Infrastructure
 
 CI Infrastructure contains Router, external network, internal network, SSH Keys, Bastion server, base images e.t.c. There are scripts to delete and create complete infra from scratch. Any changes to the bare minimal infrastructure like routers and networks would require deletion of infrastructure and creating again from scratch.
 
-###### Create Infrastructure
-	./infra_setup_ci.sh
+### Create Infrastructure
 
-###### Delete Infrastructure
-	./infra_delete_ci.sh
+```sh
+./infra_setup_ci.sh
+```
 
+### Delete Infrastructure
+
+```sh
+./infra_delete_ci.sh
+```
 
 ### DEV Infrastructure
 
@@ -31,9 +35,14 @@ Resources which developers can use directly are
 - ***Internal Network***: airship-dev-int-net
 - ***Internal Network Subnet***: airship-dev-int-net-subnet
 
-###### Create Infrastructure
-	./infra_setup_dev.sh
+#### Create Dev Infrastructure
 
-###### Delete Infrastructure
-	./infra_delete_dev.sh
+```sh
+./infra_setup_dev.sh
+```
 
+#### Delete Dev Infrastructure
+
+```sh
+./infra_delete_dev.sh
+```

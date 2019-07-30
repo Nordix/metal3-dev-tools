@@ -52,5 +52,4 @@ make test
 * [Harbour nordix](https://registry.nordix.org)
 * [Slack EST](estech-group.slack.com)
 * [Nuclino (deprecated)](https://app.nuclino.com/ETSJORVAS/Airship)
-* [Our Wiki Nordix Pages ](https://wiki.nordix.org/display/CPI/Cloud+and+Programmable+Infrastructure)
-
+* [Our Wiki Nordix Pages](https://wiki.nordix.org/display/CPI/Cloud+and+Programmable+Infrastructure)
