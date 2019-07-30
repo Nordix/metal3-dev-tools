@@ -8,23 +8,24 @@ pushd "${SCRIPTPATH}"
 cd ..
 
 setup_repo () {
-  git clone git@github.com:Nordix/"${1}".git
-  cd "${1}"
-  git remote add upstream git@github.com:"${2}"/"${1}".git
-  git remote set-url --push upstream no_push
-  git remote -v
-  # Update "master" on Nordix
-  git fetch upstream
-  git rebase upstream/master
-  git push
-  cd ..
+  if ! [ -d "${1}" ]; then
+    git clone https://github.com/Nordix/"${1}".git
+    cd "${1}"
+    git remote add upstream https://github.com/"${2}"/"${1}".git
+    git remote set-url --push upstream no_push
+    git remote -v
+    # Update "master" on Nordix
+    git fetch upstream
+    git rebase upstream/master
+    cd ..
+  fi
 }
 
 setup_go_repo () {
-  mkdir -p "${3}"
-  pushd "${3}"
-  setup_repo "${1}" "${2}"
-  popd
+   mkdir -p "${3}"
+   pushd "${3}"
+   setup_repo "${1}" "${2}"
+   popd
 }
 
 setup_go_repo cluster-api kubernetes-sigs go/src/sigs.k8s.io
