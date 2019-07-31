@@ -13,6 +13,9 @@ source "${SCRIPTPATH}/utils.sh"
 # Delete CI Openstack Infrastructure
 # ===================================
 
+# Delete CI keypair
+delete_keypair "${CI_KEYPAIR_NAME}"
+
 # Delete Internal Networks and associated resources(Subnets and Ports)
 delete_network "${CI_INT_NET}"
 

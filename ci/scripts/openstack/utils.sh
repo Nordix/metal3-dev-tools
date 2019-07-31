@@ -371,3 +371,34 @@ delete_router() {
     openstack router delete "${ROUTER_ID}" > /dev/null
   done
 }
+
+# Description:
+# Creates Openstack SSH keypair.
+#
+# Usage:
+#   create_keypair <public_key_file> <keypair_name>
+#
+create_keypair() {
+  local PUBLIC_KEY KEYPAIR_NAME
+
+  PUBLIC_KEY="${1:?}"
+  KEYPAIR_NAME="${2:?}"
+
+  openstack keypair create -f json \
+    --public-key "${PUBLIC_KEY}" \
+    "${KEYPAIR_NAME}" > /dev/null
+}
+
+# Description:
+# Deletes Openstack SSH keypair.
+#
+# Usage:
+#   delete_keypair <keypair_name>
+#
+delete_keypair() {
+  local KEYPAIR_NAME
+
+  KEYPAIR_NAME="${1:?}"
+
+  openstack keypair delete "${KEYPAIR_NAME}" > /dev/null 2>&1 || true
+}
