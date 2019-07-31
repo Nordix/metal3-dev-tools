@@ -22,10 +22,10 @@ setup_repo () {
 }
 
 setup_go_repo () {
-   mkdir -p "${3}"
-   pushd "${3}"
-   setup_repo "${1}" "${2}"
-   popd
+  mkdir -p "${3}"
+  pushd "${3}"
+  setup_repo "${1}" "${2}"
+  popd
 }
 
 setup_go_repo cluster-api kubernetes-sigs go/src/sigs.k8s.io
