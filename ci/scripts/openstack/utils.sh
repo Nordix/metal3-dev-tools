@@ -58,6 +58,38 @@ get_gateway_ip_from_cidr() {
 }
 
 # Description:
+# Generates random string of given size.
+#
+# Usage:
+#   get_random_string <string_length>
+#
+get_random_string() {
+  local STR_LENGTH
+
+  STR_LENGTH="${1:?}"
+
+  tr -cd 'a-f0-9' < /dev/urandom | head -c "${STR_LENGTH}"
+}
+
+# Description:
+# Renders cloud init user data template and outputs to given file
+#
+# Usage:
+#   render_user_data <ssh_authorized_pub_key> <ssh_user> <in_template> <out_file>
+#
+render_user_data() {
+
+  local IN_FILE OUT_FILE
+
+  export SSH_AUTHORIZED_KEY="${1:?}"
+  export DEFAULT_SSH_USER="${2:?}"
+  IN_FILE="${3:?}"
+  OUT_FILE="${4:?}"
+
+  envsubst < "${IN_FILE}" > "${OUT_FILE}"
+}
+
+# Description:
 # Generates subnet name from Network name.
 #
 # Example:
@@ -78,6 +110,28 @@ get_subnet_name() {
 get_external_port_name() {
   echo "${1:?}-ext-port"
 }
+
+# Description:
+# Get resource id from name.
+#
+# Usage: get_resource_id_from_name <resource_type> <resource_name>
+#
+get_resource_id_from_name() {
+  local RESOURCE_TYPE RESOURCE_NAME RESOURCE_INFO
+
+  RESOURCE_TYPE="${1:?}"
+  RESOURCE_NAME="${2:?}"
+
+  # Get Rsource Info
+  # shellcheck disable=SC2086
+  RESOURCE_INFO="$(openstack ${RESOURCE_TYPE} show "${RESOURCE_NAME}" -f json)"
+
+  [[ -z "${RESOURCE_INFO}" ]] && return
+
+  # Output list of IDs
+  echo "${RESOURCE_INFO}" | jq -r '.id'
+}
+
 
 # Description:
 # Returns a list of all ports in
@@ -401,4 +455,31 @@ delete_keypair() {
   KEYPAIR_NAME="${1:?}"
 
   openstack keypair delete "${KEYPAIR_NAME}" > /dev/null 2>&1 || true
+}
+
+# Description:
+# Remove old image with changes the name of the new image
+#
+# Usage:
+#   replace_image <src_image_name> <dst_image_name>
+#
+replace_image() {
+  local SRC_IMAGE DST_IMAGE IMAGE_LIST IMAGE_ARRAY IMAGE_ID
+
+  SRC_IMAGE="${1:?}"
+  DST_IMAGE="${2:?}"
+
+
+  # Get list of images by name
+  IMAGE_LIST="$(openstack image list --name "${DST_IMAGE}" -f json || true)"
+  IMAGE_ARRAY="$(echo "${IMAGE_LIST}" | jq -r 'map(.ID) | @csv' | tr ',' '\n' | tr -d '"')"
+
+  for IMAGE_ID in ${IMAGE_ARRAY}
+  do
+    echo "Deleting image ${IMAGE_ID}"
+    openstack image delete "${IMAGE_ID}" > /dev/null
+  done
+
+  echo "Setting image name from ${SRC_IMAGE} to ${DST_IMAGE}"
+  openstack image set --name "${DST_IMAGE}" "${SRC_IMAGE}" > /dev/null
 }

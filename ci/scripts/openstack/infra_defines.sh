@@ -15,9 +15,13 @@ CI_EXT_SUBNET_CIDR="10.100.10.0/24"
 CI_INT_NET="airship-ci-int-net"
 CI_INT_SUBNET_CIDR="10.0.10.0/24"
 CI_KEYPAIR_NAME="airshipci-key"
+CI_BASE_IMAGE="airship-ci-ubuntu-base-img"
+CI_JENKINS_IMAGE="airship-ci-ubuntu-jenkins-img"
+CI_METAL3_IMAGE="airship-ci-ubuntu-metal3-img"
+CI_SSH_USER_NAME="airshipci"
 
 # Global defines for Airship DEV infrastructure
-# ============================================
+# =============================================
 
 DEV_ROUTER_NAME="airship-dev-ext-router"
 DEV_EXT_NET="airship-dev-ext-net"
