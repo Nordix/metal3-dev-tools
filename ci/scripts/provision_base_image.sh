@@ -18,6 +18,13 @@ sudo apt install -y \
   coreutils \
   wget \
   curl
+  apt-transport-https \
+  ca-certificates \
+  jq \
+  gnupg-agent \
+  software-properties-common \
+  openssl
+
 
 # Install docker.
 "${SCRIPTS_DIR}"/setup_docker_ubuntu.sh
