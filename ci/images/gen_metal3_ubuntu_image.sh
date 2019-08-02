@@ -18,14 +18,15 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
 FINAL_IMAGE_NAME="${CI_METAL3_IMAGE}"
-SOURCE_IMAGE="${CI_BASE_IMAGE}"
-USER_DATA_FILE="${IMAGES_DIR}/metal3_img_userdata"
+SOURCE_IMAGE_NAME="${CI_BASE_IMAGE}"
+USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/scripts/provision_metal3_image.sh"
 
+SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \
