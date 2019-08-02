@@ -2,6 +2,8 @@
 
 set -uex
 
+SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
+
 # Metal3 Dev Env variables
 M3_DENV_ORG="${M3_DENV_ORG:-metal3-io}"
 M3_DENV_REPO="${M3_DENV_REPO:-metal3-dev-env}"
@@ -31,3 +33,7 @@ git pull -r || true
 popd
 
 rm -rf "${M3_DENV_PATH}"
+
+
+# Reset cloud-init to run on next boot.
+"${SCRIPTS_DIR}"/reset_cloud_init.sh
