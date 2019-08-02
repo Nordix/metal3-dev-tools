@@ -24,9 +24,6 @@
     "floating_ip_network": "{{user `floating_ip_net`}}",
     "availability_zone": "nova",
     "ssh_username": "{{user `ssh_username`}}",
-    "volume_size": 10,
-    "image_disk_format": "qcow2",
-    "use_blockstorage_volume": true,
     "image_visibility": "shared",
     "force_delete": true
   }],
