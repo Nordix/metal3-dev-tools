@@ -28,5 +28,5 @@ DEV_EXT_NET="airship-dev-ext-net"
 DEV_EXT_SUBNET_CIDR="10.101.10.0/24"
 DEV_INT_NET="airship-dev-int-net"
 DEV_INT_SUBNET_CIDR="10.1.10.0/24"
-
-
+DEV_JUMPHOST_NAME="airship-dev-jumphost"
+DEV_JUMPHOST_FLOATING_IP_TAG="airship_dev_jumphost_fip"

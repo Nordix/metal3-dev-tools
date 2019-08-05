@@ -17,7 +17,7 @@ sudo apt install -y \
   git \
   coreutils \
   wget \
-  curl
+  curl \
   apt-transport-https \
   ca-certificates \
   jq \

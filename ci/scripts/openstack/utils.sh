@@ -309,18 +309,19 @@ create_network_and_subnet() {
     "${NET_NAME}")"
 
   NET_ID="$(echo "${NET_INFO}" | jq -r '.id')"
-  GATEWAY_KEYWORD=$([ "${IS_EXTERNAL}" = 1 ] && echo "--gateway")
-  GATEWAY=$([ "${IS_EXTERNAL}" = 1 ] && echo "${GATEWAY_IP}")
+  GATEWAY_KEYWORD="$([ "${IS_EXTERNAL}" = 1 ] && echo "--gateway")" || true
+  GATEWAY="$([ "${IS_EXTERNAL}" = 1 ] && echo "${GATEWAY_IP}")" || true
 
-  SUBNET_INFO="$(openstack subnet create -f json\
-    --subnet-range "${CIDR}" \
+  SUBNET_CMD="openstack subnet create -f json\
+    --subnet-range ${CIDR} \
     --dhcp \
     --ip-version 4 \
-    --network "${NET_ID}" \
-    "${GATEWAY_KEYWORD}" "${GATEWAY}" \
-    --allocation-pool start="${START_IP}",end="${END_IP}" \
-    "${SUBNET_NAME}")"
+    --network ${NET_ID} \
+    ${GATEWAY_KEYWORD} ${GATEWAY} \
+    --allocation-pool start=${START_IP},end=${END_IP} \
+    ${SUBNET_NAME}"
 
+  SUBNET_INFO="$(eval "${SUBNET_CMD}")"
   SUBNET_ID="$(echo "${SUBNET_INFO}" | jq -r '.id')"
 
   echo "${NET_ID}" "${SUBNET_ID}"
@@ -482,4 +483,29 @@ replace_image() {
 
   echo "Setting image name from ${SRC_IMAGE} to ${DST_IMAGE}"
   openstack image set --name "${DST_IMAGE}" "${SRC_IMAGE}" > /dev/null
+}
+
+# Description:
+# Waits for SSH connection to come up for a server
+#
+# Usage:
+#   wait_for_ssh <ssh_user> <ssh_key_path> <server>
+#
+wait_for_ssh() {
+  local USER KEY SERVER
+
+  USER="${1:?}"
+  KEY="${2:?}"
+  SERVER="${3:?}"
+
+  echo "Waiting for SSH connection to Host[${SERVER}]"
+  until ssh -o ConnectTimeout=2 \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    -i "${KEY}" \
+    "${USER}"@"${SERVER}" echo "SSH to host is up" > /dev/null 2>&1
+        do sleep 1
+  done
+
+  echo "SSH connection to host[${SERVER}] is up."
 }
