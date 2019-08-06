@@ -46,7 +46,7 @@ scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
   -i "${AIRSHIP_CI_USER_KEY}" \
-  "${JUMPHOST_SCRIPTS_DIR}/_add_proxy_user.sh" \
+  "${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh" \
   "${AIRSHIP_CI_USER}@${JUMPHOST_PUBLIC_IP}:/tmp/" > /dev/null
 
 # Execute remote script
@@ -56,6 +56,6 @@ ssh \
   -o UserKnownHostsFile=/dev/null \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${JUMPHOST_PUBLIC_IP}" \
-  /tmp/_add_proxy_user.sh "${NEW_USER}" "/tmp/${NEW_USER}_auth_keys" > /dev/null
+  /tmp/add_proxy_user.sh "${NEW_USER}" "/tmp/${NEW_USER}_auth_keys" > /dev/null
 
 echo "User[${NEW_USER}] added successfully"

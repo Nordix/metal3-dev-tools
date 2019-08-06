@@ -24,18 +24,5 @@ done
 sudo apt install -y \
   openjdk-8-jre
 
-# Update cloud init default config to enable
-# dhcp on all ens* interfaces
-
-cat | sudo tee /etc/cloud/cloud.cfg.d/10_network_config.cfg <<EOF
-network:
-  version: 2
-  ethernets:
-    id0:
-      match:
-        name: ens*
-      dhcp4: true
-EOF
-
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh

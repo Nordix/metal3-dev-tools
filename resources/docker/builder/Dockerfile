@@ -11,7 +11,8 @@ RUN cd /src && pip install --no-cache-dir --root=/app .
 # Builder image
 FROM python:3.7-alpine
 
-RUN apk add --update --no-cache git bash wget openssl jq curl wget && \
+RUN apk add --update --no-cache git bash wget openssl \
+    jq curl wget gettext openssh && \
     mkdir /data && \
     apk --update add --no-cache --virtual build-dependencies \
     gcc \

@@ -10,6 +10,7 @@
 # in the following environment variables.
 #   RT_USER: artifactory user name.
 #   RT_TOKEN: artifactory password or api token
+#   RT_URL: Artifactory URL
 #
 # Usage:
 #   rt_upload_artifact <src_file_path> <dest_file_path> <anonymous:0/1>
