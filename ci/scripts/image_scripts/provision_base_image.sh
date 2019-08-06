@@ -38,6 +38,8 @@ sudo apt install -y \
 "${SCRIPTS_DIR}"/setup_qemu_ubuntu.sh
 
 # Perform security hardening.
+"${SCRIPTS_DIR}"/hardening_base_image.sh
+
 
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
