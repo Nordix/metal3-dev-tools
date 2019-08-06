@@ -30,7 +30,7 @@ lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
 		-v "${CURDIR}:/data" \
 		-v "${lint_folder}:/lintdata" \
 		${NAME}-md-lint \
-		mdl -s configs/linter/.mdstylerc.rb "/lintdata";
+		mdl -s configs/linter/.mdstylerc.rb "/lintdata"
 
 .PHONY: build-lint-md
 build-lint-md: ## Build Docker Image for markdown lint
@@ -57,3 +57,17 @@ lint-shell: ## Lint shell scripts (ex: make lint-shell or make lint-shell lint_f
 		-v "${lint_folder}:/data" \
 		${SHELLCHECK_IMAGE} \
 		sh /mnt/scripts/shell-linter.sh
+
+.PHONY: build-lint-go
+build-lint-go: ## Build Docker Image for go lint
+	docker build \
+		-t ${NAME}-go-lint \
+		-f resources/docker/linter/golang/Dockerfile .
+
+.PHONY: lint-go
+lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_folder=abspath)
+	docker run --rm -it \
+		-v "${CURDIR}:/mnt" \
+		-v "${lint_folder}:/data" \
+		${NAME}-go-lint \
+		sh /mnt/scripts/go-linter.sh
