@@ -9,9 +9,12 @@ set -eu
 #   Requires:
 #     - source stackrc file
 #     - openstack dev infra should already be deployed.
-#
+#     - environment variables set:
+#       - AIRSHIP_CI_USER: Ci user for jumphost.
+#       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
+#       - RT_URL: artifactory URL.
 # Usage:
-#  update_dev_jumphost_users.sh
+#  create_or_update_dev_jumphost.sh
 #
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
@@ -26,7 +29,6 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
-JUMPOST_INT_PORT_NAME="${DEV_JUMPHOST_NAME}-int-port"
 JUMPOST_EXT_PORT_NAME="${DEV_JUMPHOST_NAME}-ext-port"
 JUMPHOST_FLAVOR="4C-16GB-50GB"
 
@@ -43,18 +45,26 @@ then
 else
 
   # Cleanup any stale ports
+  echo "Cleaning up networking."
   delete_port "${JUMPOST_EXT_PORT_NAME}"
-  delete_port "${JUMPOST_INT_PORT_NAME}"
+
+  # Cleanup security group
+  delete_sg "${DEV_JUMPHOST_EXT_SG}"
+
+  #Create security group
+  echo "Creating new security group."
+  SG_ID="$(openstack security group create -f json "${DEV_JUMPHOST_EXT_SG}" | \
+    jq -r '.id')"
+  openstack security group rule create --ingress --description ssh \
+    --ethertype IPv4 --protocol tcp --dst-port 22 "${SG_ID}" > /dev/null
 
   # Create new ports
-  echo "Creating new jumphost ports."
-  INT_PORT_ID="$(openstack port create -f json \
-    --network "${DEV_INT_NET}" \
-    --fixed-ip subnet="$(get_subnet_name "${DEV_INT_NET}")" \
-    "${JUMPOST_INT_PORT_NAME}" | jq -r '.id')"
+  echo "Creating new jumphost port."
   EXT_PORT_ID="$(openstack port create -f json \
     --network "${DEV_EXT_NET}" \
     --fixed-ip subnet="$(get_subnet_name "${DEV_EXT_NET}")" \
+    --enable-port-security \
+    --security-group "${SG_ID}" \
     "${JUMPOST_EXT_PORT_NAME}" | jq -r '.id')"
 
   # Create new jumphost
@@ -63,7 +73,6 @@ else
     --image "${CI_JENKINS_IMAGE}" \
     --flavor "${JUMPHOST_FLAVOR}" \
     --port "${EXT_PORT_ID}" \
-    --port "${INT_PORT_ID}" \
     "${DEV_JUMPHOST_NAME}" | jq -r '.id')"
 fi
 

@@ -309,15 +309,13 @@ create_network_and_subnet() {
     "${NET_NAME}")"
 
   NET_ID="$(echo "${NET_INFO}" | jq -r '.id')"
-  GATEWAY_KEYWORD="$([ "${IS_EXTERNAL}" = 1 ] && echo "--gateway")" || true
-  GATEWAY="$([ "${IS_EXTERNAL}" = 1 ] && echo "${GATEWAY_IP}")" || true
 
   SUBNET_CMD="openstack subnet create -f json\
     --subnet-range ${CIDR} \
     --dhcp \
     --ip-version 4 \
     --network ${NET_ID} \
-    ${GATEWAY_KEYWORD} ${GATEWAY} \
+    --gateway ${GATEWAY_IP} \
     --allocation-pool start=${START_IP},end=${END_IP} \
     ${SUBNET_NAME}"
 
@@ -508,4 +506,17 @@ wait_for_ssh() {
   done
 
   echo "SSH connection to host[${SERVER}] is up."
+}
+
+# Description:
+# Deletes an openstack security group.
+#
+# Usage: delete_sg <sg_name_or_id>
+#
+delete_sg() {
+  local SG
+
+  SG="${1:?}"
+
+  openstack security group delete "${SG}" > /dev/null 2>&1 || true
 }

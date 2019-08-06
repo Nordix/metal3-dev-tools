@@ -34,6 +34,5 @@ popd
 
 rm -rf "${M3_DENV_PATH}"
 
-
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
