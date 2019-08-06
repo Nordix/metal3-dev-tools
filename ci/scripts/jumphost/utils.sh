@@ -1,5 +1,15 @@
 #! /usr/bin/env bash
 
+# Description:
+# Get the public ip of dev jumphost.
+#
+# Requires:
+#   - source stackrc file.
+#   - Dev jumphost should already be deployed.
+#
+# Usage:
+#  update_dev_jumphost_users.sh
+#
 get_dev_jumphost_public_ip() {
 
   FLOATING_IP_ADDRESS="$(openstack floating ip list -f json \

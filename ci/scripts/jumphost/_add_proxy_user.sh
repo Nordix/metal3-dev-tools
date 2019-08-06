@@ -2,6 +2,19 @@
 
 set -eu
 
+# Description:
+# Adds or updates User on Jumphost. This script is executed on
+# the same machine where user needs to be added and it is invoked by
+# add_jumphost_user.sh script . It performs following actions for the user.
+# - Adds a group for Proxy users if not present
+# - Add SSH configuration for proxy user's group.
+# - Adds the user if not already present.
+# - Overwrites any existing authorized keys for user.
+#
+# Usage:
+#   _add_proxy_user.sh <user_name> <file_path_containing_all_user_keys>
+#
+
 PROXY_USER="${1:?}"
 PROXY_USER_AUTHORIZED_KEYS_PATH="${2:?}"
 

@@ -2,6 +2,16 @@
 
 set -eux
 
+# Description:
+# Deletes User on Openstack Dev Jumphost.
+#
+# Requires:
+#  - source stackrc file
+#
+# Usage:
+#   dev_jumphost_user.sh <user_name>
+#
+
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"

@@ -2,6 +2,18 @@
 
 set -eu
 
+# Description:
+# Reads all the users and their keys from artifatory and
+# create or update those users' keys on dev jumphost.
+#
+# Requires:
+#   - Dev Jumphost should already be deployed.
+#
+# Usage:
+#  update_dev_jumphost_users.sh
+#
+
+
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 JUMPHOST_SCRIPTS_DIR="${CI_DIR}/scripts/jumphost"

@@ -2,6 +2,18 @@
 
 set -eu
 
+# Description:
+#   Creates or updates a dev jumphost in openstack environment
+#   and adds jumphost users on the jumphost fetching the user
+#   from artifactory.
+#   Requires:
+#     - source stackrc file
+#     - openstack dev infra should already be deployed.
+#
+# Usage:
+#  update_dev_jumphost_users.sh
+#
+
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
