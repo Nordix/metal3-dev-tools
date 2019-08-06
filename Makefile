@@ -20,9 +20,23 @@ setup-repos: ## Setup nordix repos
 update-repos: ## Update nordix repos
 	$(CURDIR)/scripts/update-nordix-repos-master.sh
 
+.PHONY: build-workspace
+build-workspace: ## Build Docker Image for workspace
+	docker build \
+		-t ${NAME}-workspace \
+		-f resources/docker/workspace/Dockerfile .
+
 .PHONY: workspace
 workspace: ## Create and execute dev workspace for nordix repos
-	$(CURDIR)/container/run-workspace.sh
+	docker run \
+		--rm -it \
+		--name workspace
+		--network host \
+		-v "${CURDIR}:/data" \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v "${HOME}"/.kube/:/root/.kube \
+		-v "${HOME}"/.minikube:"${HOME}"/.minikube \
+		${NAME}-workspace
 
 .PHONY: lint-md
 lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
@@ -34,11 +48,15 @@ lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
 
 .PHONY: build-lint-md
 build-lint-md: ## Build Docker Image for markdown lint
-	docker build -t ${NAME}-md-lint -f resources/docker/linter/Dockerfile resources/docker/linter
+	docker build \
+		-t ${NAME}-md-lint \
+		-f resources/docker/linter/Dockerfile .
 
 .PHONY: build-image-builder
 build-image-builder: ## Build Docker Image for qcow2 image building
-	docker build -t image-builder -f resources/docker/builder/Dockerfile resources/docker/builder
+	docker build \
+		-t image-builder \
+		-f resources/docker/builder/Dockerfile .
 
 .PHONY: push-image-builder
 push-image-builder: ## Build Docker Image for qcow2 image building
@@ -66,7 +84,7 @@ build-lint-go: ## Build Docker Image for go lint
 
 .PHONY: lint-go
 lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_folder=abspath)
-	docker run --rm -it \
+	docker run --rm \
 		-v "${CURDIR}:/mnt" \
 		-v "${lint_folder}:/data" \
 		${NAME}-go-lint \
