@@ -56,15 +56,12 @@ build-lint-md: ## Build Docker Image for markdown lint
 build-image-builder: ## Build Docker Image for qcow2 image building
 	docker build \
 		-t image-builder \
-		-f resources/docker/builder/Dockerfile .
+		-f resources/docker/builder/Dockerfile resources/docker/builder/
 
 .PHONY: push-image-builder
 push-image-builder: ## Build Docker Image for qcow2 image building
 	docker tag image-builder registry.nordix.org/airship/image-builder
 	docker push registry.nordix.org/airship/image-builder
-	docker build \
-		-t ${NAME}-md-lint \
-		-f resources/docker/linter/Dockerfile .
 
 SHELLCHECK_VERSION := "v0.7.0"
 SHELLCHECK_IMAGE := "koalaman/shellcheck-alpine:${SHELLCHECK_VERSION}"
