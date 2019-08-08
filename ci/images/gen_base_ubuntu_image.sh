@@ -7,7 +7,7 @@ USE_FLOATING_IP="${2:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
-SCRIPTS_DIR="${CI_DIR}/scripts"
+SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 
 # shellcheck disable=SC1090
@@ -24,7 +24,7 @@ SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/scripts/provision_base_image.sh"
+REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_base_image.sh"
 
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
 render_user_data \

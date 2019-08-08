@@ -19,9 +19,6 @@ create_router "${EXT_NET}" "${CI_ROUTER_NAME}"
 # Create CI External Network
 create_external_net "${CI_EXT_SUBNET_CIDR}" "${CI_ROUTER_NAME}" "${CI_EXT_NET}"
 
-# Create CI Internal Network
-create_network_and_subnet "${CI_INT_SUBNET_CIDR}" 0 "${CI_INT_NET}"
-
 # Create CI Keypair
 CI_PUBLIC_KEY_FILE="${SCRIPTPATH}/id_rsa_airshipci.pub"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${CI_KEYPAIR_NAME}"

@@ -13,9 +13,6 @@ source "${SCRIPTPATH}/utils.sh"
 # Delete DEV Openstack Infrastructure
 # ===================================
 
-# Delete Internal Networks and associated resources(Subnets and Ports)
-delete_network "${DEV_INT_NET}"
-
 # Delete External Networks and associated resources(Subnets and Ports)
 delete_network "${DEV_EXT_NET}"
 
