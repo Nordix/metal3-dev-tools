@@ -7,7 +7,12 @@ set -eu
 # create or update those users' keys on dev jumphost.
 #
 # Requires:
-#   - Dev Jumphost should already be deployed.
+#     - source stackrc file
+#     - openstack dev infra and jumphost should already be deployed.
+#     - environment variables set:
+#       - AIRSHIP_CI_USER: Ci user for jumphost.
+#       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
+#       - RT_URL: artifactory URL.
 #
 # Usage:
 #  update_dev_jumphost_users.sh

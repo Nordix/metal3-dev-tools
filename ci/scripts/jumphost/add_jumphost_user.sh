@@ -6,6 +6,12 @@ set -eu
 # Adds New User on Openstack Dev Jumphost. This script
 # is executed remotely to connect to the jumphost and
 # add user on it.
+#   Requires:
+#     - source stackrc file
+#     - openstack dev infra and jumphost should already be deployed.
+#     - environment variables set:
+#       - AIRSHIP_CI_USER: Ci user for jumphost.
+#       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
 #
 # Usage:
 #   add_jumphost_user.sh <user_name> <file_path_containing_all_user_keys>
