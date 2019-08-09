@@ -15,8 +15,18 @@ FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE:-true}"
 
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 
+#Install Operator SDK
+OSDK_RELEASE_VERSION=v0.10.0
+curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OSDK_RELEASE_VERSION}/operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
+chmod +x operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
+sudo mkdir -p /usr/local/bin/
+sudo cp operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
+rm operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
+
+
 sudo apt install -y git
 
+# Install metal3 requirements
 mkdir -p "${M3_DENV_ROOT}"
 if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
   sudo rm -rf "${M3_DENV_PATH}"
