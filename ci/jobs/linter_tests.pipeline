@@ -1,0 +1,73 @@
+ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
+ci_git_branch = "master"
+ci_git_credential_id = "nordixinfra-github-token"
+
+
+git_url = "https://github.com/${PROJECT_REPO_ORG}/${PROJECT_REPO_NAME}.git"
+git_branch = "${ghprbActualCommit}"
+git_credential_id = "nordixinfra-github-token"
+
+pipeline {
+  agent { label 'airship-static-workers' }
+  stages {
+    stage('SCM') {
+      steps {
+        sh 'echo "hello world"'
+
+        /* Checkout CI Repo */
+        checkout([$class: 'GitSCM',
+                 branches: [[name: ci_git_branch]],
+                 doGenerateSubmoduleConfigurations: false,
+                 extensions: [[$class: 'WipeWorkspace'],
+                 [$class: 'CleanCheckout'],
+                 [$class: 'CleanBeforeCheckout']],
+                 submoduleCfg: [],
+                 userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                 url: ci_git_url]]])
+
+        /* Checkout Target Repo in subdirectory */
+        checkout([$class: 'GitSCM',
+                 branches: [[name: git_branch]],
+                 doGenerateSubmoduleConfigurations: false,
+                 extensions: [[$class: 'WipeWorkspace'],
+                 [$class: 'CleanCheckout'],
+                 [$class: 'CleanBeforeCheckout'],
+                 [$class: 'RelativeTargetDirectory', relativeTargetDir: PROJECT_REPO_NAME]],
+                 submoduleCfg: [],
+                 userRemoteConfigs: [[credentialsId: git_credential_id,
+                 url: git_url]]])
+      }
+    }
+
+    /* TODO: Remove Building when containers are available in registry  */
+    stage('Build Linter containers') {
+      steps {
+
+        sh 'sudo apt install -y make'
+        sh 'make build-lint-md'
+        sh 'make build-lint-go'
+      }
+    }
+
+   /* Run Linters */
+   /* =========== */
+    stage('Lint MD') {
+      steps {
+        sh "make lint-md lint_foler=${PROJECT_REPO_NAME}"
+      }
+    }
+    stage('Lint Go') {
+      steps {
+
+        sh "make lint-go lint_foler=${PROJECT_REPO_NAME}"
+      }
+    }
+    stage('Lint Shell') {
+      steps {
+
+        sh "make lint-shell lint_foler=${PROJECT_REPO_NAME}"
+
+      }
+    }
+  }
+}
