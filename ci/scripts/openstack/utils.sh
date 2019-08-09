@@ -289,12 +289,11 @@ delete_network() {
 #
 create_network_and_subnet() {
 
-  local CIDR NET_NAME SUBNET_NAME IS_EXTERNAL NET_INFO
-  local GATEWAY_IP START_IP END_IP NET_ID GATEWAY_KEYWORD GATEWAY
+  local CIDR NET_NAME SUBNET_NAME NET_INFO
+  local GATEWAY_IP START_IP END_IP NET_ID
   local SUBNET_INFO SUBNET_ID
 
   CIDR="${1:?}"
-  IS_EXTERNAL="${2:?}"
   NET_NAME="${3:?}"
 
   SUBNET_NAME="$(get_subnet_name "${NET_NAME}")"
@@ -344,7 +343,7 @@ create_external_net() {
   PORT_NAME="$(get_external_port_name "${NET_NAME}")"
   GATEWAY_IP="$(get_gateway_ip_from_cidr "${CIDR}")"
 
-  NET_INFO="$(create_network_and_subnet "${CIDR}" 1 "${NET_NAME}")"
+  NET_INFO="$(create_network_and_subnet "${CIDR}" "${NET_NAME}")"
 
   NET_ID="$(echo "${NET_INFO}" | cut -d' ' -f1)"
   SUBNET_ID="$(echo "${NET_INFO}" | cut -d' ' -f2)"
