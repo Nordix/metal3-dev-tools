@@ -14,7 +14,6 @@ set -eu
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
-JUMPHOST_SCRIPTS_DIR="${CI_DIR}/scripts/jumphost"
 
 # shellcheck disable=SC1090
 source "${RT_SCRIPTS_DIR}/utils.sh"
@@ -24,7 +23,6 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 JUMPOST_EXT_PORT_NAME="${DEV_JUMPHOST_NAME}-ext-port"
-JUMPHOST_FLAVOR="4C-16GB-50GB"
 
 # Get the jumphost ID
 JUMPHOST_SERVER_ID="$(openstack server list --name "${DEV_JUMPHOST_NAME}" -f json \
