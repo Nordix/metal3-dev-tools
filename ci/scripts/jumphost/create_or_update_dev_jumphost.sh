@@ -30,7 +30,7 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 JUMPOST_EXT_PORT_NAME="${DEV_JUMPHOST_NAME}-ext-port"
-JUMPHOST_FLAVOR="4C-16GB-50GB"
+JUMPHOST_FLAVOR="1C-2GB-50GB"
 
 # Create or rebuild jumphost image
 JUMPHOST_SERVER_ID="$(openstack server list --name "${DEV_JUMPHOST_NAME}" -f json \
