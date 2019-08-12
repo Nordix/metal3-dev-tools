@@ -304,7 +304,7 @@ create_network_and_subnet() {
   NET_INFO="$(openstack network create -f json\
     --enable \
     --description "${NET_NAME}" \
-    --disable-port-security \
+    --enable-port-security \
     "${NET_NAME}")"
 
   NET_ID="$(echo "${NET_INFO}" | jq -r '.id')"
