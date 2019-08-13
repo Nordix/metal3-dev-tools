@@ -7,7 +7,7 @@ pipeline {
               sh 'echo "Hello world"'
           }
       }
-      stage('Example Test') {
+      stage('Example Test Stage') {
           steps {
               echo 'Hello, Harry'
               sh 'env'
