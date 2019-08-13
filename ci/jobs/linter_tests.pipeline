@@ -12,8 +12,6 @@ pipeline {
   stages {
     stage('SCM') {
       steps {
-        sh 'echo "hello world"'
-
         /* Checkout CI Repo */
         checkout([$class: 'GitSCM',
                  branches: [[name: ci_git_branch]],
