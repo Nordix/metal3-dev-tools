@@ -31,7 +31,7 @@ TEST_EXECUTER_PORT_NAME="${TEST_EXECUTER_PORT_NAME:-${TEST_EXECUTER_VM_NAME}-int
 TEST_EXECUTER_FLAVOR="${TEST_EXECUTER_FLAVOR:-4C-16GB-50GB}"
 
 METAL3REPO="${METAL3REPO:-https://github.com/metal3-io/metal3-dev-env.git}"
-METAL3_BRANCH="${METAL3_BRANCH:-master}"
+METAL3BRANCH="${METAL3BRANCH:-master}"
 BMOREPO="${BMOREPO:-https://github.com/metal3-io/baremetal-operator.git}"
 BMOBRANCH="${BMOBRANCH:-master}"
 CAPBMREPO="${CAPBMREPO:-https://github.com/metal3-io/cluster-api-provider-baremetal.git}"
@@ -77,5 +77,5 @@ ssh \
   -o UserKnownHostsFile=/dev/null \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${TEST_EXECUTER_IP}" \
-  /tmp/run_integration_tests.sh "${METAL3REPO}" "${METAL3_BRANCH}" \
+  /tmp/run_integration_tests.sh "${METAL3REPO}" "${METAL3BRANCH}" \
   "${BMOREPO}" "${BMOBRANCH}" "${CAPBMREPO}" "${CAPBMBRANCH}"
