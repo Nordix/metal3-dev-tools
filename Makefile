@@ -4,6 +4,12 @@ NAME    := ${PROJECT}-${APP}
 
 lint_folder ?= $(CURDIR)
 
+image_registry        := registry.nordix.org
+workspace_img_ver     := v1.0
+lint_md_img_ver       := v1.0
+lint_go_img_ver       := v1.0
+image_builder_img_ver := v1.0
+
 .DEFAULT_HELP := help
 .PHONY: help
 help:
@@ -12,12 +18,12 @@ help:
 	@echo "--------------------------------------------------------------------"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: setup-repos
-setup-repos: ## Setup nordix repos
+.PHONY: setup-local-repos
+setup-local-repos: ## Setup nordix repos
 	$(CURDIR)/scripts/init-repo.sh
 
-.PHONY: update-repos
-update-repos: ## Update nordix repos
+.PHONY: update-remote-repos
+update-remote-repos: ## Update nordix repos
 	$(CURDIR)/scripts/update-nordix-repos-master.sh
 
 .PHONY: build-workspace
@@ -26,24 +32,29 @@ build-workspace: ## Build Docker Image for workspace
 		-t ${NAME}-workspace \
 		-f resources/docker/workspace/Dockerfile .
 
+.PHONY: push-workspace
+push-workspace: ## Push Docker Image for Workspace to nordix registry
+	docker tag ${NAME}-workspace:latest ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
+	docker push ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
+
 .PHONY: workspace
 workspace: ## Create and execute dev workspace for nordix repos
 	docker run \
 		--rm -it \
-		--name workspace
+		--name workspace \
 		--network host \
 		-v "${CURDIR}:/data" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v "${HOME}"/.kube/:/root/.kube \
 		-v "${HOME}"/.minikube:"${HOME}"/.minikube \
-		${NAME}-workspace
+		${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: lint-md
 lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
 	docker run --rm \
 		-v "${CURDIR}:/data" \
 		-v "${lint_folder}:/lintdata" \
-		${NAME}-md-lint \
+		${image_registry}/airship/${NAME}-md-lint:${lint_md_img_ver} \
 		mdl -s configs/linter/.mdstylerc.rb "/lintdata"
 
 .PHONY: build-lint-md
@@ -52,6 +63,11 @@ build-lint-md: ## Build Docker Image for markdown lint
 		-t ${NAME}-md-lint \
 		-f resources/docker/linter/Dockerfile .
 
+.PHONY: push-lint-md
+push-lint-md: ## Push Docker Image for Lint markdown to nordix registry
+	docker tag ${NAME}-md-lint:latest ${image_registry}/airship/${NAME}-md-lint:${lint_md_img_ver}
+	docker push ${image_registry}/airship/${NAME}-md-lint:${lint_md_img_ver}
+
 .PHONY: build-image-builder
 build-image-builder: ## Build Docker Image for qcow2 image building
 	docker build \
@@ -59,9 +75,9 @@ build-image-builder: ## Build Docker Image for qcow2 image building
 		-f resources/docker/builder/Dockerfile resources/docker/builder/
 
 .PHONY: push-image-builder
-push-image-builder: ## Build Docker Image for qcow2 image building
-	docker tag image-builder registry.nordix.org/airship/image-builder
-	docker push registry.nordix.org/airship/image-builder
+push-image-builder: ## Push Docker Image for qcow2 image building to nordix registry
+	docker tag image-builder:latest ${image_registry}/airship/image-builder:${image_builder_img_ver}
+	docker push ${image_registry}/airship/image-builder:${image_builder_img_ver}
 
 SHELLCHECK_VERSION := "v0.7.0"
 SHELLCHECK_IMAGE := "koalaman/shellcheck-alpine:${SHELLCHECK_VERSION}"
@@ -79,10 +95,15 @@ build-lint-go: ## Build Docker Image for go lint
 		-t ${NAME}-go-lint \
 		-f resources/docker/linter/golang/Dockerfile .
 
+.PHONY: push-lint-go
+push-lint-go: ## Push Docker Image for Lint go to nordix registry
+	docker tag ${NAME}-go-lint:latest ${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver}
+	docker push ${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver}
+
 .PHONY: lint-go
 lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_folder=abspath)
 	docker run --rm \
 		-v "${CURDIR}:/mnt" \
 		-v "${lint_folder}:/data" \
-		${NAME}-go-lint \
+		${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver} \
 		sh /mnt/scripts/go-linter.sh
