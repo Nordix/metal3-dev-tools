@@ -9,8 +9,14 @@ git_credential_id = "nordixinfra-github-token"
 
 pipeline {
   agent { label 'airship-static-workers' }
+  environment {
+      CURRENT_DIR = sh (
+          script: 'pwd',
+          returnStdout: true
+          ).trim()
+  }
   stages {
-    stage('SCM') {
+   stage('SCM') {
       steps {
         /* Checkout CI Repo */
         checkout([$class: 'GitSCM',
@@ -49,29 +55,25 @@ pipeline {
 
    /* Run Linters */
    /* =========== */
-    CURRENT_DIR = sh (
-      script: 'pwd',
-      returnStdout: true
-    ).trim()
 
     stage('Lint MD') {
       steps {
 
-        sh "make lint-md lint_folder=$CURRENT_DIR/${PROJECT_REPO_NAME}"
+        sh "make lint-md lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
 
       }
     }
     stage('Lint Go') {
       steps {
 
-        sh "make lint-go lint_folder=$CURRENT_DIR/${PROJECT_REPO_NAME}"
+        sh "make lint-go lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
 
       }
     }
     stage('Lint Shell') {
       steps {
 
-        sh "make lint-shell lint_folder=$CURRENT_DIR/${PROJECT_REPO_NAME}"
+        sh "make lint-shell lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
 
       }
     }
