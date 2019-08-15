@@ -21,7 +21,6 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
-TEST_EXECUTER_VM_NAME="${TEST_EXECUTER_VM_NAME:-ci-int-tests-vm}"
 TEST_EXECUTER_PORT_NAME="${TEST_EXECUTER_PORT_NAME:-${TEST_EXECUTER_VM_NAME}-int-port}"
 
 # Delete executer vm

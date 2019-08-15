@@ -111,3 +111,11 @@ lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_fol
 .PHONY: run-dev-env
 run-dev-env: ## Create or start the metal3 dev env vm
 	$(CURDIR)/scripts/run_metal3_vm.sh
+
+.PHONY: integration_test
+integration_test: ## Run integration test
+	$(CURDIR)/ci/scripts/tests/integration_test.sh
+
+.PHONY: integration_test_cleanup 
+integration_test_cleanup: ## Clean integration test setup
+	$(CURDIR)/ci/scripts/tests/integration_delete.sh

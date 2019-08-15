@@ -14,3 +14,4 @@ git clone "${METAL3REPO}" metal3
 pushd metal3
 git checkout "${METAL3BRANCH}"
 make
+make test
