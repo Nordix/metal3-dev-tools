@@ -16,7 +16,7 @@ Some environment variables need to be set
 - RT_TOKEN: Artifactory token
 - RT_URL: Artifactory URL
 
-### Key managerment usage
+### Key management usage
 
    ```bash
      add_user_key.sh <user_name> <user_key_name> <user_public_key>

@@ -10,13 +10,13 @@ git_credential_id = "nordixinfra-github-token"
 pipeline {
   agent { label 'airship-static-workers' }
   environment {
-      CURRENT_DIR = sh (
-          script: 'pwd',
-          returnStdout: true
-          ).trim()
+    CURRENT_DIR = sh (
+                      script: 'pwd',
+                      returnStdout: true
+                     ).trim()
   }
   stages {
-   stage('SCM') {
+    stage('SCM') {
       steps {
         /* Checkout CI Repo */
         checkout([$class: 'GitSCM',
