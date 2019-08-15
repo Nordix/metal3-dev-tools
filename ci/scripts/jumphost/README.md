@@ -12,42 +12,43 @@ script
 
 Some environment variables need to be set
 
- - RT_USER: Artifactory username
- - RT_TOKEN: Artifactory token
- - RT_URL: Artifactory URL
+- RT_USER: Artifactory username
+- RT_TOKEN: Artifactory token
+- RT_URL: Artifactory URL
 
+### Key managerment usage
 
-### Usage:
-
-   add_user_key.sh <user_name> <user_key_name> <user_public_key>
+   ```bash
+     add_user_key.sh <user_name> <user_key_name> <user_public_key>
+   ```
 
 The public key should be given as content, not as a file.
 
 ## Create the Jumphost
 
-### Requirements
+### Create requirements
 
 Some environment variables need to be set
 
- - RT_URL: Artifactory URL
- - AIRSHIP_CI_USER: CI username for the jumphost
- - AIRSHIP_CI_USER_KEY: CI user private key path
+- RT_URL: Artifactory URL
+- AIRSHIP_CI_USER: CI username for the jumphost
+- AIRSHIP_CI_USER_KEY: CI user private key path
 
-### Usage
+### Creation Usage
 
    ./create_or_update_dev_jumphost.sh
 
 ## Update the Jumphost
 
-### Requirements
+### Update requirements
 
 Some environment variables need to be set
 
- - RT_URL: Artifactory URL
- - AIRSHIP_CI_USER: CI username for the jumphost
- - AIRSHIP_CI_USER_KEY: CI user private key path
+- RT_URL: Artifactory URL
+- AIRSHIP_CI_USER: CI username for the jumphost
+- AIRSHIP_CI_USER_KEY: CI user private key path
 
-### Usage
+### Update usage
 
   ./create_or_update_dev_jumphost.sh
 
@@ -57,14 +58,14 @@ Some environment variables need to be set
 
 ## Update the user keys on the jumphost
 
-### Requirements
+### Delete requirements
 
 Some environment variables need to be set
 
- - RT_URL: Artifactory URL
- - AIRSHIP_CI_USER: CI username for the jumphost
- - AIRSHIP_CI_USER_KEY: CI user private key path
+- RT_URL: Artifactory URL
+- AIRSHIP_CI_USER: CI username for the jumphost
+- AIRSHIP_CI_USER_KEY: CI user private key path
 
-### Usage
+### Delete usage
 
    ./update_dev_jumphost_users.sh
