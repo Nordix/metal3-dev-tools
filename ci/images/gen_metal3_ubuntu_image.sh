@@ -37,6 +37,10 @@ render_user_data \
 STARTER_SCRIPT_PATH="/tmp/build_starter.sh"
 echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
 
+# Create CI Keypair
+CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
+create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
+
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
