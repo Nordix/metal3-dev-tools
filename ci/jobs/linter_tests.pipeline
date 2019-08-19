@@ -10,6 +10,7 @@ git_credential_id = "nordixinfra-github-token"
 pipeline {
   agent { label 'airship-static-workers' }
   environment {
+    build_ok = true
     CURRENT_DIR = sh (
                       script: 'pwd',
                       returnStdout: true
@@ -58,23 +59,43 @@ pipeline {
 
     stage('Lint MD') {
       steps {
-
-        sh "make lint-md lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
-
+        script {
+          try{ 
+            sh "make lint-md lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
+          }   catch(e) {
+            build_ok = false
+            echo e.toString()
+          }
+        }
       }
     }
     stage('Lint Go') {
       steps {
-
-        sh "make lint-go lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
-
+        script {
+          try{
+            sh "make lint-go lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
+          }   catch(e) {
+            build_ok = false
+            echo e.toString()
+          }
+        }
       }
     }
     stage('Lint Shell') {
       steps {
-
-        sh "make lint-shell lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
-
+        script {
+          try {
+            sh "make lint-shell lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
+          }   catch(e) {
+            build_ok = false
+            echo e.toString()
+          }
+          if(build_ok) {
+            currentBuild.result = "SUCCESS"
+          } else {
+            currentBuild.result = "FAILURE"
+          }
+        }
       }
     }
   }
