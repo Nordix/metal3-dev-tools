@@ -44,5 +44,7 @@ popd
 
 rm -rf "${M3_DENV_PATH}"
 
+sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
+
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
