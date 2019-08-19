@@ -41,18 +41,30 @@ A container image is available and contains all the tools to build the images
 
    ```bash
       docker run --rm -it -v "<path to airship-dev-tool repo>:/data"
-   -v "<path to ci keys folder>:/data/keys" image-builder /bin/bash
+   -v "<path to ci keys folder>:/data/keys" registry.nordix.org/airship/image-builder /bin/bash
    ```
 
 ### Calling the scripts
+
+First, you will need to source the OpenStack credentials file.
+
+   ```bash
+      source openstack.rc
+   ```
+
+Then set the correct environment variables:
+
+   ```bash
+      export AIRSHIP_CI_USER=airshipci
+      export AIRSHIP_CI_USER_KEY=/data/keys/id_rsa_airshipci
+      export RT_URL="https://artifactory.nordix.org/artifactory"
+   ```
 
 The building scripts take two arguments :
 
 * path: to airship CI private key relative in the container
 * boolean: Use a floating ip publicly accessible ( 0 or 1 )
 
-### Example
-
    ```bash
-   ./gen_base_ubuntu_image.sh /data/keys/id_rsa_airshipci 1
+   ./gen_<xxx>_ubuntu_image.sh /data/keys/id_rsa_airshipci 1
    ```
