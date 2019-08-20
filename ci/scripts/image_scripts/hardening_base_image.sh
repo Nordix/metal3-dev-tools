@@ -72,7 +72,7 @@ sudo apt-get -y autoremove
 # Add password policies
 echo auth sufficient pam_unix.so likeauth nullok | sudo tee -a "${COMMON_PASS_PATH}" > /dev/null
 echo password sufficient pam_unix.so remember=4 | sudo tee -a "${COMMON_PASS_PATH}" > /dev/null
-echo /lib/security/$ISA/pam_cracklib.so retry=3 minlen=8 lcredit=-1 ucredit=-2 dcredit=-2 ocredit=-1 | sudo tee -a "${SYSTEM_AUTH_PATH}" > /dev/null
+echo /lib/security/"$ISA"/pam_cracklib.so retry=3 minlen=8 lcredit=-1 ucredit=-2 dcredit=-2 ocredit=-1 | sudo tee -a "${SYSTEM_AUTH_PATH}" > /dev/null
 
 # Lock the account after five failed attempts
 cat << EOL | sudo tee -a "${COMMON_PASS_PATH}" > /dev/null
@@ -99,6 +99,8 @@ sudo sed -i '/^PASS_MAX_DAYS/ c\PASS_MAX_DAYS\t90' /etc/login.defs
 
 
 # Disable the system accounts for non-root users
+
+# shellcheck disable=SC2013
 for user in $(awk -F: '($3 < 500) {print $1 }' /etc/passwd); do
   if [ "$user" != "root" ]; then
     sudo /usr/sbin/usermod -L "$user"
