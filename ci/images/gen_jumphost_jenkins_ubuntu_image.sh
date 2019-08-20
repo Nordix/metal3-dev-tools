@@ -39,12 +39,8 @@ echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
 
 # Create CI Keypair
 CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
-if [ -f "$CI_PUBLIC_KEY_FILE" ]
-then
-        echo "$CI_PUBLIC_KEY_FILE already exists. Excisting key will be used"
-else
-        create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
-fi
+delete_keypair "${SSH_KEYPAIR_NAME}"
+create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
 # Build Image
 packer build \
