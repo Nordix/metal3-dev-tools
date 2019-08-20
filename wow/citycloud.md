@@ -35,7 +35,7 @@ In order to access the dev VMs ( 10.101.10.* or 10.201.10.* ), the SSH traffic
 needs to go through the jumphost. If you want to SSH to the jumphost itself,
 please use the airshipci account with the correct SSH key.
 
-Replace <user> by your username in the following script
+Replace user by your username in the following script
 
 ```bash
 Host dev_jumphost
