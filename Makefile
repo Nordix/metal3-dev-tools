@@ -107,3 +107,7 @@ lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_fol
 		-v "${lint_folder}:/data" \
 		${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver} \
 		sh /mnt/scripts/go-linter.sh
+
+.PHONY: run-dev-env
+run-dev-env: ## Create or start the metal3 dev env vm
+	$(CURDIR)/scripts/run_metal3_vm.sh

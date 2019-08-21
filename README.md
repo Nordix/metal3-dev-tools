@@ -14,6 +14,22 @@ make setup-repos
 make update-repos
 ```
 
+## Run the metal3 dev env
+
+First, make sure that hardware virtualization is enabled, then you need to
+source your Openstack credentials
+
+```sh
+source openstack.rc
+```
+
+Then run
+
+```sh
+make run-dev-env
+```
+
+
 ## Run a development container
 
 ```sh
