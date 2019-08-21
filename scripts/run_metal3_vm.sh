@@ -1,17 +1,19 @@
 #!/bin/bash
 set -uex
 
-echo "Setting up SSH keys"
+
+SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
 WORK_DIR=/opt/metal3
 sudo mkdir -p "$WORK_DIR"
 sudo chown -R "${USER}:${USER}" "$WORK_DIR"
 
+echo "Setting up SSH keys"
 mkdir -p ~/.ssh
 if [[ ! -f ~/.ssh/metal3 ]]; then
   ssh-keygen -q -N "" -f ~/.ssh/metal3
 fi
-cp files/ubuntu-metal3-config.yaml.tpl "$WORK_DIR/ubuntu-metal3-config.yaml"
+cp "${SCRIPTPATH}/files/ubuntu-metal3-config.yaml.tpl" "$WORK_DIR/ubuntu-metal3-config.yaml"
 sed -i '/    ssh-authorized-keys:/!b;n;c\      - '"$(cat ~/.ssh/metal3.pub)" "$WORK_DIR/ubuntu-metal3-config.yaml"
 
 echo "Downloading Metal3 if needed"
