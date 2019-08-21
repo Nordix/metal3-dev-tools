@@ -29,6 +29,25 @@ Then run
 make run-dev-env
 ```
 
+If you hit an issue about the default network, saying that it is already in use
+by ens2, you need to modify the file /etc/libvirt/qemu/networks/default.xml
+to change the CIDR to not use the same CIDR as ens2 or any other interface.
+Then run
+
+```sh
+sudo virsh net-define /etc/libvirt/qemu/networks/default.xml
+sudo virsh net-start default
+```
+
+Then you can set up the environment :
+
+```sh
+git clone https://github.com/metal3-io/metal3-dev-env.git
+export CONTAINER_RUNTIME=docker
+cd metal3-dev-env
+make
+```
+
 
 ## Run a development container
 
