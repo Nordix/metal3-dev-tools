@@ -1,0 +1,65 @@
+ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
+ci_git_branch = "master"
+ci_git_credential_id = "nordixinfra-github-token"
+
+
+git_url = "https://github.com/${PROJECT_REPO_ORG}/${PROJECT_REPO_NAME}.git"
+git_credential_id = "nordixinfra-github-token"
+git_branch = "${ghprbActualCommit}"
+
+script {
+  repoMap = ["baremetal-operator": "github.com/metal3-io/baremetal-operator", "cluster-api-provider-baremetal":"github.com/metal3-io/cluster-api-provider-baremetal"]
+  REPO_PATH = repoMap["${PROJECT_REPO_NAME}"]
+}
+
+
+pipeline {
+  agent { label 'airship-static-workers' }
+  environment {
+    build_ok = true
+    CURRENT_DIR = sh (
+                      script: 'pwd',
+                      returnStdout: true
+                     ).trim()
+
+    REPO_PATH = "${REPO_PATH}"
+    REPO_NAME = "${PROJECT_REPO_NAME}"
+    MAKE_CMD = "test"
+  }
+  stages {
+    stage('SCM') {
+      steps {
+        /* Checkout CI Repo */
+        checkout([$class: 'GitSCM',
+                 branches: [[name: ci_git_branch]],
+                 doGenerateSubmoduleConfigurations: false,
+                 extensions: [[$class: 'WipeWorkspace'],
+                 [$class: 'CleanCheckout'],
+                 [$class: 'CleanBeforeCheckout']],
+                 submoduleCfg: [],
+                 userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                 url: ci_git_url]]])
+
+        /* Checkout Target Repo in subdirectory */
+        checkout([$class: 'GitSCM',
+                 branches: [[name: git_branch]],
+                 doGenerateSubmoduleConfigurations: false,
+                 extensions: [[$class: 'WipeWorkspace'],
+                 [$class: 'CleanCheckout'],
+                 [$class: 'CleanBeforeCheckout'],
+                 [$class: 'RelativeTargetDirectory', relativeTargetDir: PROJECT_REPO_NAME]],
+                 submoduleCfg: [],
+                 userRemoteConfigs: [[credentialsId: git_credential_id,
+                 url: git_url]]])
+      }
+    }
+
+    /* Run unit test for go code in the repo*/
+    stage('Run unit test') {
+      steps {
+
+        sh 'make test'
+      }
+    }
+  }
+}

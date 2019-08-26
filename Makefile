@@ -8,7 +8,9 @@ image_registry        := registry.nordix.org
 workspace_img_ver     := v1.0
 lint_md_img_ver       := v1.0
 lint_go_img_ver       := v1.0
+gotest_unit_img_ver   := v1.0
 image_builder_img_ver := v1.0
+
 
 .DEFAULT_HELP := help
 .PHONY: help
@@ -79,6 +81,17 @@ push-image-builder: ## Push Docker Image for qcow2 image building to nordix regi
 	docker tag image-builder:latest ${image_registry}/airship/image-builder:${image_builder_img_ver}
 	docker push ${image_registry}/airship/image-builder:${image_builder_img_ver}
 
+.PHONY: build-go-unittest
+build-go-unittest: ## Build Docker Image for go unit test
+	docker build \
+		-t gotest-unit \
+		-f resources/docker/gotest/Dockerfile resources/docker/gotest/
+
+.PHONY: push-go-unittest
+push-go-unittest: ## Push Docker Image for go unit test to nordix registry
+	docker tag gotest-unit:latest ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
+	docker push ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
+
 SHELLCHECK_VERSION := "v0.7.0"
 SHELLCHECK_IMAGE := "koalaman/shellcheck-alpine:${SHELLCHECK_VERSION}"
 .PHONY: lint-shell
@@ -111,6 +124,13 @@ lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_fol
 .PHONY: run-dev-env
 run-dev-env: ## Create or start the metal3 dev env vm
 	$(CURDIR)/scripts/run_metal3_vm.sh
+
+.PHONY: test
+test: ## Run unit test for the code in repository
+	docker run --rm \
+                -v "${CURRENT_DIR}/${REPO_NAME}:/go/src/${REPO_PATH}" \
+		-w "/go/src/${REPO_PATH}" -e MAKE_CMD=${MAKE_CMD} -e REPO_NAME=${REPO_NAME} \
+		${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
 .PHONY: integration_test
 integration_test: ## Run integration test
