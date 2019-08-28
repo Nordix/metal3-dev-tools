@@ -35,7 +35,7 @@ TEST_EXECUTER_FLAVOR="${TEST_EXECUTER_FLAVOR:-4C-16GB-50GB}"
 REPO_ORG="${REPO_ORG:-metal3-io}"
 REPO_NAME="${REPO_NAME:-metal3-dev-env}"
 REPO_BRANCH="${REPO_BRANCH:-master}"
-UPDATED_REPO="https://github.com/${REPO_ORG}/${REPO_NAME}.git"
+UPDATED_REPO="${UPDATED_REPO:-https://github.com/${REPO_ORG}/${REPO_NAME}.git}"
 
 if [ "${REPO_NAME}" == "metal3-dev-env" ]
 then

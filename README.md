@@ -48,7 +48,6 @@ cd metal3-dev-env
 make
 ```
 
-
 ## Run a development container
 
 ```sh
