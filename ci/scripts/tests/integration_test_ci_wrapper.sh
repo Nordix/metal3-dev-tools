@@ -21,23 +21,29 @@
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 TESTS_SCRIPTS_DIR="${CI_DIR}/scripts/tests"
 
+echo "Setting status on Github PR"
 curl -H "Authorization: token ${GITHUB_PASSWORD}" -X POST \
 -d "{\"body\": \":revolving_hearts: Test pending : ${BUILD_URL}\", \
 \"event\": \"COMMENT\"}" \
-"https://api.github.com/repos/${REPO_ORG}/${REPO_NAME}/pulls/${PR_ID}/reviews"
+"https://api.github.com/repos/${REPO_ORG}/${REPO_NAME}/pulls/${PR_ID}/reviews" \
+ > /dev/null 2> /dev/null
 
 "$TESTS_SCRIPTS_DIR/integration_test.sh"
 RETURN_CODE="$?"
 
 if [[ "$RETURN_CODE" == "0" ]]; then
+  echo -e "\n\n\n\nTests SUCCEEDED\n\n\n\n"
   RETURN_STATUS=":green_heart: Test Success"
 else
+  echo -e "\n\n\n\nTests FAILED\n\n\n\n"
   RETURN_STATUS=":broken_heart: Test Failure"
 fi
 
+echo "Setting status on Github PR"
 curl -H "Authorization: token ${GITHUB_PASSWORD}" -X POST \
 -d "{\"body\": \"${RETURN_STATUS} : ${BUILD_URL}\", \
 \"event\": \"COMMENT\"}" \
-"https://api.github.com/repos/${REPO_ORG}/${REPO_NAME}/pulls/${PR_ID}/reviews"
+"https://api.github.com/repos/${REPO_ORG}/${REPO_NAME}/pulls/${PR_ID}/reviews" \
+ > /dev/null 2> /dev/null
 
 exit "${RETURN_CODE}"
