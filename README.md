@@ -5,13 +5,13 @@ Set of internal tools for Airship and metal3 development
 ## Setup
 
 ```sh
-make setup-repos
+make setup-local-repos
 ```
 
 ## Update the nordix master branches
 
 ```sh
-make update-repos
+make update-remote-repos
 ```
 
 ## Run the metal3 dev env
@@ -48,7 +48,7 @@ cd metal3-dev-env
 make
 ```
 
-## Run a development container
+## Alternative way to run a development container
 
 ```sh
 make workspace
@@ -85,5 +85,4 @@ make test
 * [Gerrit Nordix](https://gerrit.nordix.org)
 * [Harbour nordix](https://registry.nordix.org)
 * [Slack EST](estech-group.slack.com)
-* [Nuclino (deprecated)](https://app.nuclino.com/ETSJORVAS/Airship)
 * [Our Wiki Nordix Pages](https://wiki.nordix.org/display/CPI/Cloud+and+Programmable+Infrastructure)
