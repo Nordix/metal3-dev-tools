@@ -43,8 +43,7 @@ RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \
     \
-    curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kustomize.sh && \
-    chmod +x ./install_kustomize.sh && ./install_kustomize.sh && rm install_kustomize.sh && \
+    @if ! which kustomize >/dev/null 2>&1 ; then echo "Running 'go get sigs.k8s.io/kustomize'" && go get sigs.k8s.io/kustomize ; fi
     mv /data/go/bin/kustomize /usr/local/bin && \
     \
     curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
