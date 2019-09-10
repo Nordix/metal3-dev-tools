@@ -1,0 +1,58 @@
+
+ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
+ci_git_credential_id = "nordixinfra-github-token"
+
+
+image_registry = "registry.nordix.org"
+workspace_img_ver = "v1.0"
+lint_md_img_ver = "v1.0"
+lint_go_img_ver = "v1.0"
+image_builder_img_ver = "v1.0"
+
+
+pipeline {
+    agent { label 'airship-static-workers' }
+    stages {
+        stage('Chekout git repo'){
+            steps{
+                git "${ci_git_url}"
+            }
+        }
+        stage('Building build-workspace docker image'){
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
+                }
+                sh "make build-workspace"
+                sh "make push-workspace"
+            }
+        }
+        stage('Building lint-md docker image'){
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
+                    sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
+                }
+                sh "make build-lint-md"
+                sh "make push-lint-md"
+            }
+        }
+        stage('Building build-image-builder docker image'){
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
+                }
+                sh "make build-image-builder"
+                sh "make push-image-builder"
+            }
+        }
+        stage('Building build-lint-go docker image'){
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
+                }
+                sh "make build-lint-go"
+                sh "make push-lint-go"
+            }
+        }
+    }
+}
