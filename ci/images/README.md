@@ -4,9 +4,11 @@
 
 There are three images used in the CI :
 
-* Base image
-* Jenkins image
-* Metal3 image
+* Base Ubuntu image
+* Jenkins Ubuntu image
+* Metal3 Ubuntu image
+* Base CentOS image
+* Metal3 CentOS image
 
 ### Base
 
@@ -66,5 +68,5 @@ The building scripts take two arguments :
 * boolean: Use a floating ip publicly accessible ( 0 or 1 )
 
    ```bash
-   ./gen_<xxx>_ubuntu_image.sh /data/keys/id_rsa_airshipci 1
+   ./gen_<xxx>_<ubuntu|centos>_image.sh /data/keys/id_rsa_airshipci 1
    ```

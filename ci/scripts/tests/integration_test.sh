@@ -58,6 +58,14 @@ BMOBRANCH="${BMOBRANCH:-master}"
 CAPBMREPO="${CAPBMREPO:-https://github.com/metal3-io/cluster-api-provider-baremetal.git}"
 CAPBMBRANCH="${CAPBMBRANCH:-master}"
 
+DISTRIBUTION="${DISTRIBUTION:-ubuntu}"
+if [ "${DISTRIBUTION}" == "ubuntu" ]
+then
+  IMAGE_NAME="${CI_METAL3_IMAGE}"
+else
+  IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
+fi
+
 echo "Creating new executer VM."
 
 # Creating new port, needed to immediately get the ip
@@ -68,7 +76,7 @@ EXT_PORT_ID="$(openstack port create -f json \
 
 # Create new executer vm
 openstack server create -f json \
-  --image "${CI_METAL3_IMAGE}" \
+  --image "${IMAGE_NAME}" \
   --flavor "${TEST_EXECUTER_FLAVOR}" \
   --port "${EXT_PORT_ID}" \
   "${TEST_EXECUTER_VM_NAME}" | jq -r '.id'

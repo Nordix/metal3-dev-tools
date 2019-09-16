@@ -16,16 +16,16 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-IMAGE_NAME="${CI_JENKINS_IMAGE}-$(get_random_string 10)"
-FINAL_IMAGE_NAME="${CI_JENKINS_IMAGE}"
-SOURCE_IMAGE_NAME="${CI_BASE_IMAGE}"
+IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}-$(get_random_string 10)"
+FINAL_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
+SOURCE_IMAGE_NAME="f0f394b1-5546-4b68-b2bc-8abe8a7e6b8b"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
-FLOATING_IP_NETWORK="$( ([ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}"))" || true
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_jumphost_jenkins_base_img.sh"
-SSH_USER_GROUP="sudo"
+FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
+REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_metal3_image_centos.sh"
+SSH_USER_GROUP="wheel"
 
 SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
@@ -45,6 +45,7 @@ CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
 delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
+
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
@@ -57,6 +58,7 @@ packer build \
   -var "network=${NETWORK}" \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
+  -var "ssh_pty=true" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image

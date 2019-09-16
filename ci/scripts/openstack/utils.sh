@@ -83,8 +83,10 @@ render_user_data() {
 
   export SSH_AUTHORIZED_KEY="${1:?}"
   export DEFAULT_SSH_USER="${2:?}"
-  IN_FILE="${3:?}"
-  OUT_FILE="${4:?}"
+  export DEFAULT_SSH_USER_GROUP="${3:?}"
+  export HOSTNAME="${4:?}"
+  IN_FILE="${5:?}"
+  OUT_FILE="${6:?}"
 
   envsubst < "${IN_FILE}" > "${OUT_FILE}"
 }
