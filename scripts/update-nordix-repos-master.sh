@@ -12,7 +12,7 @@ SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 pushd "${SCRIPTPATH}"
 cd ..
 
-UPDATE_REPO="${1:-go/src/sigs.k8s.io/cluster-api metal3-dev-env go/src/github.com/metal3-io/cluster-api-provider-baremetal go/src/github.com/metal3-io/baremetal-operator}"
+UPDATE_REPO="${1:-go/src/sigs.k8s.io/cluster-api metal3-dev-env metal3-docs go/src/github.com/metal3-io/cluster-api-provider-baremetal go/src/github.com/metal3-io/baremetal-operator}"
 UPDATE_BRANCH="${2:-master}"
 
 for repo in ${UPDATE_REPO}
