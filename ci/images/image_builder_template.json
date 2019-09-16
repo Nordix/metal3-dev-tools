@@ -9,7 +9,8 @@
     "ssh_private_key_file": "",
     "network": "282a8c18-614c-4fbc-9928-b66d56ae3cbe",
     "floating_ip_net": "",
-    "local_scripts_dir": "../scripts"
+    "local_scripts_dir": "../scripts",
+    "ssh_pty": "false"
   },
   "builders": [{
     "type": "openstack",
@@ -25,7 +26,8 @@
     "availability_zone": "nova",
     "ssh_username": "{{user `ssh_username`}}",
     "image_visibility": "shared",
-    "force_delete": true
+    "force_delete": true,
+    "ssh_pty" : "{{user `ssh_pty`}}"
   }],
   "provisioners": [
     {

@@ -36,6 +36,7 @@ pipeline {
     TEST_EXECUTER_VM_NAME = "${VM_NAME}"
     BUILD_URL = "${env.BUILD_URL}"
     PR_ID = "${ghprbPullId}"
+    DISTRIBUTION = "${DISTRIBUTION}"
   }
   stages {
     stage('SCM') {

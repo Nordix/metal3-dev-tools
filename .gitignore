@@ -27,3 +27,6 @@ go/
 
 #ignore metal3 dev env folder, git repo on its own
 metal3-dev-env
+
+#ignore metal3 docs folder, git repo on its own
+metal3-docs
