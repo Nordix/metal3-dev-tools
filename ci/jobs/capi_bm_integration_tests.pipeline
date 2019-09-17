@@ -12,7 +12,7 @@ script {
     ci_git_branch = "master"
   }
   def date = new Date()
-  def dateFormat = new SimpleDateFormat("yyyyMMddHHmm")
+  def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
   VM_NAME = "ci-test-vm-" + dateFormat.format(date)
 }
 
