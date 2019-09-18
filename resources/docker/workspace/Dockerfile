@@ -30,7 +30,6 @@ RUN add-apt-repository -y ppa:longsleep/golang-backports && \
 ENV GOPATH=/data/go
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/data/go/bin
 
-
 #Install Golang dep, operator-sdk, Kubectl, Kustomize and kubebuilder
 RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     mkdir -p /data/go/bin && chmod +x install.sh && ./install.sh && rm install.sh && \
@@ -43,9 +42,7 @@ RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \
     \
-    curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kustomize.sh && \
-    chmod +x ./install_kustomize.sh && ./install_kustomize.sh && rm install_kustomize.sh && \
-    mv /data/go/bin/kustomize /usr/local/bin && \
+    @if ! which kustomize >/dev/null 2>&1 ; then echo "Running 'go get sigs.k8s.io/kustomize'" && GO111MODULE=on go get sigs.k8s.io/kustomize && mv /data/go/bin/kustomize /usr/local/bin; fi \
     \
     curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
     chmod +x ./install_kubebuilder.sh && ./install_kubebuilder.sh && rm install_kubebuilder.sh && \
