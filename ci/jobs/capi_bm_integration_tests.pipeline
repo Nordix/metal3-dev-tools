@@ -40,6 +40,9 @@ pipeline {
   }
   stages {
     stage('SCM') {
+      options {
+        timeout(time: 5, unit: 'MINUTES')
+      }
       steps {
         /* Checkout CI Repo */
         checkout([$class: 'GitSCM',
@@ -55,6 +58,9 @@ pipeline {
       }
     }
     stage('Run integration test') {
+      options {
+        timeout(time: 60, unit: 'MINUTES')
+      }
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){

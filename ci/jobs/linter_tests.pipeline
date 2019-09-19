@@ -18,6 +18,9 @@ pipeline {
   }
   stages {
     stage('SCM') {
+      options {
+        timeout(time: 5, unit: 'MINUTES')
+      }
       steps {
         /* Checkout CI Repo */
         checkout([$class: 'GitSCM',
@@ -46,6 +49,9 @@ pipeline {
 
     /* TODO: Remove Building when containers are available in registry  */
     stage('Build Linter containers') {
+      options {
+        timeout(time: 30, unit: 'MINUTES')
+      }
       steps {
 
         sh 'sudo apt install -y make'
@@ -58,9 +64,12 @@ pipeline {
    /* =========== */
 
     stage('Lint MD') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
       steps {
         script {
-          try{ 
+          try{
             sh "make lint-md lint_folder=${CURRENT_DIR}/${PROJECT_REPO_NAME}"
           }   catch(e) {
             build_ok = false
@@ -70,6 +79,9 @@ pipeline {
       }
     }
     stage('Lint Go') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
       steps {
         script {
           try{
@@ -82,6 +94,9 @@ pipeline {
       }
     }
     stage('Lint Shell') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
       steps {
         script {
           try {
