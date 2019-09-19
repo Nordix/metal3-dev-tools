@@ -14,11 +14,17 @@ pipeline {
     agent { label 'airship-static-workers' }
     stages {
         stage('Chekout git repo'){
-            steps{
+          options {
+            timeout(time: 5, unit: 'MINUTES')
+          }
+          steps{
                 git "${ci_git_url}"
             }
         }
         stage('Building build-workspace docker image'){
+            options {
+              timeout(time: 10, unit: 'MINUTES')
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                      sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
@@ -28,6 +34,9 @@ pipeline {
             }
         }
         stage('Building lint-md docker image'){
+            options {
+              timeout(time: 10, unit: 'MINUTES')
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
@@ -37,6 +46,9 @@ pipeline {
             }
         }
         stage('Building build-image-builder docker image'){
+            options {
+              timeout(time: 10, unit: 'MINUTES')
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
@@ -46,6 +58,9 @@ pipeline {
             }
         }
         stage('Building build-lint-go docker image'){
+            options {
+              timeout(time: 10, unit: 'MINUTES')
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
