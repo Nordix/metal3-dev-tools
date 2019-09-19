@@ -21,10 +21,18 @@
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 TESTS_SCRIPTS_DIR="${CI_DIR}/scripts/tests"
 
+DISTRIBUTION="${DISTRIBUTION:-ubuntu}"
+if [ "${DISTRIBUTION}" == "ubuntu" ]
+then
+  DISTRIBUTION_NAME="Ubuntu"
+else
+  DISTRIBUTION_NAME="CentOS"
+fi
+
 echo "Setting status on Github PR"
 curl -H "Authorization: token ${GITHUB_PASSWORD}" -X POST \
--d "{\"body\": \":revolving_hearts: Test pending : ${BUILD_URL}\", \
-\"event\": \"COMMENT\"}" \
+-d "{\"body\": \":revolving_hearts: ${DISTRIBUTION_NAME} Test pending : \
+${BUILD_URL}\", \"event\": \"COMMENT\"}" \
 "https://api.github.com/repos/${REPO_ORG}/${REPO_NAME}/pulls/${PR_ID}/reviews" \
  > /dev/null 2> /dev/null
 
@@ -41,7 +49,7 @@ fi
 
 echo "Setting status on Github PR"
 curl -H "Authorization: token ${GITHUB_PASSWORD}" -X POST \
--d "{\"body\": \"${RETURN_STATUS} : ${BUILD_URL}\", \
+-d "{\"body\": \"${RETURN_STATUS} ${DISTRIBUTION_NAME} : ${BUILD_URL}\", \
 \"event\": \"COMMENT\"}" \
 "https://api.github.com/repos/${REPO_ORG}/${REPO_NAME}/pulls/${PR_ID}/reviews" \
  > /dev/null 2> /dev/null
