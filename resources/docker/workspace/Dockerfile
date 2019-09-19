@@ -30,7 +30,7 @@ RUN add-apt-repository -y ppa:longsleep/golang-backports && \
 ENV GOPATH=/data/go
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/data/go/bin
 
-#Install Golang dep, operator-sdk, Kubectl, Kustomize and kubebuilder
+#Install Golang dep, operator-sdk, Kubectl, Kustomize and kubebuilder;
 RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     mkdir -p /data/go/bin && chmod +x install.sh && ./install.sh && rm install.sh && \
     mv /data/go/bin/dep /usr/local/bin && \
