@@ -40,7 +40,7 @@ fi
 pushd "${M3_DENV_PATH}"
 git checkout "${M3_DENV_BRANCH}"
 git pull -r || true
-"${M3_DENV_PATH}/01_install_requirements.sh"
+make install_requirements
 popd
 
 rm -rf "${M3_DENV_PATH}"
