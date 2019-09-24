@@ -32,7 +32,7 @@ update-remote-repos: ## Update nordix repos
 build-workspace: ## Build Docker Image for workspace
 	docker build \
 		-t ${NAME}-workspace \
-		-f resources/docker/workspace/Dockerfile .
+		-f resources/docker/workspace/Dockerfile resources/docker/workspace/
 
 .PHONY: push-workspace
 push-workspace: ## Push Docker Image for Workspace to nordix registry
@@ -63,7 +63,7 @@ lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
 build-lint-md: ## Build Docker Image for markdown lint
 	docker build \
 		-t ${NAME}-md-lint \
-		-f resources/docker/linter/Dockerfile .
+		-f resources/docker/linter/Dockerfile resources/docker/linter/
 
 .PHONY: push-lint-md
 push-lint-md: ## Push Docker Image for Lint markdown to nordix registry
@@ -106,7 +106,7 @@ lint-shell: ## Lint shell scripts (ex: make lint-shell or make lint-shell lint_f
 build-lint-go: ## Build Docker Image for go lint
 	docker build \
 		-t ${NAME}-go-lint \
-		-f resources/docker/linter/golang/Dockerfile .
+		-f resources/docker/linter/golang/Dockerfile resources/docker/linter/golang
 
 .PHONY: push-lint-go
 push-lint-go: ## Push Docker Image for Lint go to nordix registry
