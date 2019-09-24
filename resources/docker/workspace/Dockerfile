@@ -28,7 +28,7 @@ RUN add-apt-repository -y ppa:longsleep/golang-backports && \
     shellcheck
 
 ENV GOPATH=/data/go
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/data/go/bin
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/data/go/bin:/usr/local/kubebuilder/bin
 
 #Install Golang dep, operator-sdk, Kubectl, Kustomize and kubebuilder
 RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
@@ -44,9 +44,8 @@ RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     \
     @if ! which kustomize >/dev/null 2>&1 ; then echo "Running 'go get sigs.k8s.io/kustomize'" && GO111MODULE=on go get sigs.k8s.io/kustomize && mv /data/go/bin/kustomize /usr/local/bin; fi \
     \
-    curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
-    chmod +x ./install_kubebuilder.sh && ./install_kubebuilder.sh && rm install_kubebuilder.sh && \
-    mv kubebuilder /usr/local && \
+    curl -sL https://go.kubebuilder.io/dl/2.0.0/$(go env GOOS)/$(go env GOARCH) | tar -xz -C /tmp/ && \
+    mv /tmp/kubebuilder_2.0.0_$(go env GOOS)_$(go env GOARCH) /usr/local/kubebuilder && \
     \
     go get github.com/securego/gosec/cmd/gosec && \
     mv /data/go/bin/gosec /usr/local/bin && \
