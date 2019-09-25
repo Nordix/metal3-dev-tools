@@ -15,3 +15,4 @@ pushd metal3
 git checkout "${METAL3BRANCH}"
 make
 make test
+make clean
