@@ -8,7 +8,8 @@ export BMOREPO="${3:-https://github.com/metal3-io/baremetal-operator.git}"
 export BMOBRANCH="${4:-master}"
 export CAPBMREPO="${5:-https://github.com/metal3-io/cluster-api-provider-baremetal.git}"
 export CAPBMBRANCH="${6:-master}"
-export CONTAINER_RUNTIME="docker"
+export CONTAINER_RUNTIME="${7:-docker}"
+export BMC_DRIVER="${8:-ipmi}"
 
 git clone "${METAL3REPO}" metal3
 pushd metal3

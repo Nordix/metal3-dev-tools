@@ -24,19 +24,18 @@ pipeline {
     REPO_NAME = "${PROJECT_REPO_NAME}"
     UPDATED_REPO = "${ghprbAuthorRepoGitUrl}"
     REPO_BRANCH = "${ghprbActualCommit}"
-    OS_USERNAME="airshipci"
-    OS_AUTH_URL="https://kna1.citycloud.com:5000"
-    OS_USER_DOMAIN_NAME="CCP_Domain_37137"
-    OS_PROJECT_DOMAIN_NAME="CCP_Domain_37137"
-    OS_REGION_NAME="Kna1"
-    OS_PROJECT_NAME="Default Project 37137"
-    OS_TENANT_NAME="Default Project 37137"
-    OS_AUTH_VERSION=3
-    OS_IDENTITY_API_VERSION=3
+    OS_USERNAME = "airshipci"
+    OS_AUTH_URL = "https://kna1.citycloud.com:5000"
+    OS_USER_DOMAIN_NAME = "CCP_Domain_37137"
+    OS_PROJECT_DOMAIN_NAME = "CCP_Domain_37137"
+    OS_REGION_NAME = "Kna1"
+    OS_PROJECT_NAME = "Default Project 37137"
+    OS_TENANT_NAME = "Default Project 37137"
+    OS_AUTH_VERSION = 3
+    OS_IDENTITY_API_VERSION = 3
     TEST_EXECUTER_VM_NAME = "${VM_NAME}"
     BUILD_URL = "${env.BUILD_URL}"
     PR_ID = "${ghprbPullId}"
-    DISTRIBUTION = "${DISTRIBUTION}"
   }
   stages {
     stage('SCM') {
@@ -57,9 +56,45 @@ pipeline {
 
       }
     }
-    stage('Run integration test') {
+    stage('Run Ubuntu integration test') {
       options {
         timeout(time: 60, unit: 'MINUTES')
+      }
+      environment {
+        DISTRIBUTION = "ubuntu"
+        CONTAINER_RUNTIME = "docker"
+        BMC_DRIVER = "redfish"
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+            withCredentials([usernamePassword(credentialsId: 'nordixinfra-github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]){
+              sh "make integration_test_wrapper"
+            }
+          }
+        }
+      }
+    }
+    stage('Delete Ubuntu vm') {
+      options {
+        timeout(time: 10, unit: 'MINUTES')
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+            sh "make integration_test_cleanup"
+          }
+        }
+      }
+    }
+    stage('Run Centos integration test') {
+      options {
+        timeout(time: 60, unit: 'MINUTES')
+      }
+      environment {
+        DISTRIBUTION = "centos"
+        CONTAINER_RUNTIME = "podman"
+        BMC_DRIVER = "ipmi"
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
@@ -72,6 +107,7 @@ pipeline {
       }
     }
   }
+
   post {
     always {
       withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
