@@ -1,0 +1,40 @@
+ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
+ci_git_branch = "master"
+ci_git_credential_id = "nordix-airship-github-ssh"
+
+pipeline {
+  agent { label 'airship-static-workers' }
+  environment {
+    CURRENT_DIR = sh (
+                      script: 'pwd',
+                      returnStdout: true
+                     ).trim()
+    MAKE_CMD = "make update-remote-repos"
+  }
+  stages {
+    stage('SCM') {
+      steps {
+        /* Checkout CI Repo */
+        checkout([$class: 'GitSCM',
+                 branches: [[name: ci_git_branch]],
+                 doGenerateSubmoduleConfigurations: false,
+                 extensions: [[$class: 'WipeWorkspace'],
+                 [$class: 'CleanCheckout'],
+                 [$class: 'CleanBeforeCheckout']],
+                 submoduleCfg: [],
+                 userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                 url: ci_git_url]]])
+      }
+    }
+    stage('Run update Nordix repos') {
+      steps {
+        withCredentials([sshUserPrivateKey(credentialsId: ci_git_credential_id, keyFileVariable: 'SSH_KEY')]){
+          sh """
+            export GIT_SSH_COMMAND='ssh -i ${SSH_KEY}'
+            ${MAKE_CMD}
+          """
+        }
+      }
+    }
+  }
+}
