@@ -136,10 +136,6 @@ test: ## Run unit test for the code in repository
 integration_test: ## Run integration test
 	$(CURDIR)/ci/scripts/tests/integration_test.sh
 
-.PHONY: integration_test_wrapper
-integration_test_wrapper: ## Run integration test
-	$(CURDIR)/ci/scripts/tests/integration_test_ci_wrapper.sh
-
 .PHONY: integration_test_cleanup
 integration_test_cleanup: ## Clean integration test setup
 	$(CURDIR)/ci/scripts/tests/integration_delete.sh
