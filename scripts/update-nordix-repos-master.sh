@@ -40,6 +40,7 @@ NORDIX_REPO="${4:-${NORDIX_CAPIPB_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} $
 i=0
 locarray=(${UPDATE_REPO})
 upsarray=(${UPSTREAM_REPO})
+ndxarray=(${NORDIX_REPO})
 
 pushd ${WORKSPACE}
 
@@ -54,6 +55,7 @@ done
 
 cd -
 
+i=0
 for repo in ${UPDATE_REPO}
 do
   echo "Updating ${repo}"
@@ -64,12 +66,13 @@ do
   # origin points to upstream repos
   git fetch origin
   git rebase origin/master
-  git remote add nordixrepo ${NORDIX_REPO}
+  git remote add nordixrepo ${ndxarray[$i]}
   git push -uf nordixrepo master
-  echo "Push done to ${NORDIX_REPO}"
+  echo "Push done to "${ndxarray[$i]}""
   git checkout "${BRANCH}"
   popd
   echo -e "\n"
+i=$(($i+1));
 done
 
 popd
