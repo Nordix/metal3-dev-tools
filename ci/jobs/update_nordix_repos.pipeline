@@ -30,7 +30,7 @@ pipeline {
       steps {
         withCredentials([sshUserPrivateKey(credentialsId: ci_git_credential_id, keyFileVariable: 'SSH_KEY')]){
           sh """
-            export GIT_SSH_COMMAND='ssh -i ${SSH_KEY}'
+            export GIT_SSH_COMMAND='ssh -i ${SSH_KEY} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
             ${MAKE_CMD}
           """
         }
@@ -38,3 +38,4 @@ pipeline {
     }
   }
 }
+
