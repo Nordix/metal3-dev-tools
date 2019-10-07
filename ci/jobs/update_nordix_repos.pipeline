@@ -1,6 +1,6 @@
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_branch = "master"
-ci_git_credential_id = "nordix-airship-github-ssh"
+ci_git_credential_id = "nordix-airship-ci"
 
 pipeline {
   agent { label 'airship-static-workers' }
@@ -30,7 +30,7 @@ pipeline {
       steps {
         withCredentials([sshUserPrivateKey(credentialsId: ci_git_credential_id, keyFileVariable: 'SSH_KEY')]){
           sh """
-            export GIT_SSH_COMMAND='ssh -i ${SSH_KEY} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+            export GIT_SSH_COMMAND='ssh -v -i ${SSH_KEY} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
             ${MAKE_CMD}
           """
         }
