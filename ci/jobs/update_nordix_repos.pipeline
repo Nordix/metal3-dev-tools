@@ -28,9 +28,9 @@ pipeline {
     }
     stage('Run update Nordix repos') {
       steps {
-        withCredentials([sshUserPrivateKey(credentialsId: ci_git_credential_id, keyFileVariable: 'SSH_KEY')]){
+        sshagent (credentials: [ci_git_credential_id]) {
           sh """
-            export GIT_SSH_COMMAND='ssh -v -i ${SSH_KEY} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+            export GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
             ${MAKE_CMD}
           """
         }
