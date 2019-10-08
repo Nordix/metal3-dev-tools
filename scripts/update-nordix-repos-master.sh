@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ue
+set -u
 
 #------------------------------------------
 # Workflow:
@@ -7,6 +7,8 @@ set -ue
 # -rebase jenkins local repos from upstream
 # -push jenkins local repos to Nordix forks
 #------------------------------------------
+
+WORKSPACE=${WORKSPACE:=/tmp}
 
 SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
