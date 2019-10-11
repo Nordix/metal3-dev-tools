@@ -59,21 +59,31 @@ pipeline {
     }
     stage('Run integration test') {
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
-            withCredentials([usernamePassword(credentialsId: 'nordixinfra-github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]){
-              sh "make integration_test"
+        script {
+          try {
+            withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'nordixinfra-github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
+                  sh "make integration_test"
+                }
+              }
             }
+          }
+          catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
+            error 'timeout error'
+          }
+          catch (err) {
+            error 'runtime error'
           }
         }
       }
     }
   }
   post {
-    always {
+    cleanup {
       withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
           sh "make integration_test_cleanup"
