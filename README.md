@@ -30,7 +30,7 @@ make run-dev-env
 ```
 
 If you hit an issue about the default network, saying that it is already in use
-by ens2, you need to modify the file /etc/libvirt/qemu/networks/default.xml
+by ens2, you need to modify the file ```/etc/libvirt/qemu/networks/default.xml```
 to change the CIDR to not use the same CIDR as ens2 or any other interface.
 Then run
 
