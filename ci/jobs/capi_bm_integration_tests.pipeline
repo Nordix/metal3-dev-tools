@@ -59,7 +59,7 @@ pipeline {
     }
     stage('Run integration test') {
       options {
-        timeout(time: 90, unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
       }
       steps {
         script {
@@ -73,10 +73,12 @@ pipeline {
             }
           }
           catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
-            error 'timeout error'
+              echo "Caught: timeout error"
+              currentBuild.result = 'FAILURE'
           }
           catch (err) {
-            error 'runtime error'
+              echo "Caught: runtime error"
+              currentBuild.result = 'FAILURE'
           }
         }
       }
