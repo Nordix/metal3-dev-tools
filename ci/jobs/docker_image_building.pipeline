@@ -1,8 +1,7 @@
 
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_credential_id = "nordixinfra-github-token"
-
-
+ci_git_branch = "master"
 image_registry = "registry.nordix.org"
 workspace_img_ver = "v1.0"
 lint_md_img_ver = "v1.0"
@@ -13,12 +12,20 @@ image_builder_img_ver = "v1.0"
 pipeline {
     agent { label 'airship-static-workers' }
     stages {
-        stage('Chekout git repo'){
-          options {
-            timeout(time: 5, unit: 'MINUTES')
-          }
-          steps{
-                git "${ci_git_url}"
+        stage('SCM'){
+            options {
+              timeout(time: 5, unit: 'MINUTES')
+            }
+            steps {
+              checkout([$class: 'GitSCM',
+                      branches: [[name: ci_git_branch]],
+                      doGenerateSubmoduleConfigurations: false,
+                      extensions: [[$class: 'WipeWorkspace'],
+                      [$class: 'CleanCheckout'],
+                      [$class: 'CleanBeforeCheckout']],
+                      submoduleCfg: [],
+                      userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                      url: ci_git_url]]])
             }
         }
         stage('Building build-workspace docker image'){
