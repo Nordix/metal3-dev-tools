@@ -26,6 +26,9 @@ rm operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
 
 sudo apt install -y git
 
+sudo apt remove -y python-openstackclient
+sudo apt -y auto-remove
+
 # Install metal3 requirements
 mkdir -p "${M3_DENV_ROOT}"
 if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
