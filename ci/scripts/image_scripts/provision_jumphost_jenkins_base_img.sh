@@ -10,6 +10,9 @@ SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 # Install required packages.
 sudo apt install -y \
   openjdk-8-jre \
+  python3-pip
+
+sudo pip3 install \
   python-openstackclient
 
 # Reset cloud-init to run on next boot.

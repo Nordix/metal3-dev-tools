@@ -23,11 +23,7 @@ sudo mkdir -p /usr/local/bin/
 sudo cp operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
 rm operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
 
-
 sudo apt install -y git
-
-sudo apt remove -y python-openstackclient
-sudo apt -y auto-remove
 
 # Install metal3 requirements
 mkdir -p "${M3_DENV_ROOT}"
