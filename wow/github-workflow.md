@@ -109,9 +109,10 @@ avoided as much as possible in this stage
 
 `git push -fu origin <topic-branch>`
 
-### 6. Open a Internal Pull Request
+### 6. Open a Internal Pull Request (Optional)
 
-When the changes in your branch are completed, a pull request has to be opened on Github.
+When the changes in your branch are completed, a pull request could be opened on Github.
+If you need more input and review from the team, you should probably open the pull request on Nordix.
 
 Before opening it, **please ensure your branch is up-to-date with `master`** branch and your commits are properly formatted.
 
@@ -122,7 +123,7 @@ git rebase upstream/master
 git push -fu origin <topic-branch>
 ```
 
-### 7. Code review
+### 7. Code review (Optional)
 
 Code review is done on web through Github's pull request. Pull request author assigns the reviewer or publishes the PR link to team chat(Slack) to notify the reviewers.
 
