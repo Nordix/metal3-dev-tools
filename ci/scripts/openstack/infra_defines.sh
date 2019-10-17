@@ -19,6 +19,7 @@ CI_BASE_IMAGE="airship-ci-ubuntu-base-img"
 CI_JENKINS_IMAGE="airship-ci-ubuntu-jenkins-img"
 CI_METAL3_IMAGE="airship-ci-ubuntu-metal3-img"
 CI_METAL3_CENTOS_IMAGE="airship-ci-centos-metal3-img"
+CI_NODE_CENTOS_IMAGE="airship-ci-centos-node-img"
 CI_SSH_USER_NAME="airshipci"
 
 # Global defines for Airship DEV infrastructure

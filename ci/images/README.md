@@ -2,13 +2,16 @@
 
 ## Images
 
-There are three images used in the CI :
+The images used in the CI :
+
+* Jenkins Ubuntu image
 
 * Base Ubuntu image
-* Jenkins Ubuntu image
 * Metal3 Ubuntu image
+
 * Base CentOS image
-* Metal3 CentOS image
+* Metal3 CentOS dev-env image
+* Metal3 CentOS node image
 
 ### Base
 
@@ -62,11 +65,22 @@ Then set the correct environment variables:
       export RT_URL="https://artifactory.nordix.org/artifactory"
    ```
 
-The building scripts take two arguments :
+The ubuntu building scripts take two arguments :
 
 * path: to airship CI private key relative in the container
 * boolean: Use a floating ip publicly accessible ( 0 or 1 )
 
    ```bash
-   ./gen_<xxx>_<ubuntu|centos>_image.sh /data/keys/id_rsa_airshipci 1
+   ./gen_<xxx>_<ubuntu>_image.sh /data/keys/id_rsa_airshipci 1
    ```
+
+The centos building scripts take three arguments :
+
+* path: to airship CI private key relative in the container
+* boolean: Use a floating ip publicly accessible ( 0 or 1 )
+* provisioner script: script file name, give random string to list available scripts
+
+   ```bash
+   ./gen_<xxx>_<centos>_image.sh /data/keys/id_rsa_airshipci 1 <provisioner script>
+   ```
+

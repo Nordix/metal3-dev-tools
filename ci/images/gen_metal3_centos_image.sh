@@ -4,6 +4,7 @@ set -eu
 
 SSH_PRIVATE_KEY_FILE="${1:?}"
 USE_FLOATING_IP="${2:?}"
+PROVISIONING_SCRIPT="${3:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
@@ -13,18 +14,30 @@ OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
+if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
+  CI_IMAGE_NAME="${CI_NODE_CENTOS_IMAGE}"
+elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
+  CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
+else
+  echo "Available provisioning scripts are:"
+  echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
+  echo "Example:"
+  echo "./gen_metal3_centos_image.sh /data/keys/id_rsa_airshipci 1 provision_node_image_centos.sh"
+  exit 1
+fi
+
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}-$(get_random_string 10)"
-FINAL_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
+IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
+FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
 SOURCE_IMAGE_NAME="76317242-9dc5-48a4-8a95-4051824e4580"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_metal3_image_centos.sh"
+REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
 SSH_USER_GROUP="wheel"
 
 SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
