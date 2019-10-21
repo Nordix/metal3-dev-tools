@@ -1,24 +1,25 @@
 import java.text.SimpleDateFormat
 
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
-ci_git_credential_id = "nordixinfra-github-token"
+ci_git_credential_id = ""
 
 script {
-  if ("${PROJECT_REPO_ORG}" == "Nordix" && "${PROJECT_REPO_NAME}" == "airship-dev-tools") {
-    echo "Checkout https://github.com/Nordix/airship-dev-tools.git branch ${ghprbActualCommit}"
-    ci_git_branch="${ghprbActualCommit}"
-  } else {
-    echo "Checkout https://github.com/Nordix/airship-dev-tools.git master"
-    ci_git_branch = "master"
-  }
-  def date = new Date()
-  def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
-  VM_NAME = "ci-test-vm-" + dateFormat.format(date)
+    if ("${PROJECT_REPO_ORG}" == "Nordix" && "${PROJECT_REPO_NAME}" == "airship-dev-tools") {
+        echo "Checkout https://github.com/Nordix/airship-dev-tools.git branch ${ghprbActualCommit}"
+        ci_git_branch="${ghprbActualCommit}"
+    }
+    else {
+        echo "Checkout https://github.com/Nordix/airship-dev-tools.git master"
+        ci_git_branch = "master"
+    }
+    def date = new Date()
+    def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
+    VM_NAME = "ci-test-vm-" + dateFormat.format(date)
 }
 
 pipeline {
-  agent { label 'airship-static-workers' }
-  environment {
+    agent { label 'airship-static-workers' }
+    environment {
     AIRSHIP_CI_USER="airshipci"
     REPO_ORG = "${PROJECT_REPO_ORG}"
     REPO_NAME = "${PROJECT_REPO_NAME}"
@@ -39,58 +40,77 @@ pipeline {
     DISTRIBUTION = "${DISTRIBUTION}"
   }
   stages {
-    stage('SCM') {
+    stage ('SCM'){
+        options {
+            timeout(time: 5, unit: 'MINUTES')
+        }
+        steps {$
+            /* Checkout CI Repo */
+            checkout([$class: 'GitSCM',
+                    branches: [[name: ci_git_branch]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'WipeWorkspace'],
+                    [$class: 'CleanCheckout'],
+                    [$class: 'CleanBeforeCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                    url: ci_git_url]]])
+        }
+    }
+    stage ('Create executer VM'){
       options {
-        timeout(time: 5, unit: 'MINUTES')
+        timeout(time: 10, unit: 'MINUTES')
       }
       steps {
-        /* Checkout CI Repo */
-        checkout([$class: 'GitSCM',
-                 branches: [[name: ci_git_branch]],
-                 doGenerateSubmoduleConfigurations: false,
-                 extensions: [[$class: 'WipeWorkspace'],
-                 [$class: 'CleanCheckout'],
-                 [$class: 'CleanBeforeCheckout']],
-                 submoduleCfg: [],
-                 userRemoteConfigs: [[credentialsId: ci_git_credential_id,
-                 url: ci_git_url]]])
-
+          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY', passphraseVariable: '', usernameVariable: 'USERNAME')]) {
+                  withCredentials([usernamePassword(credentialsId: 'nordixinfra-github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
+                      sh "make integration_test"
+                  }
+              }
+          }
       }
     }
-    stage('Run integration test') {
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        script {
-          try {
-            withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-              withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
-                withCredentials([usernamePassword(credentialsId: 'nordixinfra-github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
-                  sh "make integration_test"
-                }
-              }
-            }
-          }
-          catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
-              echo "Caught: timeout error"
-              currentBuild.result = 'FAILURE'
-          }
-          catch (err) {
-              echo "Caught: runtime error"
-              currentBuild.result = 'FAILURE'
-          }
+    stage ('Run integration test') {
+        options {
+            timeout(time: 20, unit: 'MINUTES')
         }
-      }
+        steps {
+            script {
+                stage ('SSH') {
+                    try {
+                        def remote = [:]
+                        remote.name = "${DISTRIBUTION}"
+                        remote.host = "${TEST_EXECUTER_IP}"
+                        remote.allowAnyHosts = true
+                        withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY', passphraseVariable: '', usernameVariable: 'USERNAME')]) {
+                            remote.user = USERNAME
+                            remote.identityFile = AIRSHIP_CI_USER_KEY
+                            sshPut remote: remote, from: '${TESTS_SCRIPTS_DIR}/files/run_integration_tests.sh', into: '/tmp/'
+                            sshCommand remote: remote, command: "chmod +x /tmp/run_integration_tests.sh  > /dev/null"
+                            sshCommand remote: remote, command: "PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin /tmp/run_integration_tests.sh"
+                        }
+                    }
+                    catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
+                        echo "Caught: timeout error"
+                        currentBuild.result = 'FAILURE'
+                      }
+                    catch (err) {
+                        echo "Caught: runtime error"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
     }
   }
   post {
-    cleanup {
-      withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-        withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
-          sh "make integration_test_cleanup"
-        }
+      cleanup {
+          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY', passphraseVariable: '', usernameVariable: 'USERNAME')]) {
+                  sh "make integration_test_cleanup"
+              }
+          }
       }
-    }
   }
 }

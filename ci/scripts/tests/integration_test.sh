@@ -12,7 +12,7 @@ set -eu
 #       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
 # Usage:
 #  integration_test.sh
-#
+
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
@@ -90,23 +90,23 @@ echo "Waiting for the host ${TEST_EXECUTER_VM_NAME} to come up"
 #Wait for the host to come up
 wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${TEST_EXECUTER_IP}"
 
-# Send Remote script to Executer
-scp \
-  -o StrictHostKeyChecking=no \
-  -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
-  "${TESTS_SCRIPTS_DIR}/files/run_integration_tests.sh" \
-  "${AIRSHIP_CI_USER}@${TEST_EXECUTER_IP}:/tmp/" > /dev/null
-
-echo "Running the tests"
-# Execute remote script
-# shellcheck disable=SC2029
-ssh \
-  -o StrictHostKeyChecking=no \
-  -o UserKnownHostsFile=/dev/null \
-  -o ServerAliveInterval=15 \
-  -i "${AIRSHIP_CI_USER_KEY}" \
-  "${AIRSHIP_CI_USER}"@"${TEST_EXECUTER_IP}" \
-  PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  /tmp/run_integration_tests.sh "${METAL3REPO}" "${METAL3BRANCH}" \
-  "${BMOREPO}" "${BMOBRANCH}" "${CAPBMREPO}" "${CAPBMBRANCH}"
+# # Send Remote script to Executer
+# scp \
+#   -o StrictHostKeyChecking=no \
+#   -o UserKnownHostsFile=/dev/null \
+#   -i "${AIRSHIP_CI_USER_KEY}" \
+#   "${TESTS_SCRIPTS_DIR}/files/run_integration_tests.sh" \
+#   "${AIRSHIP_CI_USER}@${TEST_EXECUTER_IP}:/tmp/" > /dev/null
+#
+# echo "Running the tests"
+# # Execute remote script
+# # shellcheck disable=SC2029
+# ssh \
+#   -o StrictHostKeyChecking=no \
+#   -o UserKnownHostsFile=/dev/null \
+#   -o ServerAliveInterval=15 \
+#   -i "${AIRSHIP_CI_USER_KEY}" \
+#   "${AIRSHIP_CI_USER}"@"${TEST_EXECUTER_IP}" \
+#   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
+#   /tmp/run_integration_tests.sh "${METAL3REPO}" "${METAL3BRANCH}" \
+#   "${BMOREPO}" "${BMOBRANCH}" "${CAPBMREPO}" "${CAPBMBRANCH}"

@@ -136,6 +136,10 @@ test: ## Run unit test for the code in repository
 integration_test: ## Run integration test
 	$(CURDIR)/ci/scripts/tests/integration_test.sh
 
+.PHONY: create_executer_vm
+create_executer_vm: ## Create executer VM
+	$(CURDIR)/ci/scripts/tests/create_executer_vm.sh
+
 .PHONY: integration_test_cleanup
 integration_test_cleanup: ## Clean integration test setup
 	$(CURDIR)/ci/scripts/tests/integration_delete.sh
