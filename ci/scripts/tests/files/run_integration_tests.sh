@@ -13,6 +13,7 @@ export CONTAINER_RUNTIME="docker"
 git clone "${METAL3REPO}" metal3
 pushd metal3
 git checkout "${METAL3BRANCH}"
+sleep 25m
 make
 make test
 make clean
