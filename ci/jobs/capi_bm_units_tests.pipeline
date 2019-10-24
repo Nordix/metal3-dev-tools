@@ -1,10 +1,10 @@
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_branch = "master"
-ci_git_credential_id = "nordixinfra-github-token"
+ci_git_credential_id = "nordix-airship-ci-github-prod-token"
 
 
 git_url = "https://github.com/${PROJECT_REPO_ORG}/${PROJECT_REPO_NAME}.git"
-git_credential_id = "nordixinfra-github-token"
+git_credential_id = "nordix-airship-ci-github-prod-token"
 git_branch = "${ghprbActualCommit}"
 
 script {
