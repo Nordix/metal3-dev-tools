@@ -28,19 +28,18 @@ pipeline {
                       url: ci_git_url]]])
             }
         }
-        stage('Building build-workspace docker image'){
+        stage('Build docker images'){
             options {
-              timeout(time: 10, unit: 'MINUTES')
+              timeout(time: 30, unit: 'MINUTES')
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
-                }
                 sh "make build-workspace"
-                sh "make push-workspace"
+                sh "make build-lint-md"
+                sh "make build-image-builder"
+                sh "make build-lint-go"
             }
         }
-        stage('Building lint-md docker image'){
+        stage('Push docker images'){
             options {
               timeout(time: 10, unit: 'MINUTES')
             }
@@ -48,33 +47,16 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
                 }
-                sh "make build-lint-md"
+                sh "make push-workspace"
                 sh "make push-lint-md"
-            }
-        }
-        stage('Building build-image-builder docker image'){
-            options {
-              timeout(time: 10, unit: 'MINUTES')
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
-                }
-                sh "make build-image-builder"
                 sh "make push-image-builder"
-            }
-        }
-        stage('Building build-lint-go docker image'){
-            options {
-              timeout(time: 10, unit: 'MINUTES')
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
-                }
-                sh "make build-lint-go"
                 sh "make push-lint-go"
             }
         }
     }
+    post {
+      cleanup {
+          sh "docker logout '${image_registry}'"
+      }
+   }
 }
