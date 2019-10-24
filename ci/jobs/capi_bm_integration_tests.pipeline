@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
-ci_git_credential_id = "nordixinfra-github-token"
+ci_git_credential_id = "nordix-airship-ci-github-prod-token"
 
 script {
   if ("${PROJECT_REPO_ORG}" == "Nordix" && "${PROJECT_REPO_NAME}" == "airship-dev-tools") {
@@ -66,9 +66,7 @@ pipeline {
           try {
             withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
               withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
-                withCredentials([usernamePassword(credentialsId: 'nordixinfra-github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
-                  sh "make integration_test"
-                }
+                sh "make integration_test"
               }
             }
           }
