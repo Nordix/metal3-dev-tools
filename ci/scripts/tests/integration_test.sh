@@ -90,7 +90,7 @@ echo "Waiting for the host ${TEST_EXECUTER_VM_NAME} to come up"
 #Wait for the host to come up
 wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${TEST_EXECUTER_IP}"
 
-# Send Remote script to Executer
+#Send Remote script to Executer
 scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \

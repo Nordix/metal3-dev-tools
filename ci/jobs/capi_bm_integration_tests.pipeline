@@ -59,10 +59,11 @@ pipeline {
     }
     stage('Run integration test') {
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 15, unit: 'MINUTES')
       }
       steps {
         script {
+          START_TIME = System.currentTimeMillis()
           try {
             withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
               withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
@@ -70,12 +71,19 @@ pipeline {
               }
             }
           }
+          catch (org.hidetake.groovy.ssh.session.BadExitStatusException err) {
+              echo "Caught: ssh error"
+              echo "${err}"
+              currentBuild.result = 'FAILURE'
+            }
           catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
               echo "Caught: timeout error"
+              echo "${err}"
               currentBuild.result = 'FAILURE'
           }
           catch (err) {
               echo "Caught: runtime error"
+              echo "${err}"
               currentBuild.result = 'FAILURE'
           }
         }
@@ -84,6 +92,15 @@ pipeline {
   }
   post {
     cleanup {
+      script {
+        END_TIME = System.currentTimeMillis()
+        if ((((END_TIME - START_TIME)/1000) - 900) > 0)  {
+          echo "Forcing to failure"
+          DIFF = ((END_TIME - START_TIME)/1000) - 900
+          echo "${DIFF}"
+          currentBuild.result = 'FAILURE'
+        }
+      }
       withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
           sh "make integration_test_cleanup"
