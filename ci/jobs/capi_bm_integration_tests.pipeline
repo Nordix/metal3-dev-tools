@@ -2,6 +2,7 @@ import java.text.SimpleDateFormat
 
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_credential_id = "nordix-airship-ci-github-prod-token"
+def TIMEOUT = 3600
 
 script {
   if ("${PROJECT_REPO_ORG}" == "Nordix" && "${PROJECT_REPO_NAME}" == "airship-dev-tools") {
@@ -59,10 +60,11 @@ pipeline {
     }
     stage('Run integration test') {
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: TIMEOUT, unit: 'SECONDS')
       }
       steps {
         script {
+          CURRENT_START_TIME = System.currentTimeMillis()
           try {
             withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
               withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
@@ -70,12 +72,19 @@ pipeline {
               }
             }
           }
+          catch (org.hidetake.groovy.ssh.session.BadExitStatusException err) {
+              echo "Caught: ssh error"
+              echo "${err}"
+              currentBuild.result = 'FAILURE'
+          }
           catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
               echo "Caught: timeout error"
+              echo "${err}"
               currentBuild.result = 'FAILURE'
           }
           catch (err) {
               echo "Caught: runtime error"
+              echo "${err}"
               currentBuild.result = 'FAILURE'
           }
         }
@@ -84,6 +93,13 @@ pipeline {
   }
   post {
     cleanup {
+      script {
+        CURRENT_BUILD_TIME = System.currentTimeMillis()
+        if ((((CURRENT_BUILD_TIME - CURRENT_START_TIME)/1000) - TIMEOUT) > 0) {
+          echo "Failed due to timeout"
+          currentBuild.result = 'FAILURE'
+        }
+      }
       withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
           sh "make integration_test_cleanup"
