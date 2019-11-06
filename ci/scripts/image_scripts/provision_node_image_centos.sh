@@ -21,8 +21,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
         https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 
-sudo yum update -y
-sudo yum install -y gcc kernel-headers kernel-devel
+sudo yum --disablerepo="*" --enablerepo="kubernetes" update -y
 sudo yum install -y keepalived
 # keepalived start/enable on master node is handled by cloud-init 
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
@@ -32,9 +31,10 @@ sudo systemctl start docker
 sudo systemctl enable docker
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
+
+sudo yum clean all && sudo rm -rf /var/cache/yum
 
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
