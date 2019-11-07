@@ -36,5 +36,7 @@ sudo systemctl enable --now kubelet
 
 sudo yum clean all && sudo rm -rf /var/cache/yum
 
+sudo package-cleanup --oldkernels --count=1
+
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
