@@ -60,9 +60,8 @@ cd -
 i=0
 for repo in ${UPDATE_REPO}
 do
-  echo "Updating ${repo}"
+  echo "Updating master branch in ${repo}"
   pushd "${repo}"
-  # Update "master" on Nordix
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
   git checkout "${UPDATE_BRANCH}"
   # origin points to upstream repos
@@ -76,5 +75,18 @@ do
   echo -e "\n"
 i=$(($i+1));
 done
+
+# v1alpha2 branch present in CAPIPB_REPO
+ echo "Updating v1alpha2 branch in ${LOCAL_CAPIPB_REPO}"
+  pushd "${LOCAL_CAPIPB_REPO}"
+  git checkout origin/v1alpha2
+  # origin points to upstream repos
+  git fetch origin v1alpha2
+  git rebase origin/v1alpha2
+  git remote add nordixrepov1a2 ${NORDIX_CAPIPB_REPO}
+  git push nordixrepov1a2 HEAD:v1alpha2
+  echo "Push done to v1alpha2 branch in "${NORDIX_CAPIPB_REPO}""
+  popd
+  echo -e "\n"
 
 popd
