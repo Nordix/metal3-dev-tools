@@ -37,6 +37,7 @@ pipeline {
                 sh "make build-lint-md"
                 sh "make build-image-builder"
                 sh "make build-lint-go"
+                sh "make build-go-unittest"
             }
         }
         stage('Push docker images'){
@@ -51,6 +52,7 @@ pipeline {
                 sh "make push-lint-md"
                 sh "make push-image-builder"
                 sh "make push-lint-go"
+                sh "make push-go-unittest"
             }
         }
     }
