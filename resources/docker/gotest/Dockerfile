@@ -55,9 +55,9 @@ RUN apk add --update \
     musl-dev \
     bash \
     && rm -rf /var/cache/apk/* && \
-    curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest |\
-    grep browser_download | grep linux | cut -d '"' -f 4 | xargs curl -O -L && \
-    mv kustomize_*_linux_amd64 kustomize && \
+    curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases |\
+    grep browser_download | grep linux | cut -d '"' -f 4 | grep /kustomize/v | sort | tail -n 1 | xargs curl -O -L && \
+    tar xzf ./kustomize_v*_linux_amd64.tar.gz && \
     chmod u+x kustomize && \
     mv kustomize /usr/local/bin \
     && curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && \
@@ -65,7 +65,7 @@ RUN apk add --update \
     && rm operator-sdk-v0.9.0-x86_64-linux-gnu && \
     go get github.com/securego/gosec/cmd/gosec && \
     mv /go/bin/gosec /usr/local/bin && \
-    go get -u golang.org/x/lint/golint && \ 
+    go get -u golang.org/x/lint/golint && \
     mv /go/bin/golint /usr/local/bin && \
     curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     chmod +x install.sh && ./install.sh && rm install.sh && \
@@ -73,7 +73,7 @@ RUN apk add --update \
     curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
     chmod +x ./install_kubebuilder.sh \
     && ./install_kubebuilder.sh \
-    && rm ./install_kubebuilder.sh && \ 
+    && rm ./install_kubebuilder.sh && \
     mv /kubebuilder /usr/local && \
     cp /usr/local/kubebuilder/bin/kubebuilder /usr/local/bin
 
