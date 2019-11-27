@@ -9,6 +9,8 @@ export BMOBRANCH="${4:-master}"
 export CAPBMREPO="${5:-https://github.com/metal3-io/cluster-api-provider-baremetal.git}"
 export CAPBMBRANCH="${6:-master}"
 export CONTAINER_RUNTIME="docker"
+export BMO_RUN_LOCAL=true
+export CAPBM_RUN_LOCAL=true
 
 git clone "${METAL3REPO}" metal3
 pushd metal3
