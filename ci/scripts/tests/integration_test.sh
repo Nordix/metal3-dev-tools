@@ -83,8 +83,7 @@ openstack server create -f json \
 
 # Get the IP
 TEST_EXECUTER_IP="$(openstack port show -f json "${TEST_EXECUTER_PORT_NAME}" \
-  | jq -r '.fixed_ips' | tr ',' '\n' | grep ip_address | cut -d '=' -f2- \
-  | tr -d "'")"
+  | jq -r '.fixed_ips[0].ip_address')"
 
 echo "Waiting for the host ${TEST_EXECUTER_VM_NAME} to come up"
 #Wait for the host to come up
