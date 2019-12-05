@@ -38,6 +38,7 @@ pipeline {
     BUILD_URL = "${env.BUILD_URL}"
     PR_ID = "${ghprbPullId}"
     DISTRIBUTION = "${DISTRIBUTION}"
+    V1ALPHA2_SWITCH = "${V1ALPHA2_SWITCH}"
   }
   stages {
     stage('SCM') {

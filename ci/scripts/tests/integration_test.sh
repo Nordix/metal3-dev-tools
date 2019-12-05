@@ -18,6 +18,7 @@ CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 TESTS_SCRIPTS_DIR="${CI_DIR}/scripts/tests"
+V1ALPHA2_SWITCH="${V1ALPHA2_SWITCH:-false}"
 
 # shellcheck disable=SC1090
 source "${RT_SCRIPTS_DIR}/utils.sh"
@@ -108,4 +109,4 @@ ssh \
   "${AIRSHIP_CI_USER}"@"${TEST_EXECUTER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
   /tmp/run_integration_tests.sh "${METAL3REPO}" "${METAL3BRANCH}" \
-  "${BMOREPO}" "${BMOBRANCH}" "${CAPBMREPO}" "${CAPBMBRANCH}"
+  "${BMOREPO}" "${BMOBRANCH}" "${CAPBMREPO}" "${CAPBMBRANCH}" "${V1ALPHA2_SWITCH}"
