@@ -33,11 +33,9 @@ pipeline {
               timeout(time: 30, unit: 'MINUTES')
             }
             steps {
-                sh "make build-workspace"
                 sh "make build-lint-md"
                 sh "make build-image-builder"
                 sh "make build-lint-go"
-                sh "make build-go-unittest"
             }
         }
         stage('Push docker images'){
@@ -48,11 +46,9 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
                 }
-                sh "make push-workspace"
                 sh "make push-lint-md"
                 sh "make push-image-builder"
                 sh "make push-lint-go"
-                sh "make push-go-unittest"
             }
         }
     }
