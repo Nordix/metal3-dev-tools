@@ -35,6 +35,7 @@ TEST_EXECUTER_FLAVOR="${TEST_EXECUTER_FLAVOR:-4C-16GB-50GB}"
 REPO_ORG="${REPO_ORG:-metal3-io}"
 REPO_NAME="${REPO_NAME:-metal3-dev-env}"
 REPO_BRANCH="${REPO_BRANCH:-master}"
+UPDATED_REPO="${UPDATED_REPO:-https://github.com/${REPO_ORG}/${REPO_NAME}.git}"
 CAPI_VERSION="${CAPI_VERSION:-v1alpha2}"
 
 DISTRIBUTION="${DISTRIBUTION:-ubuntu}"
@@ -86,5 +87,5 @@ ssh \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${TEST_EXECUTER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  /tmp/run_integration_tests.sh "${REPO_ORG}" "${REPO_NAME}" \
-  "${REPO_BRANCH}" "${CAPI_VERSION}"
+  /tmp/run_integration_tests.sh "${REPO_ORG}" "${REPO_NAME}" "${REPO_BRANCH}" \
+  "${UPDATED_REPO}" "${CAPI_VERSION}"

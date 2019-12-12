@@ -9,8 +9,8 @@ export CAPBM_RUN_LOCAL=true
 REPO_ORG="${1:-metal3-io}"
 REPO_NAME="${2:-metal3-dev-env}"
 REPO_BRANCH="${3:-master}"
-export CAPI_VERSION="${4:-v1alpha2}"
-UPDATED_REPO="https://github.com/${REPO_ORG}/${REPO_NAME}.git"
+UPDATED_REPO="${4:-https://github.com/${REPO_ORG}/${REPO_NAME}.git}"
+export CAPI_VERSION="${5:-v1alpha2}"
 
 if [ "${REPO_NAME}" == "metal3-dev-env" ]
 then
