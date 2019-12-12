@@ -35,28 +35,7 @@ TEST_EXECUTER_FLAVOR="${TEST_EXECUTER_FLAVOR:-4C-16GB-50GB}"
 REPO_ORG="${REPO_ORG:-metal3-io}"
 REPO_NAME="${REPO_NAME:-metal3-dev-env}"
 REPO_BRANCH="${REPO_BRANCH:-master}"
-UPDATED_REPO="${UPDATED_REPO:-https://github.com/${REPO_ORG}/${REPO_NAME}.git}"
-
-if [ "${REPO_NAME}" == "metal3-dev-env" ]
-then
-   METAL3REPO="${UPDATED_REPO}"
-   METAL3BRANCH="${REPO_BRANCH}"
-elif [ "${REPO_NAME}" == "baremetal-operator" ]
-then
-   BMOREPO="${UPDATED_REPO}"
-   BMOBRANCH="${REPO_BRANCH}"
-elif [ "${REPO_NAME}" == "cluster-api-provider-baremetal" ]
-then
-   CAPBMREPO="${UPDATED_REPO}"
-   CAPBMBRANCH="${REPO_BRANCH}"
-fi
-
-METAL3REPO="${METAL3REPO:-https://github.com/metal3-io/metal3-dev-env.git}"
-METAL3BRANCH="${METAL3BRANCH:-master}"
-BMOREPO="${BMOREPO:-https://github.com/metal3-io/baremetal-operator.git}"
-BMOBRANCH="${BMOBRANCH:-master}"
-CAPBMREPO="${CAPBMREPO:-https://github.com/metal3-io/cluster-api-provider-baremetal.git}"
-CAPBMBRANCH="${CAPBMBRANCH:-master}"
+CAPI_VERSION="${CAPI_VERSION:-v1alpha2}"
 
 DISTRIBUTION="${DISTRIBUTION:-ubuntu}"
 if [ "${DISTRIBUTION}" == "ubuntu" ]
@@ -107,5 +86,5 @@ ssh \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${TEST_EXECUTER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  /tmp/run_integration_tests.sh "${METAL3REPO}" "${METAL3BRANCH}" \
-  "${BMOREPO}" "${BMOBRANCH}" "${CAPBMREPO}" "${CAPBMBRANCH}"
+  /tmp/run_integration_tests.sh "${REPO_ORG}" "${REPO_NAME}" \
+  "${REPO_BRANCH}" "${CAPI_VERSION}"
