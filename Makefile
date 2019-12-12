@@ -33,10 +33,10 @@ build-workspace: ## Build Docker Image for workspace
 	docker build \
 		-t ${NAME}-workspace \
 		-f resources/docker/workspace/Dockerfile resources/docker/workspace/
+	docker tag ${NAME}-workspace:latest ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: push-workspace
 push-workspace: ## Push Docker Image for Workspace to nordix registry
-	docker tag ${NAME}-workspace:latest ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
 	docker push ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: workspace
@@ -86,10 +86,10 @@ build-go-unittest: ## Build Docker Image for go unit test
 	docker build \
 		-t gotest-unit \
 		-f resources/docker/gotest/Dockerfile resources/docker/gotest/
+	docker tag gotest-unit:latest ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
 .PHONY: push-go-unittest
 push-go-unittest: ## Push Docker Image for go unit test to nordix registry
-	docker tag gotest-unit:latest ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
 	docker push ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
 SHELLCHECK_VERSION := "v0.7.0"

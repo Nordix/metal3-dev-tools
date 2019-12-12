@@ -70,7 +70,7 @@ RUN apk add --update \
     curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     chmod +x install.sh && ./install.sh && rm install.sh && \
     mv /go/bin/dep /usr/local/bin && \
-    curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/tools/install_kubebuilder.sh && \
+    curl -LO https://raw.githubusercontent.com/Nordix/cluster-api-provider-baremetal/master/hack/tools/install_kubebuilder.sh && \
     chmod +x ./install_kubebuilder.sh \
     && ./install_kubebuilder.sh \
     && rm ./install_kubebuilder.sh && \
