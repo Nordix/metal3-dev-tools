@@ -2,15 +2,32 @@
 
 set -eux
 
-export METAL3REPO="${1:-https://github.com/metal3-io/metal3-dev-env.git}"
-export METAL3BRANCH="${2:-master}"
-export BMOREPO="${3:-https://github.com/metal3-io/baremetal-operator.git}"
-export BMOBRANCH="${4:-master}"
-export CAPBMREPO="${5:-https://github.com/metal3-io/cluster-api-provider-baremetal.git}"
-export CAPBMBRANCH="${6:-master}"
 export CONTAINER_RUNTIME="docker"
 export BMO_RUN_LOCAL=true
 export CAPBM_RUN_LOCAL=true
+
+REPO_ORG="${1:-metal3-io}"
+REPO_NAME="${2:-metal3-dev-env}"
+REPO_BRANCH="${3:-master}"
+export CAPI_VERSION="${4:-v1alpha2}"
+UPDATED_REPO="https://github.com/${REPO_ORG}/${REPO_NAME}.git"
+
+if [ "${REPO_NAME}" == "metal3-dev-env" ]
+then
+   METAL3REPO="${UPDATED_REPO}"
+   METAL3BRANCH="${REPO_BRANCH}"
+elif [ "${REPO_NAME}" == "baremetal-operator" ]
+then
+   export BMOREPO="${UPDATED_REPO}"
+   export BMOBRANCH="${REPO_BRANCH}"
+elif [ "${REPO_NAME}" == "cluster-api-provider-baremetal" ]
+then
+   export CAPBMREPO="${UPDATED_REPO}"
+   export CAPBMBRANCH="${REPO_BRANCH}"
+fi
+
+METAL3REPO="${METAL3REPO:-https://github.com/metal3-io/metal3-dev-env.git}"
+METAL3BRANCH="${METAL3BRANCH:-master}"
 
 git clone "${METAL3REPO}" metal3
 pushd metal3
