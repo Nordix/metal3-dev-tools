@@ -33,5 +33,11 @@ git clone "${METAL3REPO}" metal3
 pushd metal3
 git checkout "${METAL3BRANCH}"
 make
-make test
+
+if [ "${CAPI_VERSION}" == v1alpha1 ]; then
+  make test
+elif [ "${CAPI_VERSION}" == v1alpha2 ]; then
+  make test_v1a2
+fi
+
 make clean
