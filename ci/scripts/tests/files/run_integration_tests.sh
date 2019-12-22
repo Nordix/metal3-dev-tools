@@ -11,6 +11,8 @@ REPO_NAME="${2:-metal3-dev-env}"
 REPO_BRANCH="${3:-master}"
 UPDATED_REPO="${4:-https://github.com/${REPO_ORG}/${REPO_NAME}.git}"
 export CAPI_VERSION="${5:-v1alpha2}"
+export IMAGE_OS="${6:-Ubuntu}"
+export TARGET_NODE_MEMORY="${7:-4096}"
 
 if [ "${REPO_NAME}" == "metal3-dev-env" ]
 then
