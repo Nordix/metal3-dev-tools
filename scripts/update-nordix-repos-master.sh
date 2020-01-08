@@ -76,17 +76,19 @@ do
 i=$(($i+1));
 done
 
+# Example: sync other than master branch
+#
 # v1alpha2 branch present in CAPIPB_REPO
- echo "Updating v1alpha2 branch in ${LOCAL_CAPIPB_REPO}"
-  pushd "${LOCAL_CAPIPB_REPO}"
-  git checkout origin/v1alpha2
+# echo "Updating v1alpha2 branch in ${LOCAL_CAPIPB_REPO}"
+#  pushd "${LOCAL_CAPIPB_REPO}"
+#  git checkout origin/v1alpha2
   # origin points to upstream repos
-  git fetch origin v1alpha2
-  git rebase origin/v1alpha2
-  git remote add nordixrepov1a2 ${NORDIX_CAPIPB_REPO}
-  git push nordixrepov1a2 HEAD:v1alpha2
-  echo "Push done to v1alpha2 branch in "${NORDIX_CAPIPB_REPO}""
-  popd
-  echo -e "\n"
+#  git fetch origin v1alpha2
+#  git rebase origin/v1alpha2
+#  git remote add nordixrepov1a2 ${NORDIX_CAPIPB_REPO}
+#  git push nordixrepov1a2 HEAD:v1alpha2
+#  echo "Push done to v1alpha2 branch in "${NORDIX_CAPIPB_REPO}""
+#  popd
+#  echo -e "\n"
 
 popd
