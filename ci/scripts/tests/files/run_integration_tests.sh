@@ -3,7 +3,6 @@
 set -eux
 
 export CONTAINER_RUNTIME="docker"
-export BMO_RUN_LOCAL=true
 export CAPBM_RUN_LOCAL=true
 
 REPO_ORG="${1:-metal3-io}"
@@ -22,6 +21,16 @@ elif [ "${REPO_NAME}" == "baremetal-operator" ]
 then
    export BMOREPO="${UPDATED_REPO}"
    export BMOBRANCH="${REPO_BRANCH}"
+   export BAREMETAL_OPERATOR_LOCAL_IMAGE="${UPDATED_REPO}"
+elif [ "${REPO_NAME}" == "ironic-image" ]
+then
+   export IRONIC_LOCAL_IMAGE="${UPDATED_REPO}"
+elif [ "${REPO_NAME}" == "ironic-inspector-image" ]
+then
+  export IRONIC_INSPECTOR_LOCAL_IMAGE="${UPDATED_REPO}"
+elif [ "${REPO_NAME}" == "ironic-ipa-downloader" ]
+then
+  export IPA_DOWNLOADER_LOCAL_IMAGE="${UPDATED_REPO}"
 elif [ "${REPO_NAME}" == "cluster-api-provider-baremetal" ]
 then
    export CAPBMREPO="${UPDATED_REPO}"
