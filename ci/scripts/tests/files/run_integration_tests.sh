@@ -3,7 +3,6 @@
 set -eux
 
 export CONTAINER_RUNTIME="docker"
-export CAPBM_RUN_LOCAL=true
 
 REPO_ORG="${1:-metal3-io}"
 REPO_NAME="${2:-metal3-dev-env}"
@@ -35,6 +34,7 @@ elif [ "${REPO_NAME}" == "cluster-api-provider-baremetal" ]
 then
    export CAPBMREPO="${UPDATED_REPO}"
    export CAPBMBRANCH="${REPO_BRANCH}"
+   export CAPBM_LOCAL_IMAGE="${UPDATED_REPO}"
 fi
 
 METAL3REPO="${METAL3REPO:-https://github.com/metal3-io/metal3-dev-env.git}"
