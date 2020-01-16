@@ -21,20 +21,25 @@ then
    export BMOREPO="${UPDATED_REPO}"
    export BMOBRANCH="${REPO_BRANCH}"
    export BAREMETAL_OPERATOR_LOCAL_IMAGE="${UPDATED_REPO}"
+   export BAREMETAL_OPERATOR_LOCAL_IMAGE_BRANCH="${REPO_BRANCH}"
 elif [ "${REPO_NAME}" == "ironic-image" ]
 then
    export IRONIC_LOCAL_IMAGE="${UPDATED_REPO}"
+   export IRONIC_LOCAL_IMAGE_BRANCH="${REPO_BRANCH}"
 elif [ "${REPO_NAME}" == "ironic-inspector-image" ]
 then
   export IRONIC_INSPECTOR_LOCAL_IMAGE="${UPDATED_REPO}"
+  export IRONIC_INSPECTOR_LOCAL_IMAGE_BRANCH="${REPO_BRANCH}"
 elif [ "${REPO_NAME}" == "ironic-ipa-downloader" ]
 then
   export IPA_DOWNLOADER_LOCAL_IMAGE="${UPDATED_REPO}"
+  export IPA_DOWNLOADER_LOCAL_IMAGE_BRANCH="${REPO_BRANCH}"
 elif [ "${REPO_NAME}" == "cluster-api-provider-baremetal" ]
 then
    export CAPBMREPO="${UPDATED_REPO}"
    export CAPBMBRANCH="${REPO_BRANCH}"
    export CAPBM_LOCAL_IMAGE="${UPDATED_REPO}"
+   export CAPBM_LOCAL_IMAGE_BRANCH="${REPO_BRANCH}"
 fi
 
 METAL3REPO="${METAL3REPO:-https://github.com/metal3-io/metal3-dev-env.git}"
