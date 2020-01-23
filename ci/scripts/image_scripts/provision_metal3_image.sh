@@ -2,6 +2,17 @@
 
 set -uex
 
+#Disable the automatic updates
+cat << EOF | sudo tee /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Unattended-Upgrade "0";
+EOF
+
+systemctl disable apt-daily-upgrade.timer
+systemctl disable apt-daily.timer
+systemctl stop apt-daily-upgrade.timer
+systemctl stop apt-daily.timer
+
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
 # Metal3 Dev Env variables
