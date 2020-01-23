@@ -26,13 +26,6 @@ sudo apt install -y \
   software-properties-common \
   openssl
 
-#Disable the automatic updates
-cat << EOF | sudo tee /etc/apt/apt.conf.d/20auto-upgrades
-APT::Periodic::Update-Package-Lists "0";
-APT::Periodic::Unattended-Upgrade "0";
-EOF
-
-
 # Install docker.
 "${SCRIPTS_DIR}"/setup_docker_ubuntu.sh
 
