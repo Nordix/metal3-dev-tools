@@ -17,7 +17,7 @@ Check global status of jobs which are built on a daily basis:
 First 4 jobs above run metal3-dev-env v1alpha1/v1alpha2 integration tests. You
 should see blue colour that indicates that run was successfull.
 
-![CI](https://github.com/Nordix/airship-dev-tools/blob/document/ci-feruz/wow/jenkins_ci/ci.png)
+![CI](ci.png)
 
 In case of job **FAILURE**,
  - first check the job's logs (```console output```) to get more info.
@@ -63,7 +63,7 @@ console and get the floating IP of the corresponding Jenkins slave VM.
 3. Find the IP of the VM  from Jenkins job's **console_output**, which is
 created for running actual integration test. See example screenshot:
 
-![ssh](https://github.com/Nordix/airship-dev-tools/blob/document/ci-feruz/wow/jenkins_ci/ssh.png)
+![ssh](ssh.png)
 
 4. SSH into the Jenkins slave VM with its floating IP that you found in step2
 and from there SSH into the actual tester VM with its own IP that you found
