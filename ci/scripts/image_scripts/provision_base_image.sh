@@ -20,7 +20,6 @@ sudo apt install -y \
   curl \
   apt-transport-https \
   ca-certificates \
-  jq \
   tree \
   make \
   gnupg-agent \
