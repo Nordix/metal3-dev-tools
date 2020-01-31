@@ -14,6 +14,8 @@ Check global status of jobs which are built on a daily basis:
 * [airship_docker_image_building](https://jenkins.nordix.org/view/Airship/job/airship_docker_image_building/)
 * [airship_update_nordix_repos](https://jenkins.nordix.org/view/Airship/job/airship_update_nordix_repos/)
 
+**Note: you can run jenkins-check-ci.sh script to check job statuses**
+
 First 4 jobs above run metal3-dev-env v1alpha1/v1alpha2 integration tests. You
 should see blue colour that indicates that run was successfull.
 
