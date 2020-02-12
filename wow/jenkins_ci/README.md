@@ -10,13 +10,15 @@ Check global status of jobs which are built on a daily basis:
 * [airship_master_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_test_ubuntu/) *(v1alpha1 integration test)*
 * [airship_master_v1a2_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a2_integration_test_centos/) *(v1alpha2 integration test)*
 * [airship_master_v1a2_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a2_integration_test_ubuntu/) *(v1alpha2 integration test)*
+* [airship_master_v1a3_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_centos/) *(v1alpha3 integration test)*
+* [airship_master_v1a3_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_ubuntu/) *(v1alpha3 integration test)*
 * [airship_openstack_image_building](https://jenkins.nordix.org/view/Airship/job/airship_openstack_image_building/)
 * [airship_docker_image_building](https://jenkins.nordix.org/view/Airship/job/airship_docker_image_building/)
-* [airship_update_nordix_repos](https://jenkins.nordix.org/view/Airship/job/airship_update_nordix_repos/)
+* [airship_nordix_dev_tools_repos](https://jenkins.nordix.org/view/Airship/job/airship_nordix_dev_tools_repos/)
 
 **Note: you can run jenkins-check-ci.sh script to check job statuses**
 
-First 4 jobs above run metal3-dev-env v1alpha1/v1alpha2 integration tests. You
+Jobs with prefix 'airship_master_' run metal3-dev-env v1alpha1, v1alpha2 and v1alpha3 integration tests. You
 should see blue colour that indicates that run was successfull.
 
 ![CI](ci.png)
