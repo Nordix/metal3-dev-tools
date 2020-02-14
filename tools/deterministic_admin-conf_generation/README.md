@@ -3,6 +3,7 @@
 Given a ```ca.key``` and ```ca.crt``` we would like to create _admin.conf for accessing a kubernetes cluster.
 
 Note:
+- This scripts works on linux machines and bash shell.
 - The cluster is not setup yet.
 - The file is named ```_admin```.conf to distinguish it from the one automatically created during ```kubeadm init```
 # Steps
