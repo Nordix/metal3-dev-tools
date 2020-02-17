@@ -9,9 +9,7 @@ fi
 
 function generate_ca_certs() {
   openssl genrsa -out ./credentials/ca.key 2048
-  openssl req -new -key ./credentials/ca.key -subj "/CN=KUBERNETES-CA" -out ./credentials/ca.csr
-  openssl x509 -req -in ./credentials/ca.csr -signkey ./credentials/ca.key -CAcreateserial  -out ./credentials/ca.crt -days 3653
-  rm ./credentials/ca.csr
+  openssl req -x509 -new -nodes -key ./credentials/ca.key -subj "/CN=Kubernetes-ca" -days 10000 -out ./credentials/ca.crt
 }
 
 # if ca.key and ca.crt are not provided, then create them
