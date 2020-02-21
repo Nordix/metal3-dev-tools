@@ -17,7 +17,7 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 
 sudo yum update -y
 sudo yum update -y curl nss
-sudo yum install -y git
+sudo yum install -y git make
 
 #Install Operator SDK
 OSDK_RELEASE_VERSION=v0.12.0
