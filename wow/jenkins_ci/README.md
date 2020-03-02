@@ -76,3 +76,8 @@ in step3.
   **Note:** to SSH the Jenkins slave VM you need an airshipci SSH key
 
 5. Once you are inside the tester VM you can debug it and get more info.  
+
+### How to clean up leftover VMs from CityCloud
+There is a Jenkins [master job](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_tests_cleanup/) that every 6 hours cleans up all the leftover VMs, which failed to be deleted at the end of v1alphaX integration test.
+
+**Note:** If you want to trigger cleaning job manually, you can use the `/test-clean` phrase within an open pull request under [metal3-io/project-infra](https://github.com/metal3-io/project-infra) repo.
