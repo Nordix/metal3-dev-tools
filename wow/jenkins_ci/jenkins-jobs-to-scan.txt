@@ -1,0 +1,4 @@
+# List the jobs or string patterns here
+image_building
+tools_repos
+_master_
