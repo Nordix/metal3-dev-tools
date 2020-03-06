@@ -13,14 +13,14 @@ WORKSPACE=${WORKSPACE:=/tmp}
 SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
 CAPIPB_REPO="https://github.com/metal3-io/cluster-api-provider-baremetal.git"
-CAPM3_REPO=="https://github.com/metal3-io/cluster-api-provider-metal3.git"
+CAPM3_REPO="https://github.com/metal3-io/cluster-api-provider-metal3.git"
 CAPI_REPO="https://github.com/kubernetes-sigs/cluster-api.git"
 BMO_REPO="https://github.com/metal3-io/baremetal-operator.git"
 M3DOCS_REPO="https://github.com/metal3-io/metal3-docs.git"
 M3DEVENV_REPO="https://github.com/metal3-io/metal3-dev-env.git"
 
 NORDIX_CAPIPB_REPO="git@github.com:Nordix/cluster-api-provider-baremetal.git"
-NORDIX_CAPM3_REPO=="git@github.com:Nordix/cluster-api-provider-metal3.git"
+NORDIX_CAPM3_REPO="git@github.com:Nordix/cluster-api-provider-metal3.git"
 NORDIX_CAPI_REPO="git@github.com:Nordix/cluster-api.git"
 NORDIX_BMO_REPO="git@github.com:Nordix/baremetal-operator.git"
 NORDIX_M3DOCS_REPO="git@github.com:Nordix/metal3-docs.git"
