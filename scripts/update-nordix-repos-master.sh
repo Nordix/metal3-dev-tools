@@ -13,18 +13,21 @@ WORKSPACE=${WORKSPACE:=/tmp}
 SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
 CAPIPB_REPO="https://github.com/metal3-io/cluster-api-provider-baremetal.git"
+CAPM3_REPO=="https://github.com/metal3-io/cluster-api-provider-metal3.git"
 CAPI_REPO="https://github.com/kubernetes-sigs/cluster-api.git"
 BMO_REPO="https://github.com/metal3-io/baremetal-operator.git"
 M3DOCS_REPO="https://github.com/metal3-io/metal3-docs.git"
 M3DEVENV_REPO="https://github.com/metal3-io/metal3-dev-env.git"
 
 NORDIX_CAPIPB_REPO="git@github.com:Nordix/cluster-api-provider-baremetal.git"
+NORDIX_CAPM3_REPO=="git@github.com:Nordix/cluster-api-provider-metal3.git"
 NORDIX_CAPI_REPO="git@github.com:Nordix/cluster-api.git"
 NORDIX_BMO_REPO="git@github.com:Nordix/baremetal-operator.git"
 NORDIX_M3DOCS_REPO="git@github.com:Nordix/metal3-docs.git"
 NORDIX_M3DEVENV_REPO="git@github.com:Nordix/metal3-dev-env.git"
 
 LOCAL_CAPIPB_REPO="${WORKSPACE}/cluster-api-provider-baremetal"
+LOCAL_CAPM3_REPO="${WORKSPACE}/cluster-api-provider-metal3"
 LOCAL_CAPI_REPO="${WORKSPACE}/cluster-api"
 LOCAL_BMO_REPO="${WORKSPACE}/baremetal-operator"
 LOCAL_M3DOCS_REPO="${WORKSPACE}/metal3-docs"
@@ -33,10 +36,10 @@ LOCAL_M3DEVENV_REPO="${WORKSPACE}/metal3-dev-env"
 pushd "${SCRIPTPATH}"
 cd ..
 
-UPDATE_REPO="${1:-${LOCAL_CAPIPB_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO}}"
+UPDATE_REPO="${1:-${LOCAL_CAPIPB_REPO} ${LOCAL_CAPM3_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO}}"
 UPDATE_BRANCH="${2:-master}"
-UPSTREAM_REPO="${3:-${CAPIPB_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO}}"
-NORDIX_REPO="${4:-${NORDIX_CAPIPB_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO}}"
+UPSTREAM_REPO="${3:-${CAPIPB_REPO} ${CAPM3_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO}}"
+NORDIX_REPO="${4:-${NORDIX_CAPIPB_REPO} ${NORDIX_CAPM3_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO}}"
 
 # clone upstream repos to jenkins if not found
 i=0
