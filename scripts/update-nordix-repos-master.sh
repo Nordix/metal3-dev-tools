@@ -72,12 +72,12 @@ do
   echo "Updating master branch in ${repo}"
   pushd "${repo}"
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  git checkout "${UPDATE_BRANCH}"
+  git checkout "${BRANCH}"
   # origin points to upstream repos
   git fetch origin
-  git rebase origin/master
+  git rebase origin/"${BRANCH}"
   git remote add nordixrepo ${ndxarray[$i]}
-  git push -uf nordixrepo master
+  git push -uf nordixrepo "${BRANCH}"
   echo "Push done to "${ndxarray[$i]}""
   git checkout "${BRANCH}"
   popd
