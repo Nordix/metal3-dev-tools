@@ -31,7 +31,7 @@ setup_go_repo () {
 setup_go_repo cluster-api kubernetes-sigs go/src/sigs.k8s.io
 setup_repo metal3-dev-env metal3-io
 setup_repo metal3-docs metal3-io
-setup_go_repo cluster-api-provider-baremetal metal3-io go/src/github.com/metal3-io
+setup_go_repo cluster-api-provider-metal3 metal3-io go/src/github.com/metal3-io
 setup_go_repo baremetal-operator metal3-io go/src/github.com/metal3-io
 
 popd
