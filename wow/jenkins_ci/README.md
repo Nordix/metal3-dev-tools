@@ -9,20 +9,17 @@ with your Google account.
 * jenkins-jobs-to-scan.txt lists string patterns used for checking
 
 Check global status of jobs which are built on a daily basis:
-* [airship_master_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_test_centos/) *(v1alpha1 integration test)*
-* [airship_master_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_test_ubuntu/) *(v1alpha1 integration test)*
-* [airship_master_v1a2_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a2_integration_test_centos/) *(v1alpha2 integration test)*
-* [airship_master_v1a2_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a2_integration_test_ubuntu/) *(v1alpha2 integration test)*
 * [airship_master_v1a3_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_centos/) *(v1alpha3 integration test)*
 * [airship_master_v1a3_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_ubuntu/) *(v1alpha3 integration test)*
+* [airship_master_v1a4_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a4_integration_test_centos/) *(v1alpha4 integration test)*
+* [airship_master_v1a4_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a4_integration_test_ubuntu/) *(v1alpha4 integration test)*
+* [airship_master_integration_tests_cleanup](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_tests_cleanup/) *(capi baremetal integration tests cleanup)*
 * [airship_openstack_image_building](https://jenkins.nordix.org/view/Airship/job/airship_openstack_image_building/)
 * [airship_docker_image_building](https://jenkins.nordix.org/view/Airship/job/airship_docker_image_building/)
 * [airship_nordix_dev_tools_repos](https://jenkins.nordix.org/view/Airship/job/airship_nordix_dev_tools_repos/)
 
-Jobs with prefix 'airship_master_' run metal3-dev-env v1alpha1, v1alpha2 and v1alpha3 integration tests. You
-should see blue colour that indicates that run was successfull.
-
-![CI](ci.png)
+Jobs with prefix 'airship_master_' run metal3-dev-env v1alpha3 and v1alpha4 integration tests. You
+should see **blue** colour that indicates that run was successfull.
 
 In case of job **FAILURE**,
  - first check the job's logs (```console output```) to get more info.
