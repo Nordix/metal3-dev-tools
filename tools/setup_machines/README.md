@@ -46,10 +46,10 @@ Alternative topologies can be found [here](https://kubernetes.io/docs/setup/prod
 ### Setup test environment
 
 ```bash
-./providers/kinder/setup_test_environment.sh <cluster name> [<number of masters> <number of workers>]
+./providers/kinder/setup_test_environment.sh <cluster name> [<number of masters> <number of workers> <kindest node version>]
 ```
 
-If you do not provide the number of workers or masters or both, then both default to 3.
+If you do not provide the number of workers or masters or both, then both default to 3. Kindest node version is by default **kindest/node:v1.18.0**
 
 ### Teardown test environment
 

@@ -4,6 +4,7 @@ cluster_name="${1}"
 action="${2}"
 masters_count="${3}"
 workers_count="${4}"
+kindest_node_ver="${5}"
 
 # To items
 # Build node images such that | i.e replace configure_machines.sh by a new image
@@ -17,7 +18,7 @@ if [ "${action}" == "create" ]; then
     kinder create cluster \
         --control-plane-nodes "${masters_count}" \
         --worker-nodes "${workers_count}" \
-        --image kindest/node:latest \
+        --image "${kindest_node_ver}" \
         --name "${cluster_name}"
 
     # Verify creation of machines
