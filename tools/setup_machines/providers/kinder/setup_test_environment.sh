@@ -4,9 +4,10 @@
 cluster_name="${1}"
 masters_count="${2:-3}"
 workers_count="${3:-3}"
+kindest_node_ver="${4:-kindest/node:v1.18.0}"
 
 if [ -z "${1}" ]; then
-    echo -e "Error: Missing cluster name\nUsage:./setup_test_environment.sh <cluster name> [<number of masters> <number of workers>]"
+    echo -e "Error: Missing cluster name\nUsage:./setup_test_environment.sh <cluster name> [<number of masters> <number of workers> <kindest_node_ver>]"
     exit 1
 fi
 
@@ -22,7 +23,7 @@ fi
 # Remove existing and create new machines
 "$(dirname "${0}")"/manage_machines.sh "$cluster_name" delete
 
-"$(dirname "${0}")"/manage_machines.sh "$cluster_name" create "${masters_count}" "${workers_count}"
+"$(dirname "${0}")"/manage_machines.sh "$cluster_name" create "${masters_count}" "${workers_count}" "${kindest_node_ver}"
 
 # Install utility binaries on machines, Eg. net-tools
 machines=$(kinder get nodes --name "${cluster_name}")
