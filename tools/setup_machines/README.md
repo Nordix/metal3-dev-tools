@@ -17,7 +17,7 @@ A kubernetes control plane is made of multiple components, such as the API serve
 
 ## Experiments overview
 
-The main focus on studying the behavior of kubeadm when run on machine with multiple interfaces.
+The main focus on studying the behavior of kubeadm when run on a machine with multiple interfaces.
 And, We try to answer the following questions.
 
 - How do these components choose which interfaces to use ?
@@ -32,7 +32,6 @@ As shown below, there are multiple traffic networks for the workers and addition
 - api-server to etcd communication over localhost if they are on the same machine
 - api-server to etcd communication not possible if they are on separate machines
 
-[Topology](./resources/images/network-topology.png)
 Alternative topologies can be found [here](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/)
 
 ## Kinder based machine creation
@@ -78,8 +77,8 @@ In a multi interface control plane node, configuring control plane such that
 
 - Apply **kubeadm** init and join with default configurations to check how it populates the different static pod manifest files
 - Use a custom **kubeadm-init** config file where we add only **api-server** related configurations and check if a different interface for **api-server** is assigned
-- Extend the 2nd test case by adding **etcd-server** related configurations in **kubeadm-init** config file and check if different interface for **api-server**  and **etcd-server** gets assigned.
-- In all of the above cases, consider the impact of these configuration using **kubeadm-join** config file.
+- Extend the 2nd test case by adding **etcd-server** related configurations in **kubeadm-init** config file and check if different interfaces for **api-server**  and **etcd-server** gets assigned.
+- In all of the above cases, consider the impact of these configurations using **kubeadm-join** config file.
 
 ## Test Results
 
@@ -92,38 +91,44 @@ In a multi interface control plane node, configuring control plane such that
 
 **Test case 2:**
 
-- Setup: Custom kubeconfig-init with only api-server non-default IP
+- Setup: Custom kubeconfig-init with only api-server given a non-default IP
 - Desired result: Both api-server and etcd use the given IP
 - Actual Result: As expected
-- Observation: On the joining node, the default IP was used for both etcd and api-server, i.e. The joining string did not contributed in IP selection.
+- Observation: On the joining node, the default IP was used for both etcd and api-server, i.e. The IP in the joining string did not contribute in IP selection.
 
 **Test case 3:**
 
 - Setup: Custom kubeconfig-init and kubeconfig-join with etcd on IP1 and api-server on IP2 where both IP1 and IP2 are non-default
 - Desired result: api-server and etcd use their respective IPs
 - Actual Result: As expected
-- Observation: On the joining node, the default IP was used for both etcd and api-server, i.e. The joining string did not contributed in IP selection.
+- Observation: On the joining node, the default IP was used for both etcd and api-server, i.e. The IP in the joining string did not contribute in IP selection.
 
 **Test case 4:**
 
-- Setup: Custom kubeconfig-init with etcd on master1 has IP1 and api-server on master 1 has IP2 where both IP1 and IP2 are non-default. The kubeconfig-join configures api-server in master 2 to use own non-default IP3 and points to the api-server IP1 in master 1 as the **K8S_API_ENDPOINT_INTERNAL** (The config files are attache in later sections)
+- Setup: Custom kubeconfig-init with etcd on master1 has IP1 and api-server on master 1 has IP2 where both IP1 and IP2 are non-default. The kubeconfig-join configures api-server in master 2 to use its own non-default IP3 and points to the api-server IP1 in master 1 as the **K8S_API_ENDPOINT_INTERNAL** (The config files are attache in later sections)
 - Desired result: The api-server and etcd in master 1 and api-server in master 2 use the given IP
 - Actual Result: As expected
-- Observation: On the joining node, the given IP was used for api-server, i.e. The joining configuration file contributed in IP selection.
+- Observation: On the joining node, the given IP was used for api-server, i.e. The joining configuration file has an influence in IP selection.
 
 ## Observations
 
 Here we just pinpoint the answers for the questions asked in [Motivation](#Motivation) section:
 
-- How do these components choose which interfaces to use?
-- By default
-- How do we influence the choice during init phase?
+How do these components choose which interfaces to use?
+- They use the interface on default network.
+
+How do we influence the choice during init phase?
+
 - Using kubeadm-init config file
-- How do we influence the choice during join phase?
+
+How do we influence the choice during join phase?
+
 - Using kubeadm-join config file
-- How granular the configuration could be made?
-- Only the case where the api server and the etcd use the same none defautl ip works .....
-- Making separate was not succeeding on the joining end as it always takes ........
+
+How granular the configuration could be made?
+
+- Only the case where the api server and the etcd use the SAME none defautl ip works
+- Making them use separate interfaces (IPs) was not succeeding on the joining end.
 
 ## kubeadm-init config file sample
 
