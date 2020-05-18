@@ -5,8 +5,21 @@ with your Google account.
 
 ###  Daily steps to ensure successfullness of Jenkins CI
 
-**Note: you can run 'jenkins-check-ci.sh' script to check job statuses**
+**Note: you can run 'jenkins-check-ci.sh' script to check CI job statuses**
 * jenkins-jobs-to-scan.txt lists string patterns used for checking
+
+* running from your local repo
+* running from cli by remotely accessing github, no need for local repo
+
+```
+wget -q https://raw.githubusercontent.com/Nordix/airship-dev-tools/master/wow/jenkins_ci/jenkins-jobs-to-scan.txt | sleep 1 | bash <(curl -Ls https://raw.githubusercontent.com/Nordix/airship-dev-tools/master/wow/jenkins_ci/jenkins-check-ci.sh) && rm jenkins-jobs-to-scan.txt*
+```
+
+* a customized jenkins-jobs-to-scan.txt can be used by running (wget run once to fetch jenkins-jobs-to-scan.txt)
+
+```
+bash <(curl -Ls https://raw.githubusercontent.com/Nordix/airship-dev-tools/master/wow/jenkins_ci/jenkins-check-ci.sh)
+```
 
 Check global status of jobs which are built on a daily basis:
 * [airship_master_v1a3_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_centos/) *(v1alpha3 integration test)*
