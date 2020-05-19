@@ -25,7 +25,7 @@ function generate_metal3MachineTemplate () {
     " > "${Metal3MachineTemplate_OUTPUT_FILE}"
 }
 
-function provision_controlpalne_node() {
+function provision_controlplane_node() {
     #pushd "/home/ubuntu/metal3-dev-env"
     echo "Provisioning a controlplane node...."
     bash /home/ubuntu/metal3-dev-env/scripts/v1alphaX/provision_cluster.sh
@@ -47,6 +47,18 @@ function create_metal3_dev_env() {
     export CAPI_VERSION=v1alpha3
     export NUM_NODES=4
     export EPHEMERAL_CLUSTER=minikube
+    make clean
+    make
+    popd
+}
+
+function create_metal3_dev_env_kind() {
+    pushd "${GOPATH}/src/github.com/metal3-dev-env"
+    export DEFAULT_HOSTS_MEMORY=4096
+    export IMAGE_OS=Ubuntu
+    export CAPI_VERSION=v1alpha3
+    export NUM_NODES=4
+    export CONTAINER_RUNTIME=docker
     make clean
     make
     popd
