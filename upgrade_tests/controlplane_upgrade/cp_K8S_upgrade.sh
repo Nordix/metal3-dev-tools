@@ -2,14 +2,10 @@
 
 source ../common.sh
 
-# fix k8s version
-# ToDo, export k8s and binaries version here
-
 echo '' > ~/.ssh/known_hosts
 
-#create_metal3_dev_env_kind
-provision_controlplane_node
-#provision_worker_node
+#provision_controlplane_node
+
 CLUSTER_NAME=$(kubectl get clusters -n metal3 | grep Provisioned | cut -f1 -d' ')
 
 wait_for_ctrlplane_provisioning_start
@@ -18,7 +14,7 @@ ORIGINAL_NODE=$(kubectl get bmh -n metal3 | grep control | grep -v ready | cut -
 echo "BareMetalHost ${ORIGINAL_NODE} is in provisioning or provisioned state"
 NODE_IP=$(virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
 
-wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${NODE_IP}
+wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${NODE_IP} "Original node"
 
 FROM_VERSION=$(kubectl get kcp -n metal3 -oyaml | grep "version: v1" | cut -f2 -d':' | awk '{$1=$1;print}')
 
