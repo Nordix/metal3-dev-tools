@@ -10,9 +10,9 @@ export UPGRADED_K8S_VERSION_2="v1.18.2"
 export UPGRADED_BINARY_VERSION="v1.18.1"
 
 function generate_metal3MachineTemplate() {
-NAME="${1}"
-CLUSTER_UID="${2}"
-Metal3MachineTemplate_OUTPUT_FILE="${3}"
+  NAME="${1}"
+  CLUSTER_UID="${2}"
+  Metal3MachineTemplate_OUTPUT_FILE="${3}"
 
 echo "
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
@@ -65,7 +65,7 @@ function wait_for_ctrlplane_provisioning_start() {
             if [[ "${i}" -ge 3600 ]];then
                 echo "Error: provisioning took too long to start"
                 exit 1
-                fi
+            fi
             continue
         else
             echo -n "."
@@ -211,7 +211,7 @@ function wait_for_orig_node_deprovisioned() {
     if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
     ORIGINAL_NODE="${1}"
     echo "Waiting for ${ORIGINAL_NODE} to be deprovisioned"
-        for i in {1..3600};do
+    for i in {1..3600};do
         ready_nodes=$(kubectl get bmh -n metal3 | grep ready | wc -l)
         if [[ "${ready_nodes}" == '3' ]]; then
             echo ''
