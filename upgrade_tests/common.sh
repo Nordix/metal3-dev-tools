@@ -50,35 +50,8 @@ function provision_worker_node() {
     popd
 }
 
-function create_metal3_dev_env() {
-    pushd "/home/ubuntu/metal3-dev-env"
-    export DEFAULT_HOSTS_MEMORY=4096
-    export IMAGE_OS=Ubuntu
-    export CAPI_VERSION=v1alpha3
-    export NUM_NODES=4
-    export EPHEMERAL_CLUSTER=minikube
-    make clean
-    make
-    popd
-}
-
-function create_metal3_dev_env_kind() {
-    pushd "${GOPATH}/src/github.com/metal3-dev-env"
-    # sudo password needed if running on localhost
-    sudo ls
-    export DEFAULT_HOSTS_MEMORY=4096
-    export IMAGE_OS=Ubuntu
-    export CAPI_VERSION=v1alpha3
-    export NUM_NODES=4
-    export CONTAINER_RUNTIME=docker
-    export METAL3_DEV_ENV_DIR="${GOPATH}/src/github.com/metal3-dev-env"
-    make clean
-    make
-    popd
-}
-
 function wait_for_ctrlplane_provisioning_start() {
-    echo "Provisioning of controlplane node has started"
+    echo "Waiting for provisioning of controlplane node to start"
     for i in {1..3600};do
     kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision'
     if [ $? -ne 0 ]; then
@@ -97,9 +70,10 @@ function wait_for_ctrlplane_provisioning_start() {
 }
 
 function wait_for_ctrlplane_provisioning_complete() {
-    ORIGINAL_NODE="${1}"
+    NODE_NAME="${1}"
     NODE_IP="${2}"
-    echo "Waiting for provisioning of ${ORIGINAL_NODE} to complete"
+    NODE_DESCRIPTION="${3}"
+    echo "Waiting for provisioning of ${NODE_NAME} (${NODE_DESCRIPTION}) to complete"
     for i in {1..3600};do
     result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version 2>&1 /dev/null)
     if [[ "$?" == '0' ]]; then
@@ -152,6 +126,7 @@ function wait_for_ug_process_to_complete() {
 }
 
 function wait_for_orig_node_deprovisioned() {
+    ORIGINAL_NODE="${1}"
     echo "Waiting for ${ORIGINAL_NODE} to be deprovisioned"
     for i in {1..3600};do
     ready_nodes=$(kubectl get bmh -n metal3 | grep ready | wc -l)
