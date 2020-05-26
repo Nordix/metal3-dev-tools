@@ -4,7 +4,7 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-#provision_controlplane_node
+provision_controlplane_node
 
 CLUSTER_NAME=$(kubectl get clusters -n metal3 | grep Provisioned | cut -f1 -d' ')
 
