@@ -35,6 +35,10 @@ spec:
 ">"${Metal3MachineTemplate_OUTPUT_FILE}"
 }
 
+function set_number_of_node_replicas() {
+    export NUM_OF_NODE_REPLICAS="${1}"
+}
+
 function provision_controlplane_node() {
     pushd "${METAL3_DEV_ENV_DIR}"
     echo "Provisioning a controlplane node...."
@@ -51,98 +55,178 @@ function provision_worker_node() {
 }
 
 function wait_for_ctrlplane_provisioning_start() {
-    echo "Waiting for provisioning of controlplane node to start"
-    for i in {1..3600};do
-    kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision'
-    if [ $? -ne 0 ]; then
-        echo -n "."
-        sleep 1
-        if [[ "${i}" -ge 3600 ]];then
-            echo "Error: provisioning took too long to start"
-            exit 1
-            fi
-        continue
+    echo "Waiting for provisioning of controlplane node to start, number of replicas ${NUM_OF_NODE_REPLICAS}"
+    if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
+        for i in {1..3600};do
+        kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision'
+        if [ $? -ne 0 ]; then
+            echo -n "."
+            sleep 1
+            if [[ "${i}" -ge 3600 ]];then
+                echo "Error: provisioning took too long to start"
+                exit 1
+                fi
+            continue
+        else
+            echo -n "."
+            break
+        fi
+        done
     else
-        echo -n "."
-        break
+        for i in {1..3600};do
+    	    provisioned_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision' | wc -l)
+            running_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep 'Running' | wc -l)
+            if [[ "${provisioned_bmhs}" -ne "${NUM_OF_NODE_REPLICAS}" && "${running_machines}" -ne "${NUM_OF_NODE_REPLICAS}" ]]; then
+                echo -n ".:"
+                sleep 2
+                if [[ "${i}" -ge 3600 ]];then
+                    echo "Error: provisioning took too long to start"
+                    exit 1
+                fi
+            else
+                break
+            fi
+        done
     fi
-    done
 }
 
 function wait_for_ctrlplane_provisioning_complete() {
-    NODE_NAME="${1}"
-    NODE_IP="${2}"
-    NODE_DESCRIPTION="${3}"
-    echo "Waiting for provisioning of ${NODE_NAME} (${NODE_DESCRIPTION}) to complete"
-    for i in {1..3600};do
-    result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version 2>&1 /dev/null)
-    if [[ "$?" == '0' ]]; then
-        echo "Successfully provisioned a controlplane node"
-            server_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version --short | grep -i server)
-            client_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version --short | grep -i client)
-            echo "${server_version}"
-            echo "${server_version}"
-        break
+    if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
+        NODE_NAME="${1}"
+        NODE_IP="${2}"
+        NODE_DESCRIPTION="${3}"
+        echo "Waiting for provisioning of ${NODE_NAME} (${NODE_DESCRIPTION}) to complete"
+        for i in {1..3600};do
+        result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version 2>&1 /dev/null)
+        if [[ "$?" == '0' ]]; then
+            echo "Successfully provisioned a controlplane node"
+                server_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version --short | grep -i server)
+                client_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_IP}" -- kubectl version --short | grep -i client)
+                echo "${server_version}"
+                echo "${server_version}"
+            break
+        else
+            echo -n "-"
+        fi
+        sleep 1
+        done
     else
-        echo -n "-"
+	    NODE_LIST=( "${@}" )
+        count=0
+	    node_c=0
+        echo "Waiting for provisioning of ${NUM_OF_NODE_REPLICAS} nodes: ${NODE_LIST[@]} to complete"
+	    for node in ${NODE_LIST[@]}; do
+            for i in {1..3600};do
+            result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_LIST[${node_c}+3]}" -- kubectl version 2>&1 /dev/null)
+            if [[ "$?" == '0' ]]; then
+                echo "Successfully provisioned a controlplane node"
+                    server_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_LIST[${node_c}+3]}" -- kubectl version --short | grep -i server)
+                    client_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NODE_LIST[${node_c}+3]}" -- kubectl version --short | grep -i client)
+                    echo "${server_version}"
+                    echo "${server_version}"
+                    count=$(($count+1))
+                break # jump to outer loop
+                if [ "${count}" -eq "${NUM_OF_NODE_REPLICAS}" ]; then 
+                    break 2 # ready, jump out
+                fi
+            else
+                echo -n "-"
+            fi
+            sleep 1
+            done
+	    node_c=$(($node_c+1))
+	    if [ "${node_c}" -eq "${NUM_OF_NODE_REPLICAS}" ]; then
+                break # ready, jump out
+            fi
+        done
     fi
-    sleep 1
-    done
 }
 
 function wait_for_ug_process_to_complete() {
-    ORIGINAL_NODE="${1}"
-    echo "Waiting for upgrade process to complete"
-    for i in {1..1800};do
-    export NEW_NODE_NAME=$(kubectl get bmh -n metal3 | grep -v ${ORIGINAL_NODE} | grep 'prov' | grep 'control' | awk '{{print $1}}')
-    if [ -n "${NEW_NODE_NAME}" ]; then
-        export NEW_NODE_IP=$(virsh net-dhcp-leases baremetal | grep "${NEW_NODE_NAME}"  | awk '{{print $5}}' | cut -f1 -d\/)
-        break
-    else
-        # Process progress indicator
-        echo -n "-"
-        sleep 1
-    fi
-    done
+    if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
+        ORIGINAL_NODE="${1}"
+        echo "Waiting for upgrade process to complete"
+        for i in {1..1800};do
+        export NEW_NODE_NAME=$(kubectl get bmh -n metal3 | grep -v ${ORIGINAL_NODE} | grep 'prov' | grep 'control' | awk '{{print $1}}')
+        if [ -n "${NEW_NODE_NAME}" ]; then
+            export NEW_NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${NEW_NODE_NAME}"  | awk '{{print $5}}' | cut -f1 -d\/)
+            break
+        else
+            # Process progress indicator
+            echo -n "-"
+            sleep 1
+        fi
+        done
 
-    echo ''
-    echo "New node name is ${NEW_NODE_NAME}"
-    echo "New node IP is ${NEW_NODE_IP}"
-    for i in {1..1800};do 
-    result=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version 2>&1 /dev/null)
-    if [[ "$?" == "0" ]]; then
         echo ''
-        echo "Successfully upgraded the k8s version of a control plane node"
-        server_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version --short | grep Server)
-        client_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version --short | grep Client)
-        echo "${server_version}"
-        echo "${server_version}"
-        break
+        echo "New node name is ${NEW_NODE_NAME}"
+        echo "New node IP is ${NEW_NODE_IP}"
+        for i in {1..1800};do 
+        result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version 2>&1 /dev/null)
+        if [[ "$?" == "0" ]]; then
+            echo ''
+            echo "Successfully upgraded the k8s version of a control plane node"
+            server_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version --short | grep Server)
+            client_version=$(ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version --short | grep Client)
+            echo "${server_version}"
+            echo "${server_version}"
+            break
+        fi
+        # Upgrade progress indicator
+        echo -n "+."
+        sleep 1
+        done
+    else
+        ug_ongoing=1
+        echo "Waiting for upgrade process to complete, ${NUM_OF_NODE_REPLICAS} nodes"
+        for i in {1..1800};do
+            ug_started=$(kubectl get bmh -n metal3 | awk 'NR>1' | grep 'provisioning' | wc -l)
+            if [[ "${ug_started}" -gt "0" ]]; then
+                break
+            fi
+        done
+        while [ ${ug_ongoing} -eq 1 ]; do
+            running_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep 'Running' | wc -l)
+            other_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep -v 'Running' | wc -l)
+                if [[ "${other_machines}" -eq "0" && "${running_machines}" -eq "${NUM_OF_NODE_REPLICAS}" ]]; then
+                    provisioned_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep 'provisioned' | wc -l)
+                    other_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -v 'provisioned' | wc -l)
+                    ready_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep 'ready' | wc -l)
+                    if [[ "${other_bmhs}" -eq "1" && "${provisioned_bmhs}" -eq "${NUM_OF_NODE_REPLICAS}" && "${ready_bmhs}" -eq "1" ]]; then
+                        echo ''
+                        echo "Successfully upgraded the k8s version of ${NUM_OF_NODE_REPLICAS} control plane nodes"
+                        ug_ongoing=0
+                    fi
+                fi
+                # Upgrade progress indicator
+                echo -n "-"
+                sleep 2
+        done
     fi
-    # Upgrade progress indicator
-    echo -n "+."
-    sleep 1
-    done
 }
 
 function wait_for_orig_node_deprovisioned() {
+    if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
     ORIGINAL_NODE="${1}"
     echo "Waiting for ${ORIGINAL_NODE} to be deprovisioned"
-    for i in {1..3600};do
-    ready_nodes=$(kubectl get bmh -n metal3 | grep ready | wc -l)
-    if [[ "${ready_nodes}" == '3' ]]; then
-        echo ''
-        echo "Successfully deprovisioned ${ORIGINAL_NODE}"
-        break
+        for i in {1..3600};do
+        ready_nodes=$(kubectl get bmh -n metal3 | grep ready | wc -l)
+        if [[ "${ready_nodes}" == '3' ]]; then
+            echo ''
+            echo "Successfully deprovisioned ${ORIGINAL_NODE}"
+            break
+        else
+            echo -n "-."
+        fi
+        sleep 1
+        if [[ "${i}" -ge 3600 ]];then
+                echo "Error: deprovisioning of original node too too long to complete"
+                exit 1
+        fi
+        done
     else
-        echo -n "-."
+       echo "Successfully deprovisioned all ${NUM_OF_NODE_REPLICAS} original nodes"
     fi
-    sleep 1
-    if [[ "${i}" -ge 3600 ]];then
-            echo "Error: deprovisioning of original node too too long to complete"
-            exit 1
-    fi
-    done
 }
 
 
