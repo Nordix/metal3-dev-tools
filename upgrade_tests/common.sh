@@ -3,7 +3,7 @@
 export IMAGE_OS=${IMAGE_OS:-"Ubuntu"}
 export UPGRADE_USER=${UPGRADE_USER:-"metal3"}
 export KUBERNETES_VERSION="v1.18.0"
-export KUBERNETES_BINARIES_VERSION="v1.18.0"​
+export KUBERNETES_BINARIES_VERSION="v1.18.0"
 export METAL3_DEV_ENV_DIR=${METAL3_DEV_ENV_DIR:-"/home/${USER}/metal3-dev-env"}
 export UPGRADED_K8S_VERSION_1="v1.18.1"
 export UPGRADED_K8S_VERSION_2="v1.18.2"
@@ -34,7 +34,7 @@ spec:
         url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
 ">"${Metal3MachineTemplate_OUTPUT_FILE}"
 }
-​
+
 function provision_controlplane_node() {
     pushd "${METAL3_DEV_ENV_DIR}"
     echo "Provisioning a controlplane node...."
@@ -42,7 +42,7 @@ function provision_controlplane_node() {
     bash ./scripts/v1alphaX/provision_controlplane.sh
     popd
 }
-​
+
 function provision_worker_node() {
     pushd "${METAL3_DEV_ENV_DIR}"
     echo "Provisioning a worker node...."
@@ -109,7 +109,7 @@ function wait_for_ug_process_to_complete() {
     echo "New node name is ${NEW_NODE_NAME}"
     echo "New node IP is ${NEW_NODE_IP}"
     for i in {1..1800};do 
-    result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version 2>&1 /dev/null)
+    result=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version 2>&1 /dev/null)
     if [[ "$?" == "0" ]]; then
         echo ''
         echo "Successfully upgraded the k8s version of a control plane node"
@@ -142,5 +142,48 @@ function wait_for_orig_node_deprovisioned() {
             echo "Error: deprovisioning of original node too too long to complete"
             exit 1
     fi
+    done
+}
+
+
+function wait_for_ctrlplane_to_scale_out {
+    ORIGINAL_NODE="${1}"
+    echo "Scaling out controlplane nodes"
+    kubectl get kcp -n metal3 test1 -o json | jq '.spec.replicas=3' | kubectl apply -f-
+    for i in {1..1800};do 
+        replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes| grep master | wc -l)
+        if [[ "$replicas" == "3" ]]; then
+            echo ''
+            echo "Successfully scaledout controlplane nodes"
+            break
+        fi
+        # Upgrade progress indicator
+        echo -n "+"
+        sleep 5
+        if [[ "${i}" -ge 1800 ]];then
+            echo "Error: Scaling out of controlplane nodes took to long"
+            exit 1
+        fi        
+    done
+}
+
+function wait_for_worker_to_scale_out {
+    ORIGINAL_NODE="${1}"
+    echo "Scaling out worker nodes"    
+    kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.replicas=3' | kubectl apply -f-
+    for i in {1..1800};do 
+        replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes | awk 'NR>1' | grep -v master)
+        if [[ "$replicas" == "3" ]]; then
+            echo ''
+            echo "Successfully scaledout worker nodes"
+            break
+        fi
+        # Upgrade progress indicator
+        echo -n "*"
+        sleep 5
+        if [[ "${i}" -ge 1800 ]];then
+            echo "Error: Scaling out of workers nodes took to long"
+            exit 1
+        fi
     done
 }
