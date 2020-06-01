@@ -13,6 +13,7 @@ pushd "${M3PATH}/scripts/feature_tests/upgrade/upgrade_tests"
 ./controlplane_upgrade/3cp_0w_bootDiskImage_extraNode_upgrade.sh
 ./controlplane_upgrade/3cp_0w_k8sVer_extraNode_upgrade.sh
 ./controlplane_upgrade/3cp_1w_k8sVer_bootDiskImage_scaleInWorker_upgrade.sh
+./controlplane_upgrade/1cp_1w_kubeadm_update.sh
 popd
 
 # Run cluster level ugprade tests
