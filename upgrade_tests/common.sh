@@ -74,7 +74,7 @@ function wait_for_ctrlplane_provisioning_start() {
         done
     else
         for i in {1..3600};do
-    	    provisioned_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision' | wc -l)
+            provisioned_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision' | wc -l)
             running_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep 'Running' | wc -l)
             if [[ "${provisioned_bmhs}" -ne "${NUM_OF_NODE_REPLICAS}" && "${running_machines}" -ne "${NUM_OF_NODE_REPLICAS}" ]]; then
                 echo -n ".:"
@@ -126,7 +126,8 @@ function wait_for_ctrlplane_provisioning_complete() {
                     echo "${server_version}"
                     count=$(($count+1))
                 break # jump to outer loop
-                if [ "${count}" -eq "${NUM_OF_NODE_REPLICAS}" ]; then 
+
+                if [ "${count}" -eq "${NUM_OF_NODE_REPLICAS}" ]; then
                     break 2 # ready, jump out
                 fi
             else
@@ -161,7 +162,8 @@ function wait_for_ug_process_to_complete() {
         echo ''
         echo "New node name is ${NEW_NODE_NAME}"
         echo "New node IP is ${NEW_NODE_IP}"
-        for i in {1..1800};do 
+
+        for i in {1..1800};do
         result=$(ssh -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version 2>&1 /dev/null)
         if [[ "$?" == "0" ]]; then
             echo ''
@@ -229,12 +231,11 @@ function wait_for_orig_node_deprovisioned() {
     fi
 }
 
-
 function wait_for_ctrlplane_to_scale_out {
     ORIGINAL_NODE="${1}"
     echo "Scaling out controlplane nodes"
     kubectl get kcp -n metal3 test1 -o json | jq '.spec.replicas=3' | kubectl apply -f-
-    for i in {1..1800};do 
+    for i in {1..1800};do
         replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes| grep master | wc -l)
         if [[ "$replicas" == "3" ]]; then
             echo ''
@@ -255,7 +256,7 @@ function wait_for_worker_to_scale_out {
     ORIGINAL_NODE="${1}"
     echo "Scaling out worker nodes"    
     kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.replicas=3' | kubectl apply -f-
-    for i in {1..1800};do 
+    for i in {1..1800};do
         replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes | awk 'NR>1' | grep -v master)
         if [[ "$replicas" == "3" ]]; then
             echo ''
@@ -267,6 +268,28 @@ function wait_for_worker_to_scale_out {
         sleep 5
         if [[ "${i}" -ge 1800 ]];then
             echo "Error: Scaling out of workers nodes took to long"
+            exit 1
+        fi
+    done
+}
+
+function wait_for_worker_to_scale_to {
+    SCALE_TO="${1}"
+    ORIGINAL_NODE="${2}"
+    echo "Scaling worker nodes to ${SCALE_TO}"
+    kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.replicas='"${SCALE_TO}"'' | kubectl apply -f-
+    for i in {1..1800};do
+        replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes | awk 'NR>1' | grep -v master | wc -l)
+        if [[ "$replicas" == "${SCALE_TO}" ]]; then
+            echo ''
+            echo "Successfully scaled worker nodes to ${SCALE_TO}"
+            break
+        fi
+        # Scaling progress indicator
+        echo -n "*"
+        sleep 5
+        if [[ "${i}" -ge 1800 ]];then
+            echo "Error: Scaling of workers nodes took to long"
             exit 1
         fi
     done
