@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Run controlplane upgrade tests
+controlplane_upgrade/1cp_0w_bootDiskImage_extraNode_upgrade.sh
+controlplane_upgrade/1cp_0w_k8sBin_extraNode_upgrade.sh
+controlplane_upgrade/1cp_0w_k8sVer_bootDiskImage_extraNode_upgrade.sh
+controlplane_upgrade/1cp_0w_k8sVer_extraNode_upgrade.sh
+controlplane_upgrade/3cp_0w_bootDiskImage_extraNode_upgrade.sh
+controlplane_upgrade/3cp_0w_k8sVer_extraNode_upgrade.sh
+controlplane_upgrade/3cp_1w_k8sVer_bootDiskImage_scaleInWorker_upgrade.sh
+
+# Run cluster level ugprade tests
+1cp_1w_bootDiskImage_cluster_upgrade.sh
+
+# Run worker upgrade cases
+workers_upgrade/1cp_1w_bootDiskImage_extraNode_upgrade.sh
+workers_upgrade/1cp_1w_bootDiskImage_scaleOutWorkers_upgrade.sh
+workers_upgrade/1cp_3w_bootDiskImage_scaleInWorkers_upgrade_both.sh
+workers_upgrade/1cp_3w_bootDiskImage_scaleInWorkers_upgrade.sh
