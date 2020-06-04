@@ -305,24 +305,24 @@ function wait_for_worker_to_scale_to {
 
 function deploy_workload_on_workers {
 echo "Deploy workloads on workers"
-
+# Deploy workloads
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: workload-1-deployment
+  name: workload-1-deployment
 spec:
-replicas: 10
-selector:
+  replicas: 10
+  selector:
     matchLabels:
-    app: workload-1
-template:
+      app: workload-1
+  template:
     metadata:
-    labels:
+      labels:
         app: workload-1
     spec:
-    containers:
-    - name: nginx
+      containers:
+      - name: nginx
         image: nginx
 EOF
 
