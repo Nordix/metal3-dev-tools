@@ -195,3 +195,5 @@ done
 
 echo "Upgrading of (1M + 3W) using scaling in of workers has succeeded"
 
+deprovision_cluster
+wait_for_cluster_deprovisioned

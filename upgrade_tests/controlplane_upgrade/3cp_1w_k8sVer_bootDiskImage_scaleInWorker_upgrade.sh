@@ -95,3 +95,6 @@ wait_for_worker_to_scale_to 1 ${CP_IP}
 
 # taints back to masters, not required by the use case so just comment
 # ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "metal3@192.168.111.21" -- kubectl taint nodes ${CP_UG_NODE_LIST} node-role.kubernetes.io/master=value:NoSchedule
+
+deprovision_cluster
+wait_for_cluster_deprovisioned
