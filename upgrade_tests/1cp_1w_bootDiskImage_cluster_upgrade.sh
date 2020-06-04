@@ -152,3 +152,5 @@ done
 
 echo "Boot disk upgrade of both controlplane and worker nodes has succeeded."
 
+deprovision_cluster
+wait_for_cluster_deprovisioned
