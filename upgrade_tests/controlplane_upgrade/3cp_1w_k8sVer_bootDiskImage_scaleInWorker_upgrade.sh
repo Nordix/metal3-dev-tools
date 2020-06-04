@@ -42,14 +42,15 @@ NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}"  | awk 
 echo "ON PURPOSE for WORKER, IP ${NODE_IP}"
 wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${CP_IP} "Worker node"
 
-# Enable workload on masters
-ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${CP_IP}" -- sudo apt-get install jq -y
-# kubectl get nodes -o json | jq ".items[]|{name:.metadata.name, taints:.spec.taints}"
-# untaint all masters (one worker also gets untainted, doesn't matter):
-ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${CP_IP}" -- kubectl taint nodes --all node-role.kubernetes.io/master-
+deploy_workload_on_workers
+
+manage_node_taints ${CP_IP}
 
 # scale in worker to 0
 wait_for_worker_to_scale_to 0 ${CP_IP}
+
+# TODO: check that all 10 workloads are running on control plane
+# kubectl get pods -l app=workload-1 -owide | awk 'NR>1' | grep control | wc -l
 
 set_number_of_node_replicas 3
 
@@ -73,12 +74,15 @@ generate_metal3MachineTemplate test1-new-image "${CLUSTER_UID}" "${Metal3Machine
 kubectl apply -f "${Metal3MachineTemplate_OUTPUT_FILE}"
 
 echo "Upgrading a control plane node image and k8s version from ${FROM_VERSION} to ${TO_VERSION} in cluster ${CLUSTER_NAME}"
-# Trigger the upgrade byreplacing node image and k8s version in kcp yaml:
+# Trigger the upgrade by replacing node image and k8s version in kcp yaml:
 kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO_VERSION}/" | sed "s/name: ${M3_MACHINE_TEMPLATE_NAME}/name: test1-new-image/" | kubectl replace -f -
 
 wait_for_ug_process_to_complete
 
 wait_for_orig_node_deprovisioned
+
+# TODO: check that all 10 workloads are running on control plane after the upgrade
+# kubectl get pods -l app=workload-1 -owide | awk 'NR>1' | grep control | wc -l
 
 set_number_of_node_replicas 1
 

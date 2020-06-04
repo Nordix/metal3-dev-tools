@@ -294,3 +294,51 @@ function wait_for_worker_to_scale_to {
         fi
     done
 }
+
+function deploy_workload_on_workers {
+echo "Deploy workloads on workers"
+
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: workload-1-deployment
+spec:
+replicas: 10
+selector:
+    matchLabels:
+    app: workload-1
+template:
+    metadata:
+    labels:
+        app: workload-1
+    spec:
+    containers:
+    - name: nginx
+        image: nginx
+EOF
+
+echo "Waiting for workloads to be ready"
+for i in {1..1800};do
+    workload_replicas=$(kubectl get deployments workload-1-deployment -o json | jq '.status.readyReplicas')
+    if [[ "$workload_replicas" == "10" ]]; then
+        echo ''
+        echo "Successfully deployed workloads across the cluster"
+        break
+    fi
+    echo -n "*"
+    sleep 5
+    if [[ "${i}" -ge 1800 ]];then
+        echo "Error: Workload failed to be deployed on the cluster"
+        exit 1
+    fi
+done
+}
+
+function manage_node_taints {
+    # Enable workload on masters
+    ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${1}" -- sudo apt-get install jq -y
+    # kubectl get nodes -o json | jq ".items[]|{name:.metadata.name, taints:.spec.taints}"
+    # untaint all masters (one workers also gets untainted, doesn't matter):
+    ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${1}" -- kubectl taint nodes --all node-role.kubernetes.io/master-
+}
