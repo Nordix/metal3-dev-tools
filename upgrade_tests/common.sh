@@ -39,6 +39,14 @@ function set_number_of_node_replicas() {
     export NUM_OF_NODE_REPLICAS="${1}"
 }
 
+function set_number_of_master_node_replicas() {
+    export NUM_OF_MASTER_REPLICAS="${1}"
+}
+
+function set_number_of_worker_node_replicas() {
+    export NUM_OF_WORKER_REPLICAS="${1}"
+}
+
 function provision_controlplane_node() {
     pushd "${METAL3_DEV_ENV_DIR}"
     echo "Provisioning a controlplane node...."

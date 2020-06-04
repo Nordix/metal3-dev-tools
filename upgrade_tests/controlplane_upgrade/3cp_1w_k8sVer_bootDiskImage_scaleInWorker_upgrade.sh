@@ -4,7 +4,9 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
+# TODO: cleanup
 set_number_of_node_replicas 3
+set_number_of_master_node_replicas 3
 provision_controlplane_node
 
 CLUSTER_NAME=$(kubectl get clusters -n metal3 | grep Provisioned | cut -f1 -d' ')
@@ -27,7 +29,9 @@ CP_IP="${NODE_IP_LIST[0]}"
 # apply CNI
 ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${CP_IP}" -- kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
+# TODO: cleanup
 set_number_of_node_replicas 1
+set_number_of_worker_node_replicas 1
 provision_worker_node
 
 # wait_for_worker_provisioning_start
