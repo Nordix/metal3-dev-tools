@@ -33,18 +33,12 @@ ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@
 set_number_of_node_replicas 1
 set_number_of_worker_node_replicas 1
 provision_worker_node
+wait_for_worker_provisioning_start
 
-# wait_for_worker_provisioning_start
-# below function should work, to be renamed
-echo "ON PURPOSE for WORKER"
-wait_for_ctrlplane_provisioning_start
-
-# wait_for_worker_provisioning_complete
-# below function should work, to be renamed
 ORIGINAL_NODE=$(kubectl get bmh -n metal3 | grep worker | grep -v ready | cut -f1 -d' ')
 NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
-echo "ON PURPOSE for WORKER, IP ${NODE_IP}"
-wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${CP_IP} "Worker node"
+
+wait_for_worker_provisioning_complete 4 ${ORIGINAL_NODE} ${NODE_IP} "Worker node"
 
 deploy_workload_on_workers
 
