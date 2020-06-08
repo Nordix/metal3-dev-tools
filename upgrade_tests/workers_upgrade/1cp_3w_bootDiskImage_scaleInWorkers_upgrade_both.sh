@@ -8,6 +8,11 @@ echo '' > ~/.ssh/known_hosts
 export new_wr_metal3MachineTemplate_name="test1-new-workers-image"
 export new_cp_metal3MachineTemplate_name="test1-new-controlplane-image"
 
+# TODO: cleanup
+set_number_of_node_replicas 1
+set_number_of_master_node_replicas 1
+set_number_of_worker_node_replicas 3
+
 # provision a controlplane node
 provision_controlplane_node
 wait_for_ctrlplane_provisioning_start
@@ -18,6 +23,8 @@ CP_NODE_IP=$(virsh net-dhcp-leases baremetal | grep "${CP_NODE}"  | awk '{{print
 wait_for_ctrlplane_provisioning_complete ${CP_NODE} ${CP_NODE_IP} "original controlplane node"
 # apply CNI
 ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${CP_NODE_IP}" -- kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+
+set_number_of_node_replicas 3
 
 provision_worker_node
 # Wait until the worker joins AND the state is ready
@@ -195,3 +202,5 @@ done
 
 echo "Upgrading of (1M + 3W) using scaling in of workers has succeeded"
 
+deprovision_cluster
+wait_for_cluster_deprovisioned

@@ -13,6 +13,7 @@ function generate_metal3MachineTemplate() {
   NAME="${1}"
   CLUSTER_UID="${2}"
   Metal3MachineTemplate_OUTPUT_FILE="${3}"
+  IMG_CHKSUM="${IMG_CHKSUM:-http://172.22.0.1/images/bionic-server-cloudimg-amd64.img.md5sum}"
 
 echo "
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
@@ -30,7 +31,7 @@ spec:
     spec:
       hostSelector: {}
       image:
-        checksum: http://172.22.0.1/images/bionic-server-cloudimg-amd64.img.md5sum
+        checksum: "${IMG_CHKSUM}"
         url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
 ">"${Metal3MachineTemplate_OUTPUT_FILE}"
 }
@@ -59,6 +60,13 @@ function provision_worker_node() {
     pushd "${METAL3_DEV_ENV_DIR}"
     echo "Provisioning a worker node...."
     bash ./scripts/v1alphaX/provision_worker.sh
+    popd
+}
+
+function deprovision_cluster() {
+    pushd "${METAL3_DEV_ENV_DIR}"
+    echo "Deprovisioning the cluster...."
+    bash ./scripts/v1alphaX/deprovision_cluster.sh
     popd
 }
 
@@ -349,4 +357,19 @@ function manage_node_taints {
     # kubectl get nodes -o json | jq ".items[]|{name:.metadata.name, taints:.spec.taints}"
     # untaint all masters (one workers also gets untainted, doesn't matter):
     ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${1}" -- kubectl taint nodes --all node-role.kubernetes.io/master-
+}
+
+function wait_for_cluster_deprovisioned() {
+    for i in {1..3600};do
+        cluster_count=$(kubectl get clusters -n metal3  2>/dev/null | awk 'NR>1' | wc -l)
+        if [[ "${cluster_count}" -eq "0" ]];then
+            ready_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep 'ready' | wc -l)
+            if [[ "${ready_bmhs}" -eq "4" ]];then
+                echo "Successfully deprovisioned the cluster"
+                exit 1
+            fi
+        else
+            echo "Waiting for cluster to be deprovisioned"
+        fi
+    done
 }

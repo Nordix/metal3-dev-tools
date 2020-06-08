@@ -4,6 +4,11 @@ source ./common.sh
 
 echo '' > ~/.ssh/known_hosts
 
+# TODO: cleanup
+set_number_of_node_replicas 1
+set_number_of_master_node_replicas 1
+set_number_of_worker_node_replicas 1
+
 # provision a controlplane node
 provision_controlplane_node
 
@@ -152,3 +157,5 @@ done
 
 echo "Boot disk upgrade of both controlplane and worker nodes has succeeded."
 
+deprovision_cluster
+wait_for_cluster_deprovisioned
