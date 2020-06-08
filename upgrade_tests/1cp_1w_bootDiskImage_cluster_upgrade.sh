@@ -65,8 +65,9 @@ echo "Create a new metal3MachineTemplate with new boot disk image for both contr
 cp_Metal3MachineTemplate_OUTPUT_FILE="/tmp/cp_new_image.yaml"
 wr_Metal3MachineTemplate_OUTPUT_FILE="/tmp/wr_new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\") 
-generate_metal3MachineTemplate "test1-new-controplane-image" "${CLUSTER_UID}" "${cp_Metal3MachineTemplate_OUTPUT_FILE}"
-generate_metal3MachineTemplate "test1-new-workers-image" "${CLUSTER_UID}" "${wr_Metal3MachineTemplate_OUTPUT_FILE}"
+IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
+generate_metal3MachineTemplate "test1-new-controplane-image" "${CLUSTER_UID}" "${cp_Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
+generate_metal3MachineTemplate "test1-new-workers-image" "${CLUSTER_UID}" "${wr_Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 
 kubectl apply -f "${cp_Metal3MachineTemplate_OUTPUT_FILE}"
 kubectl apply -f "${wr_Metal3MachineTemplate_OUTPUT_FILE}"
