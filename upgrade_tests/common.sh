@@ -159,6 +159,46 @@ function wait_for_ctrlplane_provisioning_complete() {
     fi
 }
 
+function wait_for_worker_provisioning_start() {
+    echo "Waiting for provisioning of worker node to start, number of replicas ${NUM_OF_NODE_REPLICAS}"
+    for i in {1..3600};do
+    kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision' | grep 'worker'
+    if [ $? -ne 0 ]; then
+        echo -n "."
+        sleep 1
+        if [[ "${i}" -ge 3600 ]];then
+            echo "Error: provisioning took too long to start"
+            exit 1
+        fi
+        continue
+    else
+        echo -n "."
+        break
+    fi
+    done
+}
+
+function wait_for_worker_provisioning_complete() {
+    TOTAL_NBR_OF_MACHINES="${1}"
+    NODE_NAME="${2}"
+    NODE_IP="${3}"
+    NODE_DESCRIPTION="${4}"
+    echo "Waiting for provisioning of ${NODE_NAME} ${NODE_IP} (${NODE_DESCRIPTION}) to complete"
+    for i in {1..3600};do
+        running_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep 'Running' | wc -l)
+        if [[ "${running_machines}" -lt "${TOTAL_NBR_OF_MACHINES}" ]]; then
+            echo -n "::"
+            sleep 2
+            if [[ "${i}" -ge 3600 ]];then
+                echo "Error: provisioning took too long to start"
+                exit 1
+            fi
+        else
+            break
+        fi
+    done
+}
+
 function wait_for_ug_process_to_complete() {
     if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
         ORIGINAL_NODE="${1}"
