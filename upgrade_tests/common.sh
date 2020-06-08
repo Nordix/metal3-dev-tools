@@ -13,6 +13,7 @@ function generate_metal3MachineTemplate() {
   NAME="${1}"
   CLUSTER_UID="${2}"
   Metal3MachineTemplate_OUTPUT_FILE="${3}"
+  IMG_CHKSUM="${IMG_CHKSUM:-http://172.22.0.1/images/bionic-server-cloudimg-amd64.img.md5sum}"
 
 echo "
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
@@ -30,7 +31,7 @@ spec:
     spec:
       hostSelector: {}
       image:
-        checksum: http://172.22.0.1/images/bionic-server-cloudimg-amd64.img.md5sum
+        checksum: "${IMG_CHKSUM}"
         url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
 ">"${Metal3MachineTemplate_OUTPUT_FILE}"
 }
