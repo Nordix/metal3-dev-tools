@@ -4,8 +4,11 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-# provision a control plane node
-provision_controlpalne_node
+# TODO: cleanup
+set_number_of_node_replicas 1
+set_number_of_master_node_replicas 1
+
+provision_controlplane_node
 
 wait_for_ctrlplane_provisioning_start
 
@@ -18,8 +21,9 @@ wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${NODE_IP} "Original n
 # Create and update resources for upgrading OS image
 echo "Upgrading the image for the control plane node for cluster"
 Metal3MachineTemplate_OUTPUT_FILE="/tmp/new_image.yaml"
-CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\") 
-generate_metal3MachineTemplate test1-new-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}"
+CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")
+IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
+generate_metal3MachineTemplate test1-new-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 kubectl apply -f "${Metal3MachineTemplate_OUTPUT_FILE}"
 
 # Change metal3MatchineTemplate reference
@@ -49,3 +53,6 @@ done
 wait_for_orig_node_deprovisioned ${ORIGINAL_NODE}
 
 echo "Upgrade of OS Image of controlplane node succeeded"
+
+deprovision_cluster
+wait_for_cluster_deprovisioned

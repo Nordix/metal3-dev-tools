@@ -4,6 +4,10 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
+# TODO: cleanup
+set_number_of_node_replicas 1
+set_number_of_master_node_replicas 1
+
 provision_controlplane_node
 
 CLUSTER_NAME=$(kubectl get clusters -n metal3 | grep Provisioned | cut -f1 -d' ')
@@ -29,8 +33,9 @@ fi
 M3_MACHINE_TEMPLATE_NAME=$(kubectl get Metal3MachineTemplate -n metal3 -oyaml | grep "name: " | grep controlplane | cut -f2 -d':' | awk '{$1=$1;print}')
 
 Metal3MachineTemplate_OUTPUT_FILE="/tmp/new_image.yaml"
-CLUSTER_UID=$(kubectl get clusters -n metal3 ${CLUSTER_NAME} -o json |jq '.metadata.uid' | cut -f2 -d\") 
-generate_metal3MachineTemplate test1-new-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}"
+CLUSTER_UID=$(kubectl get clusters -n metal3 ${CLUSTER_NAME} -o json |jq '.metadata.uid' | cut -f2 -d\")
+IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
+generate_metal3MachineTemplate test1-new-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 kubectl apply -f "${Metal3MachineTemplate_OUTPUT_FILE}"
 
 echo "Upgrading a control plane node image and k8s version from ${FROM_VERSION} to ${TO_VERSION} in cluster ${CLUSTER_NAME}"
@@ -40,3 +45,6 @@ kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO
 wait_for_ug_process_to_complete ${ORIGINAL_NODE}
 
 wait_for_orig_node_deprovisioned ${ORIGINAL_NODE}
+
+deprovision_cluster
+wait_for_cluster_deprovisioned

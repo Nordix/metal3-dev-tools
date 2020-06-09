@@ -4,6 +4,10 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
+# TODO: cleanup
+set_number_of_node_replicas 1
+set_number_of_master_node_replicas 1
+
 provision_controlplane_node
 
 CLUSTER_NAME=$(kubectl get clusters -n metal3 | grep Provisioned | cut -f1 -d' ')
@@ -32,3 +36,6 @@ kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO
 wait_for_ug_process_to_complete ${ORIGINAL_NODE}
 
 wait_for_orig_node_deprovisioned ${ORIGINAL_NODE}
+
+deprovision_cluster
+wait_for_cluster_deprovisioned
