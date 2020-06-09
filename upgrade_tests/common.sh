@@ -236,6 +236,7 @@ function wait_for_ug_process_to_complete() {
         done
     else
         ug_ongoing=1
+        node_c=0
         echo "Waiting for upgrade process to complete, ${NUM_OF_NODE_REPLICAS} nodes"
         for i in {1..1800};do
             ug_started=$(kubectl get bmh -n metal3 | awk 'NR>1' | grep 'provisioning' | wc -l)
@@ -259,6 +260,12 @@ function wait_for_ug_process_to_complete() {
                 # Upgrade progress indicator
                 echo -n "-"
                 sleep 2
+
+                node_c=$(($node_c+1))
+                if [[ "${node_c}" -eq "7200" ]]; then
+                    ug_ongoing=2
+                    echo "Upgrade failed, resource(s) are hanging."
+                fi
         done
     fi
 }
