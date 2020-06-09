@@ -7,7 +7,10 @@ echo '' > ~/.ssh/known_hosts
 # Old name does not matter
 export new_cp_metal3MachineTemplate_name="test1-new-controlplane-image"
 
-# provision a controlplane node
+# TODO: cleanup
+set_number_of_node_replicas 3
+set_number_of_master_node_replicas 3
+
 provision_controlplane_node
 wait_for_ctrlplane_provisioning_start
 
@@ -24,7 +27,8 @@ wait_for_ctrlplane_to_scale_out ${CP_NODE_IP}
 echo "Create a new metal3MachineTemplate with new boot disk image for controlplane node"
 cp_Metal3MachineTemplate_OUTPUT_FILE="/tmp/cp_new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")
-generate_metal3MachineTemplate "${new_cp_metal3MachineTemplate_name}" "${CLUSTER_UID}" "${cp_Metal3MachineTemplate_OUTPUT_FILE}"
+IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
+generate_metal3MachineTemplate "${new_cp_metal3MachineTemplate_name}" "${CLUSTER_UID}" "${cp_Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 kubectl apply -f "${cp_Metal3MachineTemplate_OUTPUT_FILE}"
 
 # Change metal3MachineTemplate references.
@@ -84,3 +88,6 @@ for i in {1..3600};do
 		  exit 1
   fi
 done
+
+deprovision_cluster
+wait_for_cluster_deprovisioned

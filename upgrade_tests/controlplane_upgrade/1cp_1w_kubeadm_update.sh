@@ -4,7 +4,11 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
+# TODO: cleanup
 set_number_of_node_replicas 2
+set_number_of_master_node_replicas 1
+set_number_of_worker_node_replicas 1
+
 provision_controlplane_node
 
 NAMESPACE=${NAMESPACE:-"metal3"}
@@ -33,3 +37,6 @@ fi
 wait_for_ug_process_to_complete
 
 wait_for_orig_node_deprovisioned
+
+deprovision_cluster
+wait_for_cluster_deprovisioned
