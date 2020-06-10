@@ -13,7 +13,7 @@ function generate_metal3MachineTemplate() {
   NAME="${1}"
   CLUSTER_UID="${2}"
   Metal3MachineTemplate_OUTPUT_FILE="${3}"
-  IMG_CHKSUM="${IMG_CHKSUM:-http://172.22.0.1/images/bionic-server-cloudimg-amd64.img.md5sum}"
+  IMG_CHKSUM="${4:-http://172.22.0.1/images/bionic-server-cloudimg-amd64.img.md5sum}"
 
 echo "
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
@@ -320,7 +320,7 @@ function wait_for_worker_to_scale_out {
     echo "Scaling out worker nodes"    
     kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.replicas=3' | kubectl apply -f-
     for i in {1..1800};do
-        replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes | awk 'NR>1' | grep -v master)
+        replicas=$(ssh "-o LogLevel=quiet" -o "UserKnownHostsFile=/dev/null" -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${ORIGINAL_NODE}" -- kubectl get nodes | awk 'NR>1' | grep -v master | wc -l)
         if [[ "$replicas" == "3" ]]; then
             echo ''
             echo "Successfully scaledout worker nodes"
