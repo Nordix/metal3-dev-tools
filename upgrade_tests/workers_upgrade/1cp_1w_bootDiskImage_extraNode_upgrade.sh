@@ -4,16 +4,20 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-# provision a controlplane node
-# provision_controlplane_node
+# TODO: cleanup
+set_number_of_node_replicas 1
+set_number_of_master_node_replicas 1
+set_number_of_worker_node_replicas 1
 
-# wait_for_ctrlplane_provisioning_start
+provision_controlplane_node
+
+wait_for_ctrlplane_provisioning_start
 
 CP_NODE=$(kubectl get bmh -n metal3 | grep control | grep -v ready | cut -f1 -d' ')
 echo "BareMetalHost ${CP_NODE} is in provisioning or provisioned state"
 CP_NODE_IP=$(virsh net-dhcp-leases baremetal | grep "${CP_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
-
 wait_for_ctrlplane_provisioning_complete ${CP_NODE} ${CP_NODE_IP} "controlplane node"
+
 # apply CNI
 ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${CP_NODE_IP}" -- kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml      
 #provision_worker_node
@@ -63,8 +67,9 @@ done
 # WR_NODE="node-2"
 echo "Create a new metal3MachineTemplate with new OS Image"
 Metal3MachineTemplate_OUTPUT_FILE="/tmp/new_image.yaml"
-CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\") 
-generate_metal3MachineTemplate "test1-new-workers-image" "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}"
+CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")
+IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
+generate_metal3MachineTemplate "test1-new-workers-image" "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 kubectl apply -f "${Metal3MachineTemplate_OUTPUT_FILE}"
 kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.template.spec.infrastructureRef.name="test1-new-workers-image"' | kubectl apply -f-
 
@@ -106,3 +111,5 @@ done
 
 echo "Upgrade of OS Image of worker node succeeded"
 
+deprovision_cluster
+wait_for_cluster_deprovisioned
