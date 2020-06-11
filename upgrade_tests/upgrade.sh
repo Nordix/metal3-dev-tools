@@ -16,6 +16,7 @@ pushd "${M3_DIR}/scripts/feature_tests/upgrade/upgrade_tests/controlplane_upgrad
 #./1cp_0w_k8sBin_extraNode_upgrade.sh
 #./1cp_0w_k8sVer_bootDiskImage_extraNode_upgrade.sh
 #./1cp_0w_k8sVer_extraNode_upgrade.sh
+#./1cp_1w_kubeadm_update.sh
 #./3cp_0w_bootDiskImage_extraNode_upgrade.sh
 #./3cp_0w_k8sVer_extraNode_upgrade.sh
 ./3cp_1w_k8sVer_bootDiskImage_scaleInWorker_upgrade.sh
