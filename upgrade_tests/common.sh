@@ -407,16 +407,18 @@ function manage_node_taints {
 }
 
 function wait_for_cluster_deprovisioned() {
+    echo "Waiting for cluster to be deprovisioned"
     for i in {1..3600};do
         cluster_count=$(kubectl get clusters -n metal3  2>/dev/null | awk 'NR>1' | wc -l)
         if [[ "${cluster_count}" -eq "0" ]];then
             ready_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep 'ready' | wc -l)
             if [[ "${ready_bmhs}" -eq "4" ]];then
+                echo ''
                 echo "Successfully deprovisioned the cluster"
                 exit 1
             fi
         else
-            echo "Waiting for cluster to be deprovisioned"
+            echo -n "-"
         fi
     done
 }
