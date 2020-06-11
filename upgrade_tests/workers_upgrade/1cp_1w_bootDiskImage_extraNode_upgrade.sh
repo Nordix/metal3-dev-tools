@@ -58,7 +58,7 @@ for i in {1..3600};do
   fi
   echo -n "->"
   if [[ "${i}" -ge 3600 ]]; then
-		  echo "Error: Upgrading of a worker's boot disk image took to long"
+		  echo "Error: Upgrading of a worker's node image took to long"
 		  exit 1
   fi
   sleep 1

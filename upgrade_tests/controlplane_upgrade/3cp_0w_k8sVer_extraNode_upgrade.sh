@@ -44,5 +44,7 @@ wait_for_ug_process_to_complete
 
 wait_for_orig_node_deprovisioned
 
+echo "Upgrading a control plane nodes k8s version from ${FROM_VERSION} to ${TO_VERSION} in cluster ${CLUSTER_NAME}, has succeeded"
+
 deprovision_cluster
 wait_for_cluster_deprovisioned
