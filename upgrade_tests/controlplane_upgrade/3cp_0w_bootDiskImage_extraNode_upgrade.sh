@@ -27,8 +27,8 @@ ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@
 
 wait_for_ctrlplane_to_scale_out ${CP_NODE_IP}
 
-# Upgrade boot disk image of controlplane nodes
-echo "Create a new metal3MachineTemplate with new boot disk image for controlplane node"
+# Upgrade node image of controlplane nodes
+echo "Create a new metal3MachineTemplate with new node image for controlplane node"
 cp_Metal3MachineTemplate_OUTPUT_FILE="/tmp/cp_new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")
 IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
@@ -38,7 +38,7 @@ kubectl apply -f "${cp_Metal3MachineTemplate_OUTPUT_FILE}"
 # Change metal3MachineTemplate references.
 kubectl get kcp -n metal3 test1 -o json | jq '.spec.infrastructureTemplate.name="test1-new-controlplane-image"' | kubectl apply -f-
 
-echo "Waiting for start of boot disk upgrade of all controlplane nodes"
+echo "Waiting for start of node image upgrade of all controlplane nodes"
 for i in {1..3600};do
   count=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -i ${new_cp_metal3MachineTemplate_name} | wc -l)
   if [ $count -lt 3 ]; then
@@ -92,6 +92,7 @@ for i in {1..3600};do
 		  exit 1
   fi
 done
+echo "Upgrading of node image of all controlplane nodes with extra node has succeeded"
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

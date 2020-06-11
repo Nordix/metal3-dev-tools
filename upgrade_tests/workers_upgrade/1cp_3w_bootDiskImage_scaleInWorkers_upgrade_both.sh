@@ -50,7 +50,7 @@ done
 
 wait_for_worker_to_scale_out ${CP_NODE_IP}
 
-echo "Create a new metal3MachineTemplate with new boot disk image for worker nodes"
+echo "Create a new metal3MachineTemplate with new node image for worker nodes"
 wr_Metal3MachineTemplate_OUTPUT_FILE="/tmp/wr_new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")
 IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
@@ -62,7 +62,7 @@ kubectl apply -f "${wr_Metal3MachineTemplate_OUTPUT_FILE}"
 kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.strategy.rollingUpdate.maxSurge=1|.spec.strategy.rollingUpdate.maxUnavailable=1' | kubectl apply -f-
 kubectl get machinedeployment -n metal3 test1 -o json | jq '.spec.template.spec.infrastructureRef.name="test1-new-workers-image"' | kubectl apply -f-
 
-echo "Waiting for start of boot disk upgrade of all worker nodes"
+echo "Waiting for start of node image upgrade of all worker nodes"
 for i in {1..3600};do
   count=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -i ${new_wr_metal3MachineTemplate_name} | wc -l)
   if [ $count -lt 3 ]; then
@@ -159,7 +159,7 @@ done
 #   ****** change os reference
 #   ****** repeate the waiting and verification as well.
 
-echo "Create a new metal3MachineTemplate with new boot disk image for both controlplane node"
+echo "Create a new metal3MachineTemplate with new node image for both controlplane node"
 cp_Metal3MachineTemplate_OUTPUT_FILE="/tmp/cp_new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")
 IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')

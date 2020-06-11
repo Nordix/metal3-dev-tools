@@ -63,7 +63,7 @@ for i in {1..3600};do
   fi
 done
 
-echo "Create a new metal3MachineTemplate with new boot disk image for both controlplane and worker nodes"
+echo "Create a new metal3MachineTemplate with new node image for both controlplane and worker nodes"
 cp_Metal3MachineTemplate_OUTPUT_FILE="/tmp/cp_new_image.yaml"
 wr_Metal3MachineTemplate_OUTPUT_FILE="/tmp/wr_new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 test1 -o json |jq '.metadata.uid' | cut -f2 -d\")

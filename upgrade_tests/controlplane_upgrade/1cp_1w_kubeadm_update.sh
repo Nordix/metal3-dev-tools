@@ -42,5 +42,7 @@ wait_for_ug_process_to_complete
 
 wait_for_orig_node_deprovisioned
 
+echo "Mutation of kubeadm data has succeded"
+
 deprovision_cluster
 wait_for_cluster_deprovisioned
