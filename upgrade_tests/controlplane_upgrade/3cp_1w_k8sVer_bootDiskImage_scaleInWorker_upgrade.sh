@@ -73,12 +73,12 @@ M3_MACHINE_TEMPLATE_NAME=$(kubectl get Metal3MachineTemplate -n metal3 -oyaml | 
 Metal3MachineTemplate_OUTPUT_FILE="/tmp/new_image.yaml"
 CLUSTER_UID=$(kubectl get clusters -n metal3 ${CLUSTER_NAME} -o json |jq '.metadata.uid' | cut -f2 -d\")
 IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
-generate_metal3MachineTemplate test1-new-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
+generate_metal3MachineTemplate new-controlplane-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 kubectl apply -f "${Metal3MachineTemplate_OUTPUT_FILE}"
 
 echo "Upgrading a control plane node image and k8s version from ${FROM_VERSION} to ${TO_VERSION} in cluster ${CLUSTER_NAME}"
 # Trigger the upgrade by replacing node image and k8s version in kcp yaml:
-kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO_VERSION}/" | sed "s/name: ${M3_MACHINE_TEMPLATE_NAME}/name: test1-new-image/" | kubectl replace -f -
+kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO_VERSION}/" | sed "s/name: ${M3_MACHINE_TEMPLATE_NAME}/name: new-controlplane-image/" | kubectl replace -f -
 
 wait_for_ug_process_to_complete
 
@@ -94,7 +94,6 @@ wait_for_worker_to_scale_to 1 ${CP_IP}
 
 # taints back to masters, not required by the use case so just comment
 # ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "metal3@192.168.111.21" -- kubectl taint nodes ${CP_UG_NODE_LIST} node-role.kubernetes.io/master=value:NoSchedule
-echo "kubernetes version AND node image upgrades of both controlplane and worker nodes has succeeded."
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
