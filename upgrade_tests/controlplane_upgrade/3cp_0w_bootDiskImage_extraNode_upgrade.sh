@@ -1,8 +1,12 @@
 #!/bin/bash
 
+set -x
+
 source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
+
+start_logging "${0}"
 
 # Old name does not matter
 export new_cp_metal3MachineTemplate_name="test1-new-controlplane-image"

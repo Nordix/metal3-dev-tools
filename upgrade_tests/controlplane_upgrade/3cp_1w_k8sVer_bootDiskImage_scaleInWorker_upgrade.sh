@@ -1,8 +1,12 @@
 #!/bin/bash
 
+set -x
+
 source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
+
+start_logging "${0}"
 
 # TODO: cleanup
 set_number_of_node_replicas 3

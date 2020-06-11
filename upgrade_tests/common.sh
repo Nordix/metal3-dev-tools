@@ -422,3 +422,12 @@ function wait_for_cluster_deprovisioned() {
         fi
     done
 }
+
+function start_logging() {
+	log_file="${1}"
+	log_file+=$(date +".%Y.%m.%d-%T-upgrade.result.txt")
+
+	echo "${log_file}"
+
+	exec > >(tee /tmp/${log_file})
+}
