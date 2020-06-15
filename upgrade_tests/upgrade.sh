@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 M3_DIR="$(dirname "$(readlink -f "${0}")")/../../.."
 
 # Fetch the upgrade tests from airship-dev-tools
@@ -19,19 +21,19 @@ pushd "${M3_DIR}/scripts/feature_tests/upgrade/upgrade_tests/controlplane_upgrad
 #./1cp_1w_kubeadm_update.sh
 #./3cp_0w_bootDiskImage_extraNode_upgrade.sh
 #./3cp_0w_k8sVer_extraNode_upgrade.sh
-./3cp_1w_k8sVer_bootDiskImage_scaleInWorker_upgrade.sh
+source 3cp_1w_k8sVer_bootDiskImage_scaleInWorker_upgrade.sh
 popd
 
 # Run cluster level ugprade tests
 pushd "${M3_DIR}/scripts/feature_tests/upgrade/upgrade_tests"
-./1cp_1w_bootDiskImage_cluster_upgrade.sh
+source 1cp_1w_bootDiskImage_cluster_upgrade.sh
 popd
 
 # Run worker upgrade cases
 pushd "${M3_DIR}/scripts/feature_tests/upgrade/upgrade_tests/workers_upgrade"
 #./1cp_1w_bootDiskImage_extraNode_upgrade.sh
 #./1cp_1w_bootDiskImage_scaleOutWorkers_upgrade.sh
-./1cp_3w_bootDiskImage_scaleInWorkers_upgrade_both.sh
+source 1cp_3w_bootDiskImage_scaleInWorkers_upgrade_both.sh
 #./1cp_3w_bootDiskImage_scaleInWorkers_upgrade.sh
 popd
 
@@ -40,3 +42,5 @@ rm -rf /tmp/airship-dev-tools
 pushd "${M3_DIR}/scripts/feature_tests/upgrade"
 rm -rf upgrade_tests
 popd
+
+set +x
