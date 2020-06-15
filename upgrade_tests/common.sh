@@ -80,6 +80,8 @@ function wait_for_ctrlplane_provisioning_start() {
             sleep 1
             if [[ "${i}" -ge 3600 ]];then
                 echo "Error: provisioning took too long to start"
+                deprovision_cluster
+                wait_for_cluster_deprovisioned
                 exit 1
             fi
             continue
@@ -97,6 +99,8 @@ function wait_for_ctrlplane_provisioning_start() {
                 sleep 2
                 if [[ "${i}" -ge 3600 ]];then
                     echo "Error: provisioning took too long to start"
+                    deprovision_cluster
+                    wait_for_cluster_deprovisioned
                     exit 1
                 fi
             else
@@ -168,6 +172,8 @@ function wait_for_worker_provisioning_start() {
         sleep 1
         if [[ "${i}" -ge 3600 ]];then
             echo "Error: provisioning took too long to start"
+            deprovision_cluster
+            wait_for_cluster_deprovisioned
             exit 1
         fi
         continue
@@ -191,6 +197,8 @@ function wait_for_worker_provisioning_complete() {
             sleep 2
             if [[ "${i}" -ge 3600 ]];then
                 echo "Error: provisioning took too long to start"
+                deprovision_cluster
+                wait_for_cluster_deprovisioned
                 exit 1
             fi
         else
@@ -204,15 +212,22 @@ function wait_for_ug_process_to_complete() {
         ORIGINAL_NODE="${1}"
         echo "Waiting for upgrade process to complete"
         for i in {1..1800};do
-        export NEW_NODE_NAME=$(kubectl get bmh -n metal3 | grep -v ${ORIGINAL_NODE} | grep 'prov' | grep 'control' | awk '{{print $1}}')
-        if [ -n "${NEW_NODE_NAME}" ]; then
-            export NEW_NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${NEW_NODE_NAME}"  | awk '{{print $5}}' | cut -f1 -d\/)
-            break
-        else
-            # Process progress indicator
-            echo -n "-"
-            sleep 1
-        fi
+            export NEW_NODE_NAME=$(kubectl get bmh -n metal3 | grep -v ${ORIGINAL_NODE} | grep 'prov' | grep 'control' | awk '{{print $1}}')
+            if [ -n "${NEW_NODE_NAME}" ]; then
+                export NEW_NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${NEW_NODE_NAME}"  | awk '{{print $5}}' | cut -f1 -d\/)
+                break
+            else
+                # Process progress indicator
+                echo -n "-"
+                sleep 1
+            fi
+            if [[ "${i}" -ge 1800 ]]; then
+                ug_ongoing=2
+                echo "Upgrade failed, resource is hanging."
+                deprovision_cluster
+                wait_for_cluster_deprovisioned
+                exit 1
+            fi
         done
 
         echo ''
@@ -265,6 +280,9 @@ function wait_for_ug_process_to_complete() {
                 if [[ "${node_c}" -eq "7200" ]]; then
                     ug_ongoing=2
                     echo "Upgrade failed, resource(s) are hanging."
+                    deprovision_cluster
+                    wait_for_cluster_deprovisioned
+                    exit 1
                 fi
         done
     fi
@@ -286,6 +304,8 @@ function wait_for_orig_node_deprovisioned() {
         sleep 1
         if [[ "${i}" -ge 3600 ]];then
                 echo "Error: deprovisioning of original node too too long to complete"
+                deprovision_cluster
+                wait_for_cluster_deprovisioned
                 exit 1
         fi
         done
@@ -310,6 +330,8 @@ function wait_for_ctrlplane_to_scale_out {
         sleep 5
         if [[ "${i}" -ge 1800 ]];then
             echo "Error: Scaling out of controlplane nodes took to long"
+            deprovision_cluster
+            wait_for_cluster_deprovisioned
             exit 1
         fi        
     done
@@ -331,6 +353,8 @@ function wait_for_worker_to_scale_out {
         sleep 5
         if [[ "${i}" -ge 1800 ]];then
             echo "Error: Scaling out of workers nodes took to long"
+            deprovision_cluster
+            wait_for_cluster_deprovisioned
             exit 1
         fi
     done
@@ -353,6 +377,8 @@ function wait_for_worker_to_scale_to {
         sleep 5
         if [[ "${i}" -ge 1800 ]];then
             echo "Error: Scaling of workers nodes took to long"
+            deprovision_cluster
+            wait_for_cluster_deprovisioned
             exit 1
         fi
     done
@@ -393,6 +419,8 @@ for i in {1..1800};do
     sleep 5
     if [[ "${i}" -ge 1800 ]];then
         echo "Error: Workload failed to be deployed on the cluster"
+        deprovision_cluster
+        wait_for_cluster_deprovisioned
         exit 1
     fi
 done
@@ -415,7 +443,7 @@ function wait_for_cluster_deprovisioned() {
             if [[ "${ready_bmhs}" -eq "4" ]];then
                 echo ''
                 echo "Successfully deprovisioned the cluster"
-                exit 1
+                exit 0
             fi
         else
             echo -n "-"
