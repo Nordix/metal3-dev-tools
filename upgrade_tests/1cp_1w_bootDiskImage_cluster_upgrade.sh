@@ -36,6 +36,8 @@ for i in {1..3600};do
 	  sleep 1
 	  if [[ "${i}" -ge 3600 ]];then
 		  echo "Error: provisioning of a worker node took too long to start"
+      deprovision_cluster
+      wait_for_cluster_deprovisioned
 		  exit 1
     fi
 	  continue
@@ -59,6 +61,8 @@ for i in {1..3600};do
   echo "Waiting for worker to join the cluster"
   if [[ "${i}" -ge 3600 ]]; then
 	  echo "Error: It took too long for a worker to join the cluster"
+    deprovision_cluster
+    wait_for_cluster_deprovisioned
 	  exit 1
   fi
 done
@@ -110,6 +114,8 @@ for i in {1..3600};do
   echo "Waiting for completion of provisioning of new controlplane and worker nodes"
   if [[ "${i}" -ge 3600 ]]; then
 		  echo "Error: Provisioning of new controlplane and worker nodes too too long to start"
+      deprovision_cluster
+      wait_for_cluster_deprovisioned
 		  exit 1
   fi
   sleep 5
@@ -139,6 +145,8 @@ for i in {1..3600};do
   sleep 5
   if [[ "${i}" -ge 3600 ]];then
 		  echo "Error: It took too long for upgraded worker to join the new cluster"
+      deprovision_cluster
+      wait_for_cluster_deprovisioned
 		  exit 1
   fi
 done
@@ -155,6 +163,8 @@ for i in {1..3600};do
   sleep 5
   if [[ "${i}" -ge 3600 ]];then
 		  echo "Error: deprovisioning of the original controlplane and worker nodes took too long"
+      deprovision_cluster
+      wait_for_cluster_deprovisioned
 		  exit 1
   fi
 done

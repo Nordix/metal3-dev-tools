@@ -60,6 +60,8 @@ for i in {1..3600};do
       echo -n "-"	  
       if [[ "${i}" -ge 3600 ]];then
         echo "Error: Upgrade on some or all worker nodes did not start in time"
+        deprovision_cluster
+        wait_for_cluster_deprovisioned
         exit 1
       fi
       sleep 5
@@ -83,6 +85,8 @@ for i in {1..3600};do
     sleep 5
     if [[ "${i}" -ge 3600 ]];then
           echo "Error: Upgraded worker node did not join the cluster in time"
+          deprovision_cluster
+          wait_for_cluster_deprovisioned
           exit 1
     fi
 done
@@ -123,6 +127,8 @@ for i in {1..1800};do
     sleep 5
     if [[ "${i}" -ge 1800 ]];then
         echo "Error: Workload failed to be deployed on the cluster"
+        deprovision_cluster
+        wait_for_cluster_deprovisioned
         exit 1
     fi
 done
@@ -155,6 +161,8 @@ for i in {1..3600};do
   NEW_CP_NODE=$(kubectl get bmh -n metal3 | grep ${new_cp_metal3MachineTemplate_name} | awk '{{print $1}}')
     if [[ "${i}" -ge 3600 ]]; then
 		  echo "Error: Upgrade of controlplane node took too long to start"
+      deprovision_cluster
+      wait_for_cluster_deprovisioned
 		  exit 1
   fi
   if [ -z "$NEW_CP_NODE" ]; then
