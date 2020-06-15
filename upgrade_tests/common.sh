@@ -70,6 +70,23 @@ function deprovision_cluster() {
     popd
 }
 
+function wait_for_cluster_deprovisioned() {
+    echo "Waiting for cluster to be deprovisioned"
+    for i in {1..3600};do
+        cluster_count=$(kubectl get clusters -n metal3  2>/dev/null | awk 'NR>1' | wc -l)
+        if [[ "${cluster_count}" -eq "0" ]];then
+            ready_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep 'ready' | wc -l)
+            if [[ "${ready_bmhs}" -eq "4" ]];then
+                echo ''
+                echo "Successfully deprovisioned the cluster"
+                exit 0
+            fi
+        else
+            echo -n "-"
+        fi
+    done
+}
+
 function wait_for_ctrlplane_provisioning_start() {
     echo "Waiting for provisioning of controlplane node to start, number of replicas ${NUM_OF_NODE_REPLICAS}"
     if [ "${NUM_OF_NODE_REPLICAS}" -eq 1 ];then
@@ -432,23 +449,6 @@ function manage_node_taints {
     # kubectl get nodes -o json | jq ".items[]|{name:.metadata.name, taints:.spec.taints}"
     # untaint all masters (one workers also gets untainted, doesn't matter):
     ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${1}" -- kubectl taint nodes --all node-role.kubernetes.io/master-
-}
-
-function wait_for_cluster_deprovisioned() {
-    echo "Waiting for cluster to be deprovisioned"
-    for i in {1..3600};do
-        cluster_count=$(kubectl get clusters -n metal3  2>/dev/null | awk 'NR>1' | wc -l)
-        if [[ "${cluster_count}" -eq "0" ]];then
-            ready_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep 'ready' | wc -l)
-            if [[ "${ready_bmhs}" -eq "4" ]];then
-                echo ''
-                echo "Successfully deprovisioned the cluster"
-                exit 0
-            fi
-        else
-            echo -n "-"
-        fi
-    done
 }
 
 function start_logging() {
