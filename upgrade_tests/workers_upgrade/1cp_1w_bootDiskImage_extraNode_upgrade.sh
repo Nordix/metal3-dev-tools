@@ -8,8 +8,6 @@ echo '' > ~/.ssh/known_hosts
 
 start_logging "${0}"
 
-# TODO: cleanup
-set_number_of_node_replicas 1
 set_number_of_master_node_replicas 1
 set_number_of_worker_node_replicas 1
 
@@ -82,6 +80,7 @@ for i in {1..3600};do
 done
 
 echo "Upgrade of OS Image of worker node succeeded"
+echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

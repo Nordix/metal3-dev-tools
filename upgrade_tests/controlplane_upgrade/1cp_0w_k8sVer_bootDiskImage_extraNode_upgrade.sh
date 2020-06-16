@@ -8,8 +8,6 @@ echo '' > ~/.ssh/known_hosts
 
 start_logging "${0}"
 
-# TODO: cleanup
-set_number_of_node_replicas 1
 set_number_of_master_node_replicas 1
 
 provision_controlplane_node
@@ -46,11 +44,12 @@ echo "Upgrading a control plane node image and k8s version from ${FROM_VERSION} 
 # replace node image and k8s version in kcp yaml:
 kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO_VERSION}/" | sed "s/name: ${M3_MACHINE_TEMPLATE_NAME}/name: new-controlplane-image/" | kubectl replace -f -
 
-wait_for_ug_process_to_complete ${ORIGINAL_NODE}
+wait_for_ug_process_to_complete
 
-wait_for_orig_node_deprovisioned ${ORIGINAL_NODE}
+wait_for_orig_node_deprovisioned master 1
 
 echo "Upgrading a control plane node image and k8s version from ${FROM_VERSION} to ${TO_VERSION} in cluster ${CLUSTER_NAME} has succeeded"
+echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
