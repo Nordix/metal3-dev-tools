@@ -107,7 +107,9 @@ function wait_for_ctrlplane_provisioning_start() {
         for i in {1..3600};do
             provisioned_bmhs=$(kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision' | wc -l)
             running_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep 'Running' | wc -l)
-            if [[ "${provisioned_bmhs}" -ne "${NUM_OF_MASTER_REPLICAS}" && "${running_machines}" -ne "${NUM_OF_MASTER_REPLICAS}" ]]; then
+            if [[ "${provisioned_bmhs}" -eq "${NUM_OF_MASTER_REPLICAS}" && "${running_machines}" -eq "${NUM_OF_MASTER_REPLICAS}" ]]; then
+                break
+            else
                 echo -n ".:"
                 sleep 2
                 if [[ "${i}" -ge 3600 ]];then
@@ -116,8 +118,6 @@ function wait_for_ctrlplane_provisioning_start() {
                     wait_for_cluster_deprovisioned
                     exit 1
                 fi
-            else
-                break
             fi
         done
     fi
