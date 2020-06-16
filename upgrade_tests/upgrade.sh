@@ -2,6 +2,18 @@
 
 M3_DIR="$(dirname "$(readlink -f "${0}")")/../../.."
 
+# shellcheck disable=SC1091
+# shellcheck disable=SC1090
+source "${M3_DIR}/lib/common.sh"
+
+# shellcheck disable=SC1091
+# shellcheck disable=SC1090
+source "${M3_DIR}/lib/network.sh"
+
+# shellcheck disable=SC1091
+# shellcheck disable=SC1090
+source "${M3_DIR}/lib/images.sh"
+
 # Fetch the upgrade tests from airship-dev-tools
 pushd ${M3_DIR}/scripts/feature_tests/upgrade
 cd /tmp

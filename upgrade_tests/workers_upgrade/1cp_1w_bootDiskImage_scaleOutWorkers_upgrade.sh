@@ -11,8 +11,6 @@ start_logging "${0}"
 # Old name does not matter
 export new_wr_metal3MachineTemplate_name="test1-new-workers-image"
 
-# TODO: cleanup
-set_number_of_node_replicas 1
 set_number_of_master_node_replicas 1
 set_number_of_worker_node_replicas 1
 
@@ -34,11 +32,9 @@ W_NODE=$(kubectl get bmh -n metal3 | grep worker | grep -v ready | cut -f1 -d' '
 W_NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${W_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
 wait_for_worker_provisioning_complete 2 ${W_NODE} ${W_NODE_IP} "Worker node"
 
-# TODO: cleanup
-set_number_of_node_replicas 3
 set_number_of_worker_node_replicas 3
 
-wait_for_worker_to_scale_to 3 ${CP_NODE_IP}
+wait_for_node_to_scale_to 3 "${CP_NODE_IP}" "worker"
 
 echo "Create a new metal3MachineTemplate with new node image for worker nodes"
 wr_Metal3MachineTemplate_OUTPUT_FILE="/tmp/wr_new_image.yaml"
@@ -88,6 +84,7 @@ for i in {1..3600};do
 done
 
 echo "Successfully upgraded multiple workers with NO extra node"
+echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

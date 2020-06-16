@@ -8,8 +8,6 @@ echo '' > ~/.ssh/known_hosts
 
 start_logging "${0}"
 
-# TODO: cleanup
-set_number_of_node_replicas 1
 set_number_of_master_node_replicas 1
 
 provision_controlplane_node
@@ -35,28 +33,12 @@ kubectl get kubeadmcontrolplane -n metal3 test1 -o yaml > /tmp/patch-kubeadmcont
 sed -i 's/name: test1-controlplane/name: test1-new-image/g' /tmp/patch-kubeadmcontrolplane.yaml
 kubectl patch kubeadmcontrolplane test1 -n metal3 --type merge --patch "$(cat /tmp/patch-kubeadmcontrolplane.yaml)"
 
-wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${NODE_IP} "Original node"
+wait_for_ug_process_to_complete
 
-# starting to provision a new control plane node
-for i in {1..3600};do 
-  NEW_NODE=$(kubectl get bmh -n metal3 | grep -v ${ORIGINAL_NODE} | grep 'prov' | awk '{{print $1}}')
-  NEW_NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${NEW_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
-  result=$(ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "${UPGRADE_USER}@${NEW_NODE_IP}" -- kubectl version 2>&1 /dev/null)
-  if [[ "$?" == '0' ]]; then
-    wait_for_ctrlplane_provisioning_complete ${NEW_NODE} ${NEW_NODE_IP} "new node"    
-    break
-  fi
-  echo "Waiting for the ugprade of the new node, ${NEW_NODE}, to start or complete"
-  if [[ "${i}" -ge 3600 ]]; then
-		  echo "Error: Upgrading process took too long to complete"
-		  exit 1
-  fi
-  sleep 1
-done
-
-wait_for_orig_node_deprovisioned ${ORIGINAL_NODE}
+wait_for_orig_node_deprovisioned master 1
 
 echo "Upgrade of OS Image of controlplane node succeeded"
+echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
