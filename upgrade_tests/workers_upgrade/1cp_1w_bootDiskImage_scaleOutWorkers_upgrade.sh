@@ -6,7 +6,7 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-start_logging "${0}"
+start_logging "${1}"
 
 # Old name does not matter
 export new_wr_metal3MachineTemplate_name="test1-new-workers-image"
@@ -84,7 +84,7 @@ for i in {1..3600};do
 done
 
 echo "Successfully upgraded multiple workers with NO extra node"
-echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

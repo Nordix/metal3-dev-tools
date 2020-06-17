@@ -6,7 +6,7 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-start_logging "${0}"
+start_logging "${1}"
 
 # Old name does not matter
 export new_cp_metal3MachineTemplate_name="test1-new-controlplane-image"
@@ -46,7 +46,7 @@ kubectl get kcp -n metal3 test1 -o json | jq '.spec.infrastructureTemplate.name=
 wait_for_ug_process_to_complete
 
 wait_for_orig_node_deprovisioned
-echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

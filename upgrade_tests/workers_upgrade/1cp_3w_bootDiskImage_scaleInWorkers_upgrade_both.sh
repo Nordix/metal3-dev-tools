@@ -6,7 +6,7 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-start_logging "${0}"
+start_logging "${1}"
 
 # Old name does not matter
 export new_wr_metal3MachineTemplate_name="test1-new-workers-image"
@@ -33,7 +33,7 @@ W_NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${W_NODE}"  | awk '{{pr
 wait_for_worker_provisioning_complete 2 "${W_NODE}" "${W_NODE_IP}" "Worker node"
 
 set_number_of_worker_node_replicas 3
-wait_for_node_to_scale_to 3 "${CP_NODE_IP}" "worker"
+wait_for_node_to_scale_to 3 ${CP_NODE_IP} "worker"
 
 echo "Create a new metal3MachineTemplate with new node image for worker nodes"
 wr_Metal3MachineTemplate_OUTPUT_FILE="/tmp/wr_new_image.yaml"
@@ -53,7 +53,7 @@ wait_for_worker_ug_process_to_complete "${CP_NODE_IP}" "${new_wr_metal3MachineTe
 deploy_workload_on_workers
 
 set_number_of_worker_node_replicas 2
-wait_for_node_to_scale_to 2 "${CP_NODE_IP}" "worker"
+wait_for_node_to_scale_to 2 ${CP_NODE_IP} "worker"
 
 # upgrade a Controlplane
 echo "Create a new metal3MachineTemplate with new node image for both controlplane node"
@@ -86,10 +86,10 @@ for i in {1..3600};do
 done
 
 set_number_of_worker_node_replicas 3
-wait_for_node_to_scale_to 3 "${CP_NODE_IP}" "worker"
+wait_for_node_to_scale_to 3 ${NEW_CP_NODE_IP} "worker"
 
 echo "Upgrading of both (1M + 3W) using scaling in of workers has succeeded"
-echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
