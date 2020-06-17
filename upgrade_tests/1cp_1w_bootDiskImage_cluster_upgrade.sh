@@ -5,7 +5,7 @@ set -x
 source ./common.sh
 echo '' > ~/.ssh/known_hosts
 
-start_logging "${0}"
+start_logging "${1}"
 
 set_number_of_master_node_replicas 1
 set_number_of_worker_node_replicas 1
@@ -132,7 +132,7 @@ for i in {1..3600};do
 done
 
 echo "Boot disk upgrade of both controlplane and worker nodes has succeeded."
-echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

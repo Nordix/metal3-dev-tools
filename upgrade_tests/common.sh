@@ -75,7 +75,7 @@ function wait_for_cluster_deprovisioned() {
             if [[ "${ready_bmhs}" -eq "4" ]];then
                 echo ''
                 echo "Successfully deprovisioned the cluster"
-                exit 0
+                break
             fi
         else
             echo -n "-"
@@ -95,7 +95,7 @@ function wait_for_ctrlplane_provisioning_start() {
                 echo "Error: provisioning took too long to start"
                 deprovision_cluster
                 wait_for_cluster_deprovisioned
-                exit 1
+                break
             fi
             continue
         else
@@ -116,7 +116,7 @@ function wait_for_ctrlplane_provisioning_start() {
                     echo "Error: provisioning took too long to start"
                     deprovision_cluster
                     wait_for_cluster_deprovisioned
-                    exit 1
+                    break
                 fi
             fi
         done
@@ -187,7 +187,7 @@ function wait_for_worker_provisioning_start() {
             echo "Error: provisioning took too long to start"
             deprovision_cluster
             wait_for_cluster_deprovisioned
-            exit 1
+            break
         fi
         continue
     else
@@ -212,7 +212,7 @@ function wait_for_worker_provisioning_complete() {
                 echo "Error: provisioning took too long to start"
                 deprovision_cluster
                 wait_for_cluster_deprovisioned
-                exit 1
+                break
             fi
         else
             break
@@ -257,7 +257,7 @@ function wait_for_ug_process_to_complete() {
                 echo "Upgrade failed, resource(s) are hanging."
                 deprovision_cluster
                 wait_for_cluster_deprovisioned
-                exit 1
+                break
             fi
     done
 
@@ -300,7 +300,7 @@ function wait_for_worker_ug_process_to_complete() {
                 echo "Error: Upgrade on some or all worker nodes did not start in time"
                 deprovision_cluster
                 wait_for_cluster_deprovisioned
-                exit 1
+                break
             fi
             sleep 5
             continue
@@ -325,7 +325,7 @@ function wait_for_worker_ug_process_to_complete() {
             echo "Error: Upgraded worker node did not join the cluster in time"
             deprovision_cluster
             wait_for_cluster_deprovisioned
-            exit 1
+            break
         fi
     done
     echo "Successfully upgraded multiple workers"
@@ -359,7 +359,7 @@ function wait_for_orig_node_deprovisioned() {
                 echo "Error: deprovisioning of original node too too long to complete"
                 deprovision_cluster
                 wait_for_cluster_deprovisioned
-                exit 1
+                break
             fi
         done
     else
@@ -399,7 +399,7 @@ function wait_for_node_to_scale_to {
             echo "Error: Scaling of ${node_type} nodes took to long"
             deprovision_cluster
             wait_for_cluster_deprovisioned
-            exit 1
+            break
         fi
     done
 }
@@ -441,7 +441,7 @@ for i in {1..1800};do
         echo "Error: Workload failed to be deployed on the cluster"
         deprovision_cluster
         wait_for_cluster_deprovisioned
-        exit 1
+        break
     fi
 done
 }

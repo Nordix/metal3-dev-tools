@@ -6,7 +6,7 @@ source ../common.sh
 
 echo '' > ~/.ssh/known_hosts
 
-start_logging "${0}"
+start_logging "${1}"
 
 set_number_of_master_node_replicas 1
 set_number_of_worker_node_replicas 1
@@ -41,7 +41,7 @@ wait_for_ug_process_to_complete
 wait_for_orig_node_deprovisioned master_and_worker 2
 
 echo "Mutation of kubeadm data has succeded"
-echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
