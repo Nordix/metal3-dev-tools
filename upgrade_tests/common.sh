@@ -4,7 +4,7 @@ export IMAGE_OS=${IMAGE_OS:-"Ubuntu"}
 export UPGRADE_USER=${UPGRADE_USER:-"metal3"}
 export KUBERNETES_VERSION="v1.18.0"
 export KUBERNETES_BINARIES_VERSION="v1.18.0"
-export METAL3_DEV_ENV_DIR="${SCRIPTDIR}"
+export METAL3_DEV_ENV_DIR="/home/ubuntu/metal3-dev-env" # Needs verification in CI
 export UPGRADED_K8S_VERSION_1="v1.18.1"
 export UPGRADED_K8S_VERSION_2="v1.18.2"
 export UPGRADED_BINARY_VERSION="v1.18.1"
@@ -80,6 +80,7 @@ function wait_for_cluster_deprovisioned() {
         else
             echo -n "-"
         fi
+        sleep 10
     done
 }
 
@@ -90,7 +91,7 @@ function wait_for_ctrlplane_provisioning_start() {
         kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision'
         if [ $? -ne 0 ]; then
             echo -n "."
-            sleep 1
+            sleep 10
             if [[ "${i}" -ge 3600 ]];then
                 echo "Error: provisioning took too long to start"
                 deprovision_cluster
@@ -111,7 +112,7 @@ function wait_for_ctrlplane_provisioning_start() {
                 break
             else
                 echo -n ".:"
-                sleep 2
+                sleep 10
                 if [[ "${i}" -ge 3600 ]];then
                     echo "Error: provisioning took too long to start"
                     deprovision_cluster
@@ -141,7 +142,7 @@ function wait_for_ctrlplane_provisioning_complete() {
         else
             echo -n "-"
         fi
-        sleep 1
+        sleep 10
         done
     else
 	    NODE_LIST=( "${@}" )
@@ -166,7 +167,7 @@ function wait_for_ctrlplane_provisioning_complete() {
             else
                 echo -n "-"
             fi
-            sleep 1
+            sleep 10
             done
 	    node_c=$(($node_c+1))
 	    if [ "${node_c}" -eq "${NUM_OF_MASTER_REPLICAS}" ]; then
@@ -182,7 +183,7 @@ function wait_for_worker_provisioning_start() {
     kubectl get bmh -n metal3 | awk 'NR>1'| grep -i 'provision' | grep 'worker'
     if [ $? -ne 0 ]; then
         echo -n "."
-        sleep 1
+        sleep 10
         if [[ "${i}" -ge 3600 ]];then
             echo "Error: provisioning took too long to start"
             deprovision_cluster
@@ -207,7 +208,7 @@ function wait_for_worker_provisioning_complete() {
         running_machines=$(kubectl get machines -n metal3 | awk 'NR>1'| grep 'Running' | wc -l)
         if [[ "${running_machines}" -lt "${TOTAL_NBR_OF_MACHINES_IN_CLUSTER}" ]]; then
             echo -n "::"
-            sleep 2
+            sleep 10
             if [[ "${i}" -ge 3600 ]];then
                 echo "Error: provisioning took too long to start"
                 deprovision_cluster
@@ -249,7 +250,7 @@ function wait_for_ug_process_to_complete() {
             fi
             # Upgrade progress indicator
             echo -n "-"
-            sleep 2
+            sleep 10
 
             node_c=$(($node_c+1))
             if [[ "${node_c}" -eq "7200" ]]; then
@@ -280,7 +281,7 @@ function wait_for_ug_process_to_complete() {
                 fi
                 # Upgrade progress indicator
                 echo -n ".ssh."
-                sleep 1
+                sleep 10
             done
         else
             echo "Connectivity test after upgrade skipped"
@@ -302,7 +303,7 @@ function wait_for_worker_ug_process_to_complete() {
                 wait_for_cluster_deprovisioned
                 break
             fi
-            sleep 5
+            sleep 10
             continue
         else
             echo "Upgrade of all worker nodes has finished"
@@ -320,7 +321,7 @@ function wait_for_worker_ug_process_to_complete() {
             echo "Upgraded worker nodes have joined the cluster"
             break
         fi
-        sleep 5
+        sleep 10
         if [[ "${i}" -ge 3600 ]];then
             echo "Error: Upgraded worker node did not join the cluster in time"
             deprovision_cluster
@@ -354,7 +355,7 @@ function wait_for_orig_node_deprovisioned() {
             else
                 echo -n "-."
             fi
-            sleep 1
+            sleep 10
             if [[ "${i}" -ge 3600 ]];then
                 echo "Error: deprovisioning of original node too too long to complete"
                 deprovision_cluster
@@ -394,7 +395,7 @@ function wait_for_node_to_scale_to {
         fi
         # Scaling progress indicator
         echo -n "*"
-        sleep 5
+        sleep 10
         if [[ "${i}" -ge 1800 ]];then
             echo "Error: Scaling of ${node_type} nodes took to long"
             deprovision_cluster
@@ -436,7 +437,7 @@ for i in {1..1800};do
         break
     fi
     echo -n "*"
-    sleep 5
+    sleep 10
     if [[ "${i}" -ge 1800 ]];then
         echo "Error: Workload failed to be deployed on the cluster"
         deprovision_cluster
@@ -461,4 +462,17 @@ function start_logging() {
 	echo "${log_file}"
 
 	exec > >(tee /tmp/${log_file})
+}
+
+function log_test_result() {
+	test_case_file="${1}"
+    test_result="${2}" # pass or fail
+
+    if [ "${test_result}" == "pass" ]; then
+        echo "Test case ${test_case_file} has passed" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+    elif [ "${test_result}" == "fail" ]; then
+        echo "Test case ${test_case_file} has failed" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+    else
+        echo "Unknown result for Test case ${test_case_file}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+    fi
 }

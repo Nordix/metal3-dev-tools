@@ -2,6 +2,9 @@
 
 set -x
 
+# Remove old test result
+rm -rf /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+
 M3_DIR="$(dirname "$(readlink -f "${0}")")/../../.."
 
 # shellcheck disable=SC1091

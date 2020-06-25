@@ -1,7 +1,8 @@
 #!/bin/bash
 
-
 set -x
+
+source ../common.sh
 
 start_logging "${1}"
 
@@ -14,9 +15,9 @@ rm -rf /tmp/cluster-api-clone
 mkdir /tmp/cluster-api-clone
 rm /usr/local/bin/clusterctl
 
-# Build clusterctl 
+# Build clusterctl
 git clone https://github.com/kubernetes-sigs/cluster-api.git /tmp/cluster-api-clone
-pushd /tmp/cluster-api-clone 
+pushd /tmp/cluster-api-clone
 make clusterctl
 sudo mv bin/clusterctl /usr/local/bin
 
@@ -25,14 +26,14 @@ kind delete cluster --name upgrade_CAPI_with_clusterctl
 kind create cluster --name upgrade_CAPI_with_clusterctl
 
 # create required configuration files
-cat << EOF > clusterctl-settings.json
+cat <<EOF >clusterctl-settings.json
 {
   "providers": [ "cluster-api", "bootstrap-kubeadm", "control-plane-kubeadm",  "infrastructure-metal3"],
   "provider_repos": ["${CAPM3_REPO}"]
 }
 EOF
 
-cat << EOF > clusterctl-settings-metal3.json
+cat <<EOF >clusterctl-settings-metal3.json
 {
   "name": "infrastructure-metal3",
   "config": {
@@ -42,7 +43,7 @@ cat << EOF > clusterctl-settings-metal3.json
 }
 EOF
 
-cat << EOF > /home/$USER/.cluster-api/clusterctl.yaml
+cat <<EOF >/home/$USER/.cluster-api/clusterctl.yaml
 providers:
   - name: cluster-api
     url: /home/$USER/.cluster-api/overrides/cluster-api/v0.3.1/core-components.yaml
@@ -61,7 +62,7 @@ mv clusterctl-settings-metal3.json "${CAPM3_REPO}/clusterctl-settings.json"
 
 # Install initial version
 clusterctl_init_command=$(cmd/clusterctl/hack/local-overrides.py | grep "clusterctl init")
-echo ${clusterctl_init_command} --target-namespace t1 --watching-namespace t1 | bash 
+echo ${clusterctl_init_command} --target-namespace t1 --watching-namespace t1 | bash
 
 # Create a new version
 cp -r /home/$USER/.cluster-api/overrides/infrastructure-metal3/v0.3.0 /home/$USER/.cluster-api/overrides/infrastructure-metal3/v0.3.4
@@ -75,17 +76,19 @@ sed -i 's/\bm3c\b/m3c2020/g' /home/$USER/.cluster-api/overrides/infrastructure-m
 clusterctl upgrade plan
 
 # do upgrade
-clusterctl upgrade plan | grep "upgrade apply" | xargs | xargs clusterctl 
+clusterctl upgrade plan | grep "upgrade apply" | xargs | xargs clusterctl
 
 # Verify upgrade
 upgraded_controllers_count=$(kubectl api-resources | grep m3c2020 | wc -l)
 
-if [ $upgraded_controllers_count -ne 1 ]
-then
+if [ $upgraded_controllers_count -ne 1 ]; then
   echo "Failed to upgrad infrastructure components"
+  log_test_result ${0} "fail"
   exit 1
 fi
 
 echo "Successfully upgraded infrastructure components"
-echo "successfully run ${0}" >> /tmp/$(date +"%Y.%m.%d_upgrade.capm3.result.txt")
+log_test_result ${0} "pass"
 set +x
+
+# status = passed

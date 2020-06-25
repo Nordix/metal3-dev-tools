@@ -4,7 +4,7 @@ set -x
 
 source ../common.sh
 
-echo '' > ~/.ssh/known_hosts
+echo '' >~/.ssh/known_hosts
 
 start_logging "${1}"
 
@@ -21,8 +21,8 @@ CP_ORIGINAL_NODE_LIST=$(kubectl get bmh -n metal3 | grep control | grep -v ready
 echo "BareMetalHosts ${CP_ORIGINAL_NODE_LIST} are in provisioning or provisioned state"
 
 NODE_IP_LIST=()
-for node in "${CP_ORIGINAL_NODE_LIST[@]}";do
-    NODE_IP_LIST+=$(sudo virsh net-dhcp-leases baremetal | grep "${node}"  | awk '{{print $5}}' | cut -f1 -d\/)
+for node in "${CP_ORIGINAL_NODE_LIST[@]}"; do
+  NODE_IP_LIST+=$(sudo virsh net-dhcp-leases baremetal | grep "${node}" | awk '{{print $5}}' | cut -f1 -d\/)
 done
 echo "NODE_IP_LIST ${NODE_IP_LIST[@]}"
 wait_for_ctrlplane_provisioning_complete ${CP_ORIGINAL_NODE_LIST[@]} ${NODE_IP_LIST[@]}
@@ -37,7 +37,7 @@ provision_worker_node
 wait_for_worker_provisioning_start
 
 ORIGINAL_NODE=$(kubectl get bmh -n metal3 | grep worker | grep -v ready | cut -f1 -d' ')
-NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
+NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}" | awk '{{print $5}}' | cut -f1 -d\/)
 
 wait_for_worker_provisioning_complete 4 ${ORIGINAL_NODE} ${NODE_IP} "Worker node"
 
@@ -62,7 +62,7 @@ fi
 M3_MACHINE_TEMPLATE_NAME=$(kubectl get Metal3MachineTemplate -n metal3 -oyaml | grep "name: " | grep controlplane | cut -f2 -d':' | awk '{$1=$1;print}')
 
 Metal3MachineTemplate_OUTPUT_FILE="/tmp/new_image.yaml"
-CLUSTER_UID=$(kubectl get clusters -n metal3 ${CLUSTER_NAME} -o json |jq '.metadata.uid' | cut -f2 -d\")
+CLUSTER_UID=$(kubectl get clusters -n metal3 ${CLUSTER_NAME} -o json | jq '.metadata.uid' | cut -f2 -d\")
 IMG_CHKSUM=$(curl -s https://cloud-images.ubuntu.com/bionic/current/MD5SUMS | grep bionic-server-cloudimg-amd64.img | cut -f1 -d' ')
 generate_metal3MachineTemplate new-controlplane-image "${CLUSTER_UID}" "${Metal3MachineTemplate_OUTPUT_FILE}" "${IMG_CHKSUM}"
 kubectl apply -f "${Metal3MachineTemplate_OUTPUT_FILE}"
@@ -77,14 +77,15 @@ wait_for_orig_node_deprovisioned
 
 # the control plane node might have been replaced by a worker node after the upgrade, discover a control plane ip again
 CP_NEW=$(kubectl get bmh -n metal3 | grep control | grep -v ready | cut -f1 -d' ' | head -1)
-CP_NEW_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${CP_NEW}"  | awk '{{print $5}}' | cut -f1 -d\/)
+CP_NEW_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${CP_NEW}" | awk '{{print $5}}' | cut -f1 -d\/)
 echo "New control plane ip ${CP_NEW_IP}"
 wait_for_node_to_scale_to 1 ${CP_NEW_IP} "worker"
 
 # taints back to masters, not required by the use case so just comment
 # ssh -o PasswordAuthentication=no -o "StrictHostKeyChecking no" "metal3@192.168.111.21" -- kubectl taint nodes ${CP_UG_NODE_LIST} node-role.kubernetes.io/master=value:NoSchedule
-
-echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+log_test_result ${0} "pass"
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
+
+# status = passed

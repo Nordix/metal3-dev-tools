@@ -4,7 +4,7 @@ set -x
 
 source ../common.sh
 
-echo '' > ~/.ssh/known_hosts
+echo '' >~/.ssh/known_hosts
 
 start_logging "${1}"
 
@@ -18,7 +18,7 @@ wait_for_ctrlplane_provisioning_start
 
 ORIGINAL_NODE=$(kubectl get bmh -n metal3 | grep control | grep -v ready | cut -f1 -d' ')
 echo "BareMetalHost ${ORIGINAL_NODE} is in provisioning or provisioned state"
-NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}"  | awk '{{print $5}}' | cut -f1 -d\/)
+NODE_IP=$(sudo virsh net-dhcp-leases baremetal | grep "${ORIGINAL_NODE}" | awk '{{print $5}}' | cut -f1 -d\/)
 
 wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE} ${NODE_IP} "Original node"
 
@@ -37,10 +37,10 @@ kubectl get kcp -n metal3 -oyaml | sed "s/version: ${FROM_VERSION}/version: ${TO
 
 wait_for_ug_process_to_complete
 
-wait_for_orig_node_deprovisioned master 1
+wait_for_orig_node_deprovisioned master 3
 
 echo "Upgrading a single control plane nodes k8s version with extra nodes has succeeded."
-echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+log_test_result ${0} "pass"
 
 deprovision_cluster
 wait_for_cluster_deprovisioned

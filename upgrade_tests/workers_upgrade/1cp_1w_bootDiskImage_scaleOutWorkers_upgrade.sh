@@ -56,9 +56,10 @@ for i in {1..3600};do
       echo -n "-"	  
       if [[ "${i}" -ge 3600 ]];then
         echo "Error: Upgrade on some or all worker nodes did not start in time"
+        log_test_result ${0} "fail"
         exit 1
       fi
-      sleep 5
+      sleep 10
       continue
   else
       echo "Upgrade of all worker nodes has finished"
@@ -76,15 +77,16 @@ for i in {1..3600};do
         echo "Upgraded worker nodes have joined the cluster"
         break
     fi
-    sleep 5
+    sleep 10
     if [[ "${i}" -ge 3600 ]];then
           echo "Error: Upgraded worker node did not join the cluster in time"
+          log_test_result ${0} "fail"
           exit 1
     fi
 done
 
 echo "Successfully upgraded multiple workers with NO extra node"
-echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+log_test_result ${0} "pass"
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
