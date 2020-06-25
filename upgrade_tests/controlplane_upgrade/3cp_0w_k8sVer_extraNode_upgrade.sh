@@ -4,7 +4,7 @@ set -x
 
 source ../common.sh
 
-echo '' > ~/.ssh/known_hosts
+echo '' >~/.ssh/known_hosts
 
 start_logging "${1}"
 
@@ -20,8 +20,8 @@ ORIGINAL_NODE_LIST=$(kubectl get bmh -n metal3 | grep control | grep -v ready | 
 echo "BareMetalHosts ${ORIGINAL_NODE_LIST} are in provisioning or provisioned state"
 
 NODE_IP_LIST=()
-for node in "${ORIGINAL_NODE_LIST[@]}";do
-    NODE_IP_LIST+=$(sudo virsh net-dhcp-leases baremetal | grep "${node}"  | awk '{{print $5}}' | cut -f1 -d\/)
+for node in "${ORIGINAL_NODE_LIST[@]}"; do
+  NODE_IP_LIST+=$(sudo virsh net-dhcp-leases baremetal | grep "${node}" | awk '{{print $5}}' | cut -f1 -d\/)
 done
 echo "NODE_IP_LIST ${NODE_IP_LIST[@]}"
 wait_for_ctrlplane_provisioning_complete ${ORIGINAL_NODE_LIST[@]} ${NODE_IP_LIST[@]}
@@ -44,7 +44,9 @@ wait_for_ug_process_to_complete
 wait_for_orig_node_deprovisioned
 
 echo "Upgrading a control plane nodes k8s version from ${FROM_VERSION} to ${TO_VERSION} in cluster ${CLUSTER_NAME}, has succeeded"
-echo "successfully run ${1}" >> /tmp/$(date +"%Y.%m.%d_upgrade.result.txt")
+log_test_result ${0} "pass"
 
 deprovision_cluster
 wait_for_cluster_deprovisioned
+
+# status = passed
