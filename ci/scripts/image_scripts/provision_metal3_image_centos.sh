@@ -13,7 +13,8 @@ M3_DENV_ROOT="${M3_DENV_ROOT:-/tmp}"
 M3_DENV_PATH="${M3_DENV_PATH:-${M3_DENV_ROOT}/${M3_DENV_REPO}}"
 FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE:-true}"
 
-export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
+export IMAGE_OS="${IMAGE_OS:-Centos}"
+export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-minikube}"
 
 sudo yum update -y
 sudo yum update -y curl nss
@@ -28,22 +29,22 @@ sudo cp operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/ope
 rm operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
 
 ## Install metal3 requirements
-#mkdir -p "${M3_DENV_ROOT}"
-#if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
-#  sudo rm -rf "${M3_DENV_PATH}"
-#fi
-#if [ ! -d "${M3_DENV_PATH}" ] ; then
-#  pushd "${M3_DENV_ROOT}"
-#  git clone "${M3_DENV_URL}"
-#  popd
-#fi
-#pushd "${M3_DENV_PATH}"
-#git checkout "${M3_DENV_BRANCH}"
-#git pull -r || true
-#make install_requirements
-#popd
-#
-#rm -rf "${M3_DENV_PATH}"
+mkdir -p "${M3_DENV_ROOT}"
+if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
+  sudo rm -rf "${M3_DENV_PATH}"
+fi
+if [ ! -d "${M3_DENV_PATH}" ] ; then
+  pushd "${M3_DENV_ROOT}"
+  git clone "${M3_DENV_URL}"
+  popd
+fi
+pushd "${M3_DENV_PATH}"
+git checkout "${M3_DENV_BRANCH}"
+git pull -r || true
+make install_requirements
+popd
+
+rm -rf "${M3_DENV_PATH}"
 
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
