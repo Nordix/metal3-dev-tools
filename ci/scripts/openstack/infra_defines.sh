@@ -21,6 +21,9 @@ CI_METAL3_IMAGE="airship-ci-ubuntu-metal3-img"
 CI_METAL3_CENTOS_IMAGE="airship-ci-centos-metal3-img"
 CI_NODE_CENTOS_IMAGE="airship-ci-centos-node-img"
 CI_SSH_USER_NAME="airshipci"
+VM_KEY=${VM_KEY:-local}
+VM_PREFIX="ubuntu"
+VM_PREFIX_CENTOS="centos"
 
 # Global defines for Airship DEV infrastructure
 # =============================================

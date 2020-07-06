@@ -3,11 +3,16 @@ ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_credential_id = "nordix-airship-ci-github-prod-token"
 ci_git_branch = "master"
 
+scripts {
+  def rand = new Random()
+  VM_KEY = (1..4).collect { ('a'..'z').join("")[ rand.nextInt( 26 ) ] }.join("")
+}
 
 pipeline {
   agent { label 'airship-static-workers' }
   environment {
     AIRSHIP_CI_USER="airshipci"
+    VM_KEY = "${VM_KEY}"
     RT_URL="https://artifactory.nordix.org/artifactory"
     OS_AUTH_URL="https://kna1.citycloud.com:5000"
     OS_USER_DOMAIN_NAME="CCP_Domain_37137"
@@ -19,6 +24,7 @@ pipeline {
     OS_IDENTITY_API_VERSION=3
     DOCKER_CMD_ENV="--env AIRSHIP_CI_USER \
       --env AIRSHIP_CI_USER_KEY=/data/id_rsa_airshipci \
+      --env VM_KEY \
       --env RT_URL \
       --env OS_AUTH_URL \
       --env OS_USER_DOMAIN_NAME \
@@ -135,6 +141,81 @@ pipeline {
               /data/ci/images/gen_metal3_centos_image.sh \
               /data/id_rsa_airshipci 1 \
               provision_metal3_image_centos.sh"
+
+          }
+        }
+      }
+    }
+    stage('Building Metal3 Ubuntu volume'){
+      options {
+        timeout(time: 60, unit: 'MINUTES')
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+            
+            /* Generate Metal3 ubuntu volume */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/gen_metal3_ubuntu_volume.sh \
+              /data/id_rsa_airshipci 1"
+          }
+        }
+      }
+      post {
+        always {
+          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+              
+            /* Clean up Metal3 ubuntu volume */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/cleanup_volume.sh \
+              /data/id_rsa_airshipci 1"
+            }
+          }
+        }
+      }
+    }
+    stage('Building Metal3 CentOS volume'){
+      options {
+        timeout(time: 60, unit: 'MINUTES')
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+            
+            /* Generate Metal3 CentOS dev-env volume */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/gen_metal3_centos_volume.sh \
+              /data/id_rsa_airshipci 1"
+          }
+        }
+      }
+      post {
+        always {
+          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+
+            /* Clean up Metal3 CentOS dev-env volume */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/cleanup_volume.sh \
+              /data/id_rsa_airshipci 1"
+            }
           }
         }
       }

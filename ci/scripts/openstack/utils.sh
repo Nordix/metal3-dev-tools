@@ -485,6 +485,53 @@ replace_image() {
 }
 
 # Description:
+# Creates Openstack volume.
+#
+# Usage:
+#   create_volume <source_image_name> <volume_size> <builder_volume_name>
+#
+create_volume() {
+  local SOURCE_IMAGE_NAME VOLUME_SIZE BUILDER_VOLUME_NAME
+
+  SOURCE_IMAGE_NAME="${1:?}"
+  VOLUME_SIZE="${2:?}"
+  BUILDER_VOLUME_NAME="${3:?}"
+  
+  openstack volume create \
+    --image "${SOURCE_IMAGE_NAME}" \
+    --size "${VOLUME_SIZE}" \
+    --bootable \
+    "${BUILDER_VOLUME_NAME}"
+}
+
+# Description:
+# Remove old volume with changes the name of the new volume
+#
+# Usage:
+#   replace_volume <src_volume_name> <dst_volume_name>
+#
+replace_volume() {
+  local SRC_VOLUME DST_VOLUME VOLUME_LIST VOLUME_ARRAY VOLUME_ID
+
+  SRC_VOLUME="${1:?}"
+  DST_VOLUME="${2:?}"
+
+
+  # Get list of volumes by name
+  VOLUME_LIST="$(openstack volume list --name "${DST_VOLUME}" -f json || true)"
+  VOLUME_ARRAY="$(echo "${VOLUME_LIST}" | jq -r 'map(.ID) | @csv' | tr ',' '\n' | tr -d '"')"
+
+  for VOLUME_ID in ${VOLUME_ARRAY}
+  do
+    echo "Deleting volume ${VOLUME_ID}"
+    openstack volume delete "${VOLUME_ID}" > /dev/null
+  done
+
+  echo "Setting volume name from ${SRC_VOLUME} to ${DST_VOLUME}"
+  openstack volume set --name "${DST_VOLUME}" "${SRC_VOLUME}" > /dev/null
+}
+
+# Description:
 # Waits for SSH connection to come up for a server
 #
 # Usage:
