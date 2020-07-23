@@ -3,7 +3,7 @@ ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_credential_id = "nordix-airship-ci-github-prod-token"
 ci_git_branch = "master"
 
-scripts {
+script {
   def rand = new Random()
   VM_KEY = (1..4).collect { ('a'..'z').join("")[ rand.nextInt( 26 ) ] }.join("")
 }
