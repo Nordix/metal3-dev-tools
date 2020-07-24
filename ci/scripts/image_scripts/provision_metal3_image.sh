@@ -2,6 +2,8 @@
 
 set -uex
 
+DEPLOY_METAL3="${1:-false}"
+
 #Disable the automatic updates
 cat << EOF | sudo tee /etc/apt/apt.conf.d/20auto-upgrades
 APT::Periodic::Update-Package-Lists "0";
@@ -29,32 +31,33 @@ export IMAGE_OS="${IMAGE_OS:-Ubuntu}"
 export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-kind}"
 
 #Install Operator SDK
-OSDK_RELEASE_VERSION=v0.12.0
+OSDK_RELEASE_VERSION=v0.19.0
 curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OSDK_RELEASE_VERSION}/operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
 chmod +x operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
 sudo mkdir -p /usr/local/bin/
-sudo cp operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
-rm operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
+sudo mv operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
 
 sudo apt install -y git
 
-## Install metal3 requirements
-mkdir -p "${M3_DENV_ROOT}"
-if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
-  sudo rm -rf "${M3_DENV_PATH}"
-fi
-if [ ! -d "${M3_DENV_PATH}" ] ; then
-  pushd "${M3_DENV_ROOT}"
-  git clone "${M3_DENV_URL}"
+if [[ "${DEPLOY_METAL3}" == "true" ]]; then
+  ## Install metal3 requirements
+  mkdir -p "${M3_DENV_ROOT}"
+  if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
+    sudo rm -rf "${M3_DENV_PATH}"
+  fi
+  if [ ! -d "${M3_DENV_PATH}" ] ; then
+    pushd "${M3_DENV_ROOT}"
+    git clone "${M3_DENV_URL}"
+    popd
+  fi
+  pushd "${M3_DENV_PATH}"
+  git checkout "${M3_DENV_BRANCH}"
+  git pull -r || true
+  make install_requirements
   popd
-fi
-pushd "${M3_DENV_PATH}"
-git checkout "${M3_DENV_BRANCH}"
-git pull -r || true
-make install_requirements
-popd
 
-rm -rf "${M3_DENV_PATH}"
+  rm -rf "${M3_DENV_PATH}"
+fi
 
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
