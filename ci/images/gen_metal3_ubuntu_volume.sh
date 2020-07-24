@@ -31,9 +31,9 @@ CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
 delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
-# Create a volume from CI_JENKINS_IMAGE
+# Create a volume from CI_METAL3_IMAGE
 echo "Creating a volume..."
-create_volume "${CI_JENKINS_IMAGE}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
+create_volume "${CI_METAL3_IMAGE}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
 
 # Wait for a volume to be available...
 echo "Waiting for a volume to be available..."
@@ -52,7 +52,7 @@ do
       echo "Deleting a volume that failed to be created..."
       openstack volume delete "${BUILDER_VOLUME_NAME}"
       echo "Creating another new volume..."
-      create_volume "${CI_JENKINS_IMAGE}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
+      create_volume "${CI_METAL3_IMAGE}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
       retry=1
     else
       exit 1
@@ -121,7 +121,7 @@ ssh \
   -i "${SSH_PRIVATE_KEY_FILE}" \
   "${SSH_USER_NAME}"@"${PACKAGE_INSTALLER_VM_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  /tmp/provision_metal3_image.sh
+  /tmp/provision_metal3_image.sh true
 
 # Delete the floating IP of installer VM
 if [[ "$USE_FLOATING_IP" -ne 1 ]]; then

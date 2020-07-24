@@ -20,23 +20,11 @@ VM_NAME="${VM_PREFIX_CENTOS}-${VM_KEY}"
 VM_PORT_NAME="${VM_NAME}-int-port"
 BUILDER_VOLUME_NAME="${VM_PREFIX_CENTOS}-${VM_KEY}"
 BASE_VOLUME_NAME="metal3-centos"
-SOURCE_IMAGE_NAME="87bc649e-dba6-43ca-b659-ca8c19810ffb"
 VOLUME_SIZE="50"
 CI_INSTALLER_VM_FLAVOR="4C-8GB"
-USER_DATA_FILE="$(mktemp -d)/userdata"
-SSH_USER_GROUP="wheel"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
-
-SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
-render_user_data \
-  "${SSH_AUTHORIZED_KEY}" \
-  "${SSH_USER_NAME}" \
-  "${SSH_USER_GROUP}" \
-  "${VM_NAME}" \
-  "${IMAGES_DIR}/userdata.tpl" \
-  "${USER_DATA_FILE}"
 
 # Create CI Keypair
 CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
@@ -45,7 +33,7 @@ create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
 # Create a volume from SOURCE_IMAGE_NAME
 echo "Creating a volume..."
-create_volume "${SOURCE_IMAGE_NAME}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
+create_volume "${CI_METAL3_CENTOS_IMAGE}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
 
 # Wait for a volume to be available...
 echo "Waiting for a volume to be available..."
@@ -54,7 +42,7 @@ until openstack volume show "${BUILDER_VOLUME_NAME}" -f json \
   | jq .status | grep "available"
 do
   sleep 10
-  # Check if volume creation is failed 
+  # Check if volume creation is failed
   if [[ "$(openstack volume show "${BUILDER_VOLUME_NAME}" -f json \
     | jq .status)" == "error" ]];
   then
@@ -64,7 +52,7 @@ do
       echo "Deleting a volume that failed to be created..."
       openstack volume delete "${BUILDER_VOLUME_NAME}"
       echo "Creating another new volume..."
-      create_volume "${SOURCE_IMAGE_NAME}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
+      create_volume "${CI_METAL3_CENTOS_IMAGE}" "${VOLUME_SIZE}" "${BUILDER_VOLUME_NAME}"
       retry=1
     else
       exit 1
@@ -95,7 +83,6 @@ PACKAGE_INSTALLER_VM_ID="$(openstack server create -f json \
   --volume "${BUILDER_VOLUME_NAME}" \
   --flavor "${CI_INSTALLER_VM_FLAVOR}" \
   --port "${PRIVATE_PORT_ID}" \
-  --user-data "${USER_DATA_FILE}" \
   --key-name "${SSH_KEYPAIR_NAME}" \
   "${VM_NAME}" | jq -r '.id')"
 
@@ -134,7 +121,7 @@ ssh \
   -i "${SSH_PRIVATE_KEY_FILE}" \
   "${SSH_USER_NAME}"@"${PACKAGE_INSTALLER_VM_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  /tmp/provision_metal3_image_centos.sh
+  /tmp/provision_metal3_image_centos.sh true
 
 # Delete the floating IP of installer VM
 if [[ "$USE_FLOATING_IP" -ne 1 ]]; then
