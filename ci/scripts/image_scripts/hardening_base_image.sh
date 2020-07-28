@@ -1,8 +1,5 @@
 #! /usr/bin/env bash
 
-COMMON_PASS_PATH=/etc/pam.d/common-password
-SYSTEM_AUTH_PATH=/etc/pam.d/common-auth
-
 # Declares ssh values to set in /etc/ssh/sshd_config
 declare -A ssh_values=(
   [PermitRootLogin]=no
@@ -68,35 +65,7 @@ done
 sudo apt-get -y --purge remove telnet
 sudo apt-get -y autoremove
 
-
-# Add password policies
-echo auth sufficient pam_unix.so likeauth nullok | sudo tee -a "${COMMON_PASS_PATH}" > /dev/null
-echo password sufficient pam_unix.so remember=4 | sudo tee -a "${COMMON_PASS_PATH}" > /dev/null
-echo /lib/security/"$ISA"/pam_cracklib.so retry=3 minlen=8 lcredit=-1 ucredit=-2 dcredit=-2 ocredit=-1 | sudo tee -a "${SYSTEM_AUTH_PATH}" > /dev/null
-
-# Lock the account after five failed attempts
-cat << EOL | sudo tee -a "${COMMON_PASS_PATH}" > /dev/null
-auth required pam_env.so
-auth required pam_faillock.so preauth audit silent deny=5 unlock_time=900
-auth [success=1 default=bad] pam_unix.so
-auth [default=die] pam_faillock.so authfail audit deny=5 unlock_time=900
-auth sufficient pam_faillock.so authsucc audit deny=5 unlock_time=900
-auth required pam_deny.so
-EOL
-
-cat << EOL | sudo tee -a "${SYSTEM_AUTH_PATH}" > /dev/null
-auth required pam_env.so
-auth required pam_faillock.so preauth audit silent deny=5 unlock_time=900
-auth [success=1 default=bad] pam_unix.so
-auth [default=die] pam_faillock.so authfail audit deny=5 unlock_time=900
-auth sufficient pam_faillock.so authsucc audit deny=5 unlock_time=900
-auth required pam_deny.so
-EOL
-
-
-# Set the password to expire after 90 days
-sudo sed -i '/^PASS_MAX_DAYS/ c\PASS_MAX_DAYS\t90' /etc/login.defs
-
+# We do not use passwords on the machines
 
 # Disable the system accounts for non-root users
 
