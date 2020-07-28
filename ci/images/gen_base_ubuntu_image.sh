@@ -18,7 +18,7 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_BASE_IMAGE}-$(get_random_string 10)"
 FINAL_IMAGE_NAME="${CI_BASE_IMAGE}"
-SOURCE_IMAGE="5829b81b-f8c3-49c8-a5cf-682416c3b5ea"
+SOURCE_IMAGE="dba1e718-a102-46be-b8e9-ae1b1f2fd2fb"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
