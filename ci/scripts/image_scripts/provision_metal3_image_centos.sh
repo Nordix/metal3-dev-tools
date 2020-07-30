@@ -45,6 +45,9 @@ if [[ "${DEPLOY_METAL3}" == "true" ]]; then
   git checkout "${M3_DENV_BRANCH}"
   git pull -r || true
   make install_requirements
+  sudo minikube stop
+  sudo minikube delete
+  for veth in $(ifconfig | grep -w "provisioning" | grep -w "baremetal"); do ifconfig $veth delete; done
   popd
 
   rm -rf "${M3_DENV_PATH}"
