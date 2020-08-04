@@ -5,6 +5,7 @@ set -uex
 DEPLOY_METAL3="${1:-false}"
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
+USER="$(whoami)"
 
 # Metal3 Dev Env variables
 M3_DENV_ORG="${M3_DENV_ORG:-metal3-io}"
@@ -45,8 +46,7 @@ if [[ "${DEPLOY_METAL3}" == "true" ]]; then
   git checkout "${M3_DENV_BRANCH}"
   git pull -r || true
   make install_requirements
-  sudo minikube stop
-  sudo minikube delete
+  sudo su -l -c "minikube delete" "${USER}"
   for veth in $(ifconfig | grep -w "provisioning" | grep -w "baremetal"); do ifconfig $veth delete; done
   popd
 
