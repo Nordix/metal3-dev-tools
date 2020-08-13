@@ -55,5 +55,3 @@ sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_confi
 
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
-
-echo "Passw0rd!" | sudo passwd --stdin airshipci
