@@ -45,11 +45,7 @@ if [[ "${DEPLOY_METAL3}" == "true" ]]; then
   git checkout "${M3_DENV_BRANCH}"
   git pull -r || true
   make install_requirements
-  sudo su -l -c "minikube delete"
-  for veth_mac in $(sudo virsh domiflist minikube | grep -Ei 'provisioning|baremetal' | awk '{ print $5 }');
-  do
-    sudo virsh detach-interface minikube --type network --mac $veth_mac --config
-  done
+  sudo su -l -c "minikube delete" "${USER}"
   popd
 
   rm -rf "${M3_DENV_PATH}"
@@ -59,3 +55,5 @@ sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_confi
 
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
+
+echo "Passw0rd!" | sudo passwd --stdin airshipci
