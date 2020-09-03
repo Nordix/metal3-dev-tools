@@ -56,8 +56,5 @@ echo "password123" | sudo passwd --stdin furkat
 sudo sed -i "0,/.*PasswordAuthentication.*/s//PasswordAuthentication yes/" /etc/ssh/sshd_config
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
-sudo systemctl disable firewalld
-sudo systemctl stop firewalld
-
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
