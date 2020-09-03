@@ -51,8 +51,8 @@ if [[ "${DEPLOY_METAL3}" == "true" ]]; then
   rm -rf "${M3_DENV_PATH}"
 fi
 
-sudo adduser furkat
-echo "password123" | sudo passwd --stdin furkat
+sudo useradd testuser1 || true
+echo 'testuser1:newpassword' | sudo chpasswd
 sudo sed -i "0,/.*PasswordAuthentication.*/s//PasswordAuthentication yes/" /etc/ssh/sshd_config
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
