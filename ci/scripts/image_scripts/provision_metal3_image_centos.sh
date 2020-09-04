@@ -54,8 +54,6 @@ fi
 sudo useradd testuser1 || true
 echo 'testuser1:newpassword' | sudo chpasswd
 sudo usermod -aG wheel testuser1
-echo "newpassword" | sudo passwd --stdin airshipci
-sudo sed -i "0,/.*PasswordAuthentication.*/s//PasswordAuthentication yes/" /etc/ssh/sshd_config
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
 # Reset cloud-init to run on next boot.
