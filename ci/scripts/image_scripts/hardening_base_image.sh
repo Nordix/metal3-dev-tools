@@ -6,7 +6,6 @@ declare -A ssh_values=(
   [IgnoreRhosts]=yes
   [HostbasedAuthentication]=no
   [PermitEmptyPasswords]=no
-  [PasswordAuthentication]=yes
   [X11Forwarding]=no
   [MaxAuthTries]=5
   [Ciphers]="aes128-ctr,aes192-ctr,aes256-ctr"
