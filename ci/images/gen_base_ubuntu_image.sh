@@ -19,6 +19,7 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 IMAGE_NAME="${CI_BASE_IMAGE}-$(get_random_string 10)"
 FINAL_IMAGE_NAME="${CI_BASE_IMAGE}"
 SOURCE_IMAGE="dba1e718-a102-46be-b8e9-ae1b1f2fd2fb"
+IMAGE_FLAVOR="1C-4GB-20GB"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
@@ -45,7 +46,6 @@ CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
 delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
-
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
@@ -58,6 +58,7 @@ packer build \
   -var "network=${NETWORK}" \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
+  -var "image_flavor=${IMAGE_FLAVOR}" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image

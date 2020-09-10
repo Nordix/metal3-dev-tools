@@ -10,14 +10,15 @@
     "network": "282a8c18-614c-4fbc-9928-b66d56ae3cbe",
     "floating_ip_net": "",
     "local_scripts_dir": "../scripts",
-    "ssh_pty": "false"
+    "ssh_pty": "false",
+    "flavor":"4C-16GB-50GB"
   },
   "builders": [{
     "type": "openstack",
     "image_name": "{{user `image_name`}}",
     "source_image": "{{user `source_image`}}",
     "user_data_file": "{{user `user_data_file`}}",
-    "flavor": "4C-16GB-50GB",
+    "flavor":  "{{user `image_flavor`}}",
     "reuse_ips": false,
     "ssh_keypair_name": "airshipci-key",
     "ssh_private_key_file": "{{user `ssh_private_key_file`}}",

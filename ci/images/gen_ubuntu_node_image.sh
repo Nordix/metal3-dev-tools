@@ -4,7 +4,9 @@ set -eu
 
 SSH_PRIVATE_KEY_FILE="${1:?}"
 USE_FLOATING_IP="${2:?}"
-PROVISIONING_SCRIPT="${3:?}"
+
+
+
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
@@ -14,33 +16,24 @@ OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
-if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
-  CI_IMAGE_NAME="${CI_NODE_CENTOS_IMAGE}"
-elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
-  CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
-else
-  echo "Available provisioning scripts are:"
-  echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
-  echo "Example:"
-  echo "./gen_metal3_centos_image.sh /data/keys/id_rsa_airshipci 1 provision_node_image_centos.sh"
-  exit 1
-fi
-
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
-FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
-SOURCE_IMAGE_NAME="87bc649e-dba6-43ca-b659-ca8c19810ffb"
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.18.8"}
+
+
+IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
+FINAL_IMAGE_NAME="UBUNTU_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"
+IMAGE_FLAVOR="1C-4GB-20GB"
+SOURCE_IMAGE="dba1e718-a102-46be-b8e9-ae1b1f2fd2fb"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
-SSH_USER_GROUP="wheel"
+REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_node_image.sh"
+SSH_USER_GROUP="sudo"
 
-SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \
@@ -70,9 +63,32 @@ packer build \
   -var "network=${NETWORK}" \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
-  -var "ssh_pty=true" \
+  -var "image_flavor=${IMAGE_FLAVOR}" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image
 
 replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
+
+# Download and push the image to artifactory
+WORK_DIR=/tmp/node_image
+mkdir -p "$WORK_DIR"
+echo "Downloading node Image from openstack"
+openstack image save --file "$WORK_DIR"/"$FINAL_IMAGE_NAME" "$FINAL_IMAGE_NAME"
+
+RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
+
+
+# shellcheck disable=SC1090
+source "${RT_SCRIPTS_DIR}/utils.sh"
+SOURCE_PATH="${WORK_DIR}/${FINAL_IMAGE_NAME}"
+DST_PATH="airship/images/k8s_${KUBERNETES_VERSION}/${FINAL_IMAGE_NAME}.qcow2"
+
+# Following environment variables should be set 
+# to push the image to artifactory
+#   RT_USER: artifactory user name.
+#   RT_TOKEN: artifactory password or api token
+#   RT_URL: Artifactory URL
+
+rt_upload_artifact  "${SOURCE_PATH}" "${DST_PATH}" "0"
+
