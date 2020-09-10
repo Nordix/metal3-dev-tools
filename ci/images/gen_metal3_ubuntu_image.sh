@@ -45,7 +45,6 @@ CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
 delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
-
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
