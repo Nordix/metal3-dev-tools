@@ -58,7 +58,7 @@ packer build \
   -var "network=${NETWORK}" \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
-  -var "image_flavor=${IMAGE_FLAVOR}" \
+  -var "flavor=${IMAGE_FLAVOR}" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image

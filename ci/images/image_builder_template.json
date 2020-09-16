@@ -18,7 +18,7 @@
     "image_name": "{{user `image_name`}}",
     "source_image": "{{user `source_image`}}",
     "user_data_file": "{{user `user_data_file`}}",
-    "flavor":  "{{user `image_flavor`}}",
+    "flavor":  "{{user `flavor`}}",
     "reuse_ips": false,
     "ssh_keypair_name": "airshipci-key",
     "ssh_private_key_file": "{{user `ssh_private_key_file`}}",
