@@ -5,9 +5,6 @@ set -eu
 SSH_PRIVATE_KEY_FILE="${1:?}"
 USE_FLOATING_IP="${2:?}"
 
-
-
-
 CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
@@ -20,10 +17,10 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.18.8"}
-
+export UBUNTU_VERSION=${UBUNTU_VERSION:-"20.04"}
 
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
-FINAL_IMAGE_NAME="UBUNTU_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"
+FINAL_IMAGE_NAME="UBUNTU_""${UBUNTU_VERSION}""_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"
 IMAGE_FLAVOR="1C-4GB-20GB"
 SOURCE_IMAGE="dba1e718-a102-46be-b8e9-ae1b1f2fd2fb"
 USER_DATA_FILE="$(mktemp -d)/userdata"
@@ -70,25 +67,6 @@ packer build \
 
 replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
 
-# Download and push the image to artifactory
-WORK_DIR=/tmp/node_image
-mkdir -p "$WORK_DIR"
-echo "Downloading node Image from openstack"
-openstack image save --file "$WORK_DIR"/"$FINAL_IMAGE_NAME" "$FINAL_IMAGE_NAME"
-
-RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 
 
-# shellcheck disable=SC1090
-source "${RT_SCRIPTS_DIR}/utils.sh"
-SOURCE_PATH="${WORK_DIR}/${FINAL_IMAGE_NAME}"
-DST_PATH="airship/images/k8s_${KUBERNETES_VERSION}/${FINAL_IMAGE_NAME}.qcow2"
-
-# Following environment variables should be set 
-# to push the image to artifactory
-#   RT_USER: artifactory user name.
-#   RT_TOKEN: artifactory password or api token
-#   RT_URL: Artifactory URL
-
-rt_upload_artifact  "${SOURCE_PATH}" "${DST_PATH}" "0"
 
