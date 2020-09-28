@@ -10,14 +10,20 @@ CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
+CENTOS_VERSION="8.2"
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.18.8"}
 
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   CI_IMAGE_NAME="${CI_NODE_CENTOS_IMAGE}"
+  IMAGE_FLAVOR="1C-4GB-20GB"
+  FINAL_IMAGE_NAME="CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
+  IMAGE_FLAVOR="4C-16GB-50GB"
+  FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
 else
   echo "Available provisioning scripts are:"
   echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
@@ -30,8 +36,7 @@ fi
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
-FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
-SOURCE_IMAGE_NAME="87bc649e-dba6-43ca-b659-ca8c19810ffb"
+SOURCE_IMAGE_NAME="23fa42d9-79e9-4519-8842-33329f823ce7"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
@@ -71,6 +76,7 @@ packer build \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "ssh_pty=true" \
+  -var "flavor=${IMAGE_FLAVOR}" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image

@@ -10,10 +10,11 @@
 #   4. uploads it to artifactory
 # 
 # Usage:
-#   ./upload.sh <IMAGE_NAME>
-#
+#   ./shrink_resize_upload_node_image.sh <IMAGE_NAME> <IMAGE_SIZE>
+#   ./shrink_resize_upload_node_image.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8 5G
 set -x
 IMAGE_NAME="${1:?}"
+IMAGE_SIZE="${2:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
@@ -37,7 +38,7 @@ ls -la
 sudo virt-sparsify "$IMAGE_NAME" converted_"$IMAGE_NAME" --compress
 sudo rm "$IMAGE_NAME"
 sudo mv converted_"$IMAGE_NAME" "$IMAGE_NAME" 
-sudo qemu-img resize --shrink "$IMAGE_NAME" 3G
+sudo qemu-img resize --shrink "$IMAGE_NAME" "$IMAGE_SIZE"
 popd
 
 # shellcheck disable=SC1090
@@ -50,6 +51,7 @@ DST_PATH="airship/images/k8s_${KUBERNETES_VERSION}/${IMAGE_NAME}"
 #   RT_USER: artifactory user name.
 #   RT_TOKEN: artifactory password or api token
 #   RT_URL: Artifactory URL
+
 rt_upload_artifact  "${SOURCE_PATH}" "${DST_PATH}" "0"
 
 # Delete the image from local work directory
