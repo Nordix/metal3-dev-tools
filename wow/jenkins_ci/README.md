@@ -85,6 +85,9 @@ and from there SSH into the actual tester VM with its own IP that you found
 in step3.
 
   **Note:** to SSH the Jenkins slave VM you need an airshipci SSH key
+  * if needed run 'ssh-add -l' to check that the key is loaded to ssh-agent
+  * ssh airshipci@'Jenkins-slave-VM-IP' -A
+  * ssh 'tester-VM-IP'
 
 5. Once you are inside the tester VM you can debug it and get more info.  
 
