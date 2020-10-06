@@ -44,7 +44,7 @@ do
   sleep 10
   # Check if volume creation is failed
   if [[ "$(openstack volume show "${BUILDER_VOLUME_NAME}" -f json \
-    | jq .status)" == "error" ]];
+    | jq .status)" == *"error"* ]];
   then
     echo "Volume creation is failed"
     # If volume creation is failed, then retry volume creation only once
