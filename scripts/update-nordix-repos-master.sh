@@ -23,6 +23,7 @@ IRONIC_IMAGE_REPO="https://github.com/metal3-io/ironic-image.git"
 IRONIC_INSPECTOR_REPO="https://github.com/metal3-io/ironic-inspector-image.git"
 METAL3GITHUBIO_REPO="https://github.com/metal3-io/metal3-io.github.io.git"
 
+
 NORDIX_CAPIPB_REPO="git@github.com:Nordix/cluster-api-provider-baremetal.git"
 NORDIX_CAPM3_REPO="git@github.com:Nordix/cluster-api-provider-metal3.git"
 NORDIX_CAPI_REPO="git@github.com:Nordix/cluster-api.git"
