@@ -174,13 +174,62 @@ git checkout <topic-branch>
 To avoid leaving unneeded branches in the repository, delete your branch if you
 don't use it anymore.
 
+Remove the topic branch remotely only
+
 ```sh
 git push origin :<topic-branch>
 ```
 
-Above command will ensure that the topic branch is removed locally and remotely
+Remove the topic branch locally only
+
+```bash
+git branch -d <topic-branch>
+```
 
 ## git workflow for a Nordix github repo
 
 It is exactly the same process except that steps 9. 10. and 11. do not happen.
 Instead the code is merged with the internal pull request.
+
+## How to backport
+
+Sometimes you may need to backport a commit (e.g. bug fix) from a master branch
+into a stable release branch. This involves a couple of steps as  described below.
+In this example, we will use `release-0.3` as the stable branch in to which we will backport a
+specific commit from the `master` branch.
+
+Create and checkout to a new branch (e.g. `backport_commit_x`) based on the stable 
+branch (e.g. `release-0.3`)
+
+```bash
+git checkout -b backport_commit_x origin/release-0.3
+
+34a036b73 radnom1
+d2ff718f9 radnom2
+d83cb0e4b radnom3
+d589bcfc2 radnom4
+b9a16e24e radnom5
+eface850b random6
+```
+
+Print out the commits from the `master` branch which aren't in the `release-0.3` branch.
+
+Here you need to take a copy of a SHA (e.g. `eface850b` for random6) of the specific commit
+that you want to backport into the `release-0.3` branch.
+
+Once you know the SHA of the commit, you can cherry-pick that commit.
+
+```bash
+git cherry-pick -x eface850b
+```
+
+If you have conflicts you will need to fix them before you push.
+If you don't have conflicts or you have already fixed them, then go ahead and 
+push your commit.
+
+```bash
+git push origin backport_commit_x
+```
+
+During the PR submission on the Github UI, make sure that you have selected the right target branch,
+which in our case is `release-0.3` branch.
