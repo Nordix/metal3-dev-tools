@@ -5,24 +5,17 @@
 # Description:
 # This script does the following:
 #   1. downloads an image from openstack
-#   2. sparsifies and shrinks it
-#   3. resizes it
-#   4. uploads it to artifactory
+#   2. uploads it to artifactory
 # 
 # Usage:
-#   ./shrink_resize_upload_node_image.sh <IMAGE_NAME> <IMAGE_SIZE>
-#   ./shrink_resize_upload_node_image.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8 5G
+#   ./upload_node_image_rt.sh <IMAGE_NAME> <IMAGE_SIZE>
+#   ./upload_node_image_rt.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8
 set -x
 IMAGE_NAME="${1:?}"
-IMAGE_SIZE="${2:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.18.8"}
-
-# Install necessary package
-sudo apt update -y 
-sudo apt install libguestfs-tools -y
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.19.3"}
 
 # Download and push the image to artifactory
 WORK_DIR=/tmp/node_image
@@ -30,16 +23,6 @@ mkdir -p "$WORK_DIR"
 echo "Downloading node Image from openstack"
 openstack image save --file "${WORK_DIR}"/"$IMAGE_NAME".qcow2 "$IMAGE_NAME"
 IMAGE_NAME="$IMAGE_NAME".qcow2
-
-# Resize image  
-pushd "${WORK_DIR}"
-export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
-ls -la
-sudo virt-sparsify "$IMAGE_NAME" converted_"$IMAGE_NAME" --compress
-sudo rm "$IMAGE_NAME"
-sudo mv converted_"$IMAGE_NAME" "$IMAGE_NAME" 
-sudo qemu-img resize --shrink "$IMAGE_NAME" "$IMAGE_SIZE"
-popd
 
 # shellcheck disable=SC1090
 source "${RT_SCRIPTS_DIR}/utils.sh"
