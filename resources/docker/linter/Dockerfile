@@ -1,8 +1,8 @@
-FROM alpine:3.10
+FROM alpine:latest
 
 RUN apk update && \
     apk add --no-cache ruby ruby-json && \
-    gem install --no-rdoc --no-ri mdl && \
+    gem install --no-document mdl && \
     mkdir /data
 
 WORKDIR /data
