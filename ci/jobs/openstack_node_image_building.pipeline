@@ -95,9 +95,8 @@ pipeline {
             /* Generate node CentOS dev-env image */
             sh "upload_node_image_rt.sh UBUNTU_20.04_NODE_IMAGE_K8S_v1.19.3"
             sh "upload_node_image_rt.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.19.3"
-          }
         }
       }
-    }      
-  }
+    }
+  }      
 }
