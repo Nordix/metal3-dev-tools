@@ -67,6 +67,5 @@ packer build \
 
 replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
 
-
-
-
+# upload node image to artifactory
+bash "${SCRIPTS_DIR}/upload_node_image_rt.sh" "${FINAL_IMAGE_NAME}"
