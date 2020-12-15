@@ -50,6 +50,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')])
 
             /* Generate node ubuntu image */
             sh "docker run --rm \
@@ -71,6 +72,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')])
 
             /* Generate node CentOS dev-env image */
             sh "docker run --rm \
@@ -83,18 +85,6 @@ pipeline {
               provision_node_image_centos.sh"
 
           }
-        }
-      }
-    }
-    stage('Push node images to artifactory'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-            /* Generate node CentOS dev-env image */
-            sh "upload_node_image_rt.sh UBUNTU_20.04_NODE_IMAGE_K8S_v1.19.3"
-            sh "upload_node_image_rt.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.19.3"
         }
       }
     }

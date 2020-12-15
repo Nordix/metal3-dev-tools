@@ -82,3 +82,8 @@ packer build \
 # Replace any old image
 
 replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
+
+# upload node image to artifactory
+if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
+  bash "${SCRIPTS_DIR}/upload_node_image_rt.sh" "${FINAL_IMAGE_NAME}"
+fi
