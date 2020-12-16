@@ -26,6 +26,8 @@ pipeline {
       --env AIRSHIP_CI_USER_KEY=/data/id_rsa_airshipci \
       --env VM_KEY \
       --env RT_URL \
+      --env RT_TOKEN \
+      --env RT_USER \
       --env OS_AUTH_URL \
       --env OS_USER_DOMAIN_NAME \
       --env OS_PROJECT_DOMAIN_NAME \
