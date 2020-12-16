@@ -36,6 +36,3 @@ DST_PATH="airship/images/k8s_${KUBERNETES_VERSION}/${IMAGE_NAME}"
 #   RT_URL: Artifactory URL
 
 rt_upload_artifact  "${SOURCE_PATH}" "${DST_PATH}" "0"
-
-# Delete the image from local work directory
-sudo rm -r ${WORK_DIR}
