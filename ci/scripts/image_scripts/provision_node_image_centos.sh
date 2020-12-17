@@ -17,7 +17,7 @@ sudo dnf install python3 -y
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-sudo dnf install docker-ce docker-ce-cli --disableexcludes=kubernetes --nobest -y
+sudo dnf install docker-ce-19.03.14-3.el8 docker-ce-cli-19.03.14-3.el8 --disableexcludes=kubernetes --nobest -y
 sudo dnf install gcc kernel-headers kernel-devel keepalived -y
 sudo dnf install device-mapper-persistent-data lvm2 -y
 echo  \"Installing kubernetes binaries\"
