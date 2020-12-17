@@ -12,20 +12,18 @@ SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 CENTOS_VERSION="8.2"
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.19.3"}
-IMAGE_DISK_FORMAT="raw"
-USE_BLOCKSTORAGE_VOLUME="false"
 
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   CI_IMAGE_NAME="${CI_NODE_CENTOS_IMAGE}"
+  BUILDER_CONFIG_FILE="image_builder_template_node.json"
   IMAGE_FLAVOR="1C-4GB-20GB"
-  IMAGE_DISK_FORMAT="qcow2"
-  USE_BLOCKSTORAGE_VOLUME="true"
   FINAL_IMAGE_NAME="CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
+  BUILDER_CONFIG_FILE="image_builder_template.json"
   IMAGE_FLAVOR="4C-16GB-50GB"
   FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
 else
@@ -48,7 +46,6 @@ NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
 SSH_USER_GROUP="wheel"
-
 SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
 render_user_data \
@@ -81,9 +78,7 @@ packer build \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "ssh_pty=true" \
   -var "flavor=${IMAGE_FLAVOR}" \
-  -var "image_disk_format=${IMAGE_DISK_FORMAT}" \
-  -var "use_blockstorage_volume=${USE_BLOCKSTORAGE_VOLUME}" \
-  "${IMAGES_DIR}/image_builder_template.json"
+  "${IMAGES_DIR}/${BUILDER_CONFIG_FILE}"
 
 # Replace any old image
 
