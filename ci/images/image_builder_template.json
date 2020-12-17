@@ -11,7 +11,9 @@
     "floating_ip_net": "",
     "local_scripts_dir": "../scripts",
     "ssh_pty": "false",
-    "flavor":"4C-16GB-50GB"
+    "flavor":"4C-16GB-50GB",
+    "image_disk_format": "raw",
+    "use_blockstorage_volume": "false"
   },
   "builders": [{
     "type": "openstack",
@@ -19,8 +21,8 @@
     "source_image": "{{user `source_image`}}",
     "user_data_file": "{{user `user_data_file`}}",
     "flavor":  "{{user `flavor`}}",
-    "image_disk_format": "qcow2",
-    "use_blockstorage_volume": "true",
+    "image_disk_format": "{{user `image_disk_format`}}",
+    "use_blockstorage_volume": "{{user `use_blockstorage_volume`}}",
     "volume_size": "20",
     "reuse_ips": false,
     "ssh_keypair_name": "airshipci-key",

@@ -30,6 +30,8 @@ NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_node_image.sh"
 SSH_USER_GROUP="sudo"
+IMAGE_DISK_FORMAT="qcow2"
+USE_BLOCKSTORAGE_VOLUME="true"
 
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
 render_user_data \
@@ -61,6 +63,8 @@ packer build \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "flavor=${IMAGE_FLAVOR}" \
+  -var "image_disk_format=${IMAGE_DISK_FORMAT}" \
+  -var "use_blockstorage_volume=${USE_BLOCKSTORAGE_VOLUME}" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image
