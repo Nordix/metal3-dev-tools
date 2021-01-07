@@ -3,9 +3,12 @@
 set -uex
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.19.3"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.20.0"}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.2.7"}
+
+# Install CRI-O
+"${SCRIPTS_DIR}"/install_crio_on_centos.sh 
 
 echo $PATH|tr ':' '\n'
 sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
@@ -17,7 +20,6 @@ sudo dnf install python3 -y
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-sudo dnf install docker-ce-19.03.14-3.el8 docker-ce-cli-19.03.14-3.el8 --disableexcludes=kubernetes --nobest -y
 sudo dnf install gcc kernel-headers kernel-devel keepalived -y
 sudo dnf install device-mapper-persistent-data lvm2 -y
 echo  \"Installing kubernetes binaries\"

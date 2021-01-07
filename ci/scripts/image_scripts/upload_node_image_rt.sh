@@ -8,14 +8,16 @@
 #   2. uploads it to artifactory
 # 
 # Usage:
-#   ./upload_node_image_rt.sh <IMAGE_NAME> <IMAGE_SIZE>
+#   ./upload_node_image_rt.sh <IMAGE_NAME>
 #   ./upload_node_image_rt.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8
+# Don't include the image format, only the name.
+# Example: CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8 instead of CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8.qcow2
 set -x
 IMAGE_NAME="${1:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.19.3"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.20.0"}
 
 # Download and push the image to artifactory
 WORK_DIR=/tmp/node_image

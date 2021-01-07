@@ -4,7 +4,7 @@ set -uex
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.19.3"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.20.0"}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.2.7"}
 
@@ -31,13 +31,15 @@ sudo apt install -y \
 sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo apt-get install -y conntrack socat
-sudo apt install net-tools gcc linux-headers-$(uname -r) bridge-utils apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
+sudo apt install net-tools gcc linux-headers-$(uname -r) bridge-utils -y
 sudo apt install -y keepalived && sudo systemctl stop keepalived
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
 sudo apt update -y
-# Install docker.
-"${SCRIPTS_DIR}"/setup_docker_ubuntu.sh 
+
+# Install CRI-O
+"${SCRIPTS_DIR}"/install_crio_on_ubuntu.sh 
+
 echo  "Installing kubernetes binaries"
 curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
 sudo chmod a+x kubeadm kubelet kubectl
