@@ -194,25 +194,32 @@ Instead the code is merged with the internal pull request.
 ## How to backport
 
 Sometimes you may need to backport a commit (e.g. bug fix) from a master branch
-into a stable release branch. This involves a couple of steps as  described below.
+into a stable release branch. This involves a couple of steps as described below.
 In this example, we will use `release-0.3` as the stable branch in to which we will backport a
 specific commit from the `master` branch.
 
-Create and checkout to a new branch (e.g. `backport_commit_x`) based on the stable 
-branch (e.g. `release-0.3`)
+Create and checkout to a new branch (e.g. `backport_commit_x`) based on the stable branch (e.g. `release-0.3`)
 
 ```bash
 git checkout -b backport_commit_x origin/release-0.3
-
-34a036b73 radnom1
-d2ff718f9 radnom2
-d83cb0e4b radnom3
-d589bcfc2 radnom4
-b9a16e24e radnom5
-eface850b random6
 ```
 
-Print out the commits from the `master` branch which aren't in the `release-0.3` branch.
+In order to cherry-pick a specific commit(s) you want, you will need to identify the commit hash(es).
+
+```bash
+git log --oneline --no-merges ..master
+```
+
+prints out all the commits in the `master` branch which aren't in the `release-0.3` branch in a below provided format:
+
+```
+34a036b73 random1
+d2ff718f9 random2
+d83cb0e4b random3
+d589bcfc2 random4
+b9a16e24e random5
+eface850b random6
+```
 
 Here you need to take a copy of a SHA (e.g. `eface850b` for random6) of the specific commit
 that you want to backport into the `release-0.3` branch.
@@ -223,9 +230,14 @@ Once you know the SHA of the commit, you can cherry-pick that commit.
 git cherry-pick -x eface850b
 ```
 
-If you have conflicts you will need to fix them before you push.
-If you don't have conflicts or you have already fixed them, then go ahead and 
-push your commit.
+If you have conflicts you will need to fix them first and then run the below commands before you push.
+
+```bash
+git add .
+git cherry-pick --continue
+```
+
+If you don't have conflicts or you have already fixed them, then go ahead and push your commit.
 
 ```bash
 git push origin backport_commit_x
