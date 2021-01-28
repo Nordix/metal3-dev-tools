@@ -477,6 +477,7 @@ replace_image() {
   for IMAGE_ID in ${IMAGE_ARRAY}
   do
     echo "Deleting image ${IMAGE_ID}"
+    openstack image set "${IMAGE_ID}" --deactivate > /dev/null
     openstack image delete "${IMAGE_ID}" > /dev/null
   done
 
