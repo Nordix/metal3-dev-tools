@@ -34,6 +34,9 @@ sudo /usr/local/bin/retrieve.configuration.files.sh https://raw.githubuserconten
 sudo yum clean all && sudo rm -rf /var/cache/yum
 sudo rm "${HOME}"/.ssh/authorized_keys
 
+# Download container images
+"${SCRIPTS_DIR}"/target_cluster_container_images.sh
+
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
 

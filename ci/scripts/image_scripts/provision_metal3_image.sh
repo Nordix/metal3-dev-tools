@@ -59,6 +59,9 @@ if [[ "${DEPLOY_METAL3}" == "true" ]]; then
   rm -rf "${M3_DENV_PATH}"
 fi
 
+# Download container images
+"${SCRIPTS_DIR}"/source_cluster_container_images.sh
+
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
 # Reset cloud-init to run on next boot.
