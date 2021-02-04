@@ -8,7 +8,10 @@ export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.2.7"}
 
 # Install CRI-O
-"${SCRIPTS_DIR}"/install_crio_on_centos.sh 
+"${SCRIPTS_DIR}"/install_crio_on_centos.sh
+# NOTE: When running with sudo, PATH is different. 
+# /usr/local/bin is NOT read by sudo commands, but rather /usr/bin. 
+sudo cp /usr/local/bin/crictl /usr/bin/
 
 echo $PATH|tr ':' '\n'
 sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
