@@ -13,7 +13,12 @@ if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
     export IMG_KIND_NODE_IMAGE="${IMG_KIND_NODE_IMAGE:-"kindest/node:${KUBERNETES_VERSION}"}"
 fi
 
-# Download container images.
-for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
-  sudo "${CONTAINER_RUNTIME}" pull "${container}"
-done
+if [[ "${CONTAINER_RUNTIME}" == "docker" ]]; then
+    for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
+      sudo "${CONTAINER_RUNTIME}" pull "${container}"
+    done
+else
+    for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
+      "${CONTAINER_RUNTIME}" pull "${container}"
+    done    
+fi
