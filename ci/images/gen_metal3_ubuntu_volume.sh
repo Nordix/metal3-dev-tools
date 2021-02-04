@@ -108,6 +108,7 @@ scp \
   -o UserKnownHostsFile=/dev/null \
   -i "${SSH_PRIVATE_KEY_FILE}" \
   "${IMAGE_SCRIPTS_DIR}/provision_metal3_image.sh" "${IMAGE_SCRIPTS_DIR}/reset_cloud_init.sh" \
+  "${IMAGE_SCRIPTS_DIR}/source_cluster_container_images.sh" \
   "${SSH_USER_NAME}@${PACKAGE_INSTALLER_VM_IP}:/tmp/" > /dev/null
 
 # Execute provision_metal3_image.sh script
