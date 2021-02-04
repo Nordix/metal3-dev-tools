@@ -17,6 +17,7 @@ FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE:-true}"
 
 export IMAGE_OS="${IMAGE_OS:-Centos}"
 export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-minikube}"
+export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
 sudo yum update -y
 sudo yum update -y curl nss
