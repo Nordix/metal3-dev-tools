@@ -52,6 +52,10 @@ if [[ "${DEPLOY_METAL3}" == "true" ]]; then
   rm -rf "${M3_DENV_PATH}"
 fi
 
+# We need podman in order to
+#pull container images for Centos Jenkins image
+sudo dnf -y install podman
+
 # Download container images
 "${SCRIPTS_DIR}"/source_cluster_container_images.sh
 
