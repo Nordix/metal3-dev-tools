@@ -5,7 +5,7 @@ set -uex
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME}"
 # Container images that we pre-pull into the CI image.
 export IMG_REGISTRY="${IMG_REGISTRY:-"docker.io/registry:latest"}"
-export IMG_GOLANG_IMG="${IMG_GOLANG_IMG:-"registry.hub.docker.com/library/golang:1.15.3"}"
+export IMG_GOLANG_IMG="${IMG_GOLANG_IMG:-"registry.hub.docker.com/library/golang:1.16"}"
 export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"docker.io/centos:centos8"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
