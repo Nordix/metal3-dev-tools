@@ -10,7 +10,7 @@ export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"docker.io/centos:centos8"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
     export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.20.4"}
-    export IMG_KIND_NODE_IMAGE="${IMG_KIND_NODE_IMAGE:-"kindest/node:${KUBERNETES_VERSION}"}"
+    export IMG_KIND_NODE_IMAGE="${IMG_KIND_NODE_IMAGE:-"kindest/node:v1.20.2"}"
 fi
 
 if [[ "${CONTAINER_RUNTIME}" == "docker" ]]; then
