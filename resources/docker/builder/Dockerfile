@@ -4,7 +4,7 @@ FROM hashicorp/packer:light AS packer
 # Build openstack client
 FROM python:3.7-alpine AS builder
 
-RUN apk add --update --no-cache git build-base linux-headers libffi-dev openssl-dev
+RUN apk add --update --no-cache git build-base linux-headers libffi-dev openssl-dev cargo
 RUN git clone --depth 1 https://github.com/openstack/python-openstackclient.git /src
 RUN cd /src && pip install --no-cache-dir --root=/app .
 
@@ -18,7 +18,8 @@ RUN apk add --update --no-cache git bash wget openssl \
     gcc \
     musl-dev \
     libffi-dev \
-    openssl-dev && \
+    openssl-dev \
+    cargo && \
     pip install ansible && \
     apk del build-dependencies && \
     curl -fL https://getcli.jfrog.io | sh && \
