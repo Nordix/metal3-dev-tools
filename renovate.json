@@ -1,0 +1,49 @@
+{
+ "extends": ["config:base"],
+ "baseBranches": ["master"],
+ "bumpVersion": null,
+ "packageRules": [
+   {
+     "depTypeList": ["devDependencies"],
+     "updateTypes": ["minor"],
+     "automerge": false
+   }
+ ],
+ "prHourlyLimit": 5,
+ "prConcurrentLimit": 10,
+ "rangeStrategy": "bump",
+ "renovateFork": true,
+ "includeForks": true,
+ "regexManagers": [
+    {
+      "fileMatch": [".*$"],
+      "matchStrings": ["docker.io/calico/cni:(?<currentValue>v.*?)\"}"],
+      "depNameTemplate": "calico/cni",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": [".*$"],
+      "matchStrings": ["docker.io/calico/pod2daemon-flexvol:(?<currentValue>v.*?)\"}"],
+      "depNameTemplate": "calico/pod2daemon-flexvol",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": [".*$"],
+      "matchStrings": ["docker.io/calico/node:(?<currentValue>v.*?)\"}"],
+      "depNameTemplate": "calico/node",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": [".*$"],
+      "matchStrings": ["docker.io/calico/kube-controllers:(?<currentValue>v.*?)\"}"],
+      "depNameTemplate": "calico/kube-controllers",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^ci/.*$"],
+      "matchStrings": ["CRICTL_VERSION:-\"(?<currentValue>v.*?)\"}"],
+      "depNameTemplate": "kubernetes-sigs/cri-tools",
+      "datasourceTemplate": "github-tags"
+    }
+  ]
+}

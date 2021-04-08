@@ -8,7 +8,8 @@ OS=${OS:-"CentOS_8"}
 # please make sure that k8s version given in
 # KUBERNETES_VERSION variable matches CRI-O version
 # give in VERSION variable.
-VERSION=${VERSION:-"1.20"}
+TEMP_CRIO_VERSION="${CRICTL_VERSION#v}" && TEMP_CRIO_VERSION="${TEMP_CRIO_VERSION%.*}" # e.g. v1.20.2 -> 1.20
+VERSION=${VERSION:-"${TEMP_CRIO_VERSION}"}
 
 # Create the .conf file to load the modules at bootup
 cat <<EOF | sudo tee /etc/modules-load.d/crio.conf
