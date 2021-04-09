@@ -4,7 +4,7 @@ set -uex
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.20.4"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.0"}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.2.7"}
 
@@ -41,7 +41,7 @@ sudo apt update -y
 "${SCRIPTS_DIR}"/install_crio_on_ubuntu.sh 
 
 echo  "Installing kubernetes binaries"
-if [[ $KUBERNETES_BINARIES_VERSION != "v1.20.4" ]]; then
+if [[ $KUBERNETES_BINARIES_VERSION != "v1.21.0" && $KUBERNETES_BINARIES_VERSION != "v1.20.4" ]]; then
     curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
 else
     echo "Installing patched kubeadm to workaround etcd startup issue in Kubernetes ${KUBERNETES_BINARIES_VERSION}"
