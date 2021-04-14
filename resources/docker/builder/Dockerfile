@@ -2,14 +2,14 @@
 FROM hashicorp/packer:light AS packer
 
 # Build openstack client
-FROM python:3.7-alpine AS builder
+FROM python:3.9-alpine AS builder
 
 RUN apk add --update --no-cache git build-base linux-headers libffi-dev openssl-dev cargo
 RUN git clone --depth 1 https://github.com/openstack/python-openstackclient.git /src
 RUN cd /src && pip install --no-cache-dir --root=/app .
 
 # Builder image
-FROM python:3.7-alpine
+FROM python:3.9-alpine
 
 RUN apk add --update --no-cache git bash wget openssl \
     jq curl wget gettext openssh && \
