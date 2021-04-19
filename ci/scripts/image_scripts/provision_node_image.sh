@@ -41,7 +41,14 @@ sudo apt update -y
 "${SCRIPTS_DIR}"/install_crio_on_ubuntu.sh 
 
 echo  "Installing kubernetes binaries"
-curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
+if [[ $KUBERNETES_BINARIES_VERSION != "v1.20.4" ]]; then
+    curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
+else
+    echo "Installing patched kubeadm to workaround etcd startup issue in Kubernetes ${KUBERNETES_BINARIES_VERSION}"
+    echo "https://github.com/kubernetes/kubernetes/issues/99305"
+    curl -L --remote-name -w "-w %{url_effective}" "https://artifactory.nordix.org/artifactory/airship/kubeadm_etcd_patched/k8s_${KUBERNETES_BINARIES_VERSION}/kubeadm"
+    curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubelet,kubectl}"
+fi
 sudo chmod a+x kubeadm kubelet kubectl
 sudo mv kubeadm kubelet kubectl /usr/local/bin/
 sudo mkdir -p /etc/systemd/system/kubelet.service.d
