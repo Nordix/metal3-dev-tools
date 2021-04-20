@@ -28,6 +28,10 @@ setup-local-repos: ## Setup nordix repos
 update-remote-repos: ## Update nordix repos
 	$(CURDIR)/scripts/update-nordix-repos-master.sh
 
+.PHONY: update-nordix-artifacts
+update-nordix-artifacts: ## Update Nordix Artifactory
+	$(CURDIR)/scripts/update-nordix-artifacts.sh
+
 .PHONY: build-workspace
 build-workspace: ## Build Docker Image for workspace
 	docker build \
