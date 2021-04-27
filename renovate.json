@@ -45,5 +45,9 @@
       "depNameTemplate": "kubernetes-sigs/cri-tools",
       "datasourceTemplate": "github-tags"
     }
-  ]
+  ],
+  "assigneesFromCodeOwners": true,
+  "assigneesSampleSize": 1,
+  "reviewersFromCodeOwners": true,
+  "reviewersSampleSize": 1
 }
