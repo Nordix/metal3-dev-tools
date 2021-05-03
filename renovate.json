@@ -46,8 +46,6 @@
       "datasourceTemplate": "github-tags"
     }
   ],
-  "assigneesFromCodeOwners": true,
-  "assigneesSampleSize": 1,
-  "reviewersFromCodeOwners": true,
-  "reviewersSampleSize": 1
+  "assignees": ["kashifest", "fmuyassarov","furkatgofurov7", "Xenwar", "smoshiur1237", "macaptain", "jan-est", "namnx228"],
+  "assigneesSampleSize": 2
 }
