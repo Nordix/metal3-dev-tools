@@ -1,0 +1,1 @@
+- Move clouds.yaml file to a differnt location
