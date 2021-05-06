@@ -9,3 +9,5 @@ users:
 
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
+  - systemctl stop NetworkManager.service
+  - systemctl mask NetworkManager.service
