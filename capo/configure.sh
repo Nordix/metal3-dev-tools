@@ -1,22 +1,59 @@
 #!/bin/bash
 
-CACERT_PATH="${1}"
+set -euxo pipefail
 
-if [ $# -eq 0 ]; then
-    echo "Cacert path is required"
-    exit 1
+GIT_ROOT=$(git rev-parse --show-toplevel)
+CAPI_REPO=$(realpath "${GIT_ROOT}/../cluster-api")
+CAPO_REPO=$(realpath "${GIT_ROOT}/../cluster-api-provider-openstack")
+
+CACERT_PATH="/tmp/cacert.pem"
+OPENSTACK_RC_PATH="/tmp/openstackrc"
+
+if ! [[ -d "$CAPI_REPO" ]]; then
+  echo "Expected to find directory $CAPI_REPO, but couldn't find it."
+  echo "Clone this repo from https://github.com/kubernetes-sigs/cluster-api"
+  exit 1
 fi
 
-if [ ! -f "${CACERT_PATH}" ]; then
-    echo "Cacert file not found"
-    exit 1
+if ! [[ -d "$CAPO_REPO" ]]; then
+  echo "Expected to find directory $CAPO_REPO, but couldn't find it."
+  echo "Clone this repo from https://github.com/Nordix/cluster-api-provider-openstack"
+  exit 1
 fi
 
-source /tmp/openstackrc 
+if ! [[ -f "$CACERT_PATH" ]]; then
+  echo "Expected to find OpenStack auth cacert.pem at $CACERT_PATH"
+  exit 1
+fi
 
-echo "
+if ! [[ -f "$OPENSTACK_RC_PATH" ]]; then
+  echo "Expected to find OpenStack RC file at $OPENSTACK_RC_PATH"
+  echo "You can get this PEM file from 1Password."
+  exit 1
+fi
+
+if ! [[ -f ~/.ssh/id_rsa.pub ]]; then
+  echo "Couldn't find a pubkey to use at ~/.ssh/id_rsa.pub"
+  echo "Set your pubkey in capo_os_vars.rc"
+  exit 1
+fi
+
+if ! command -v kind &> /dev/null; then
+  echo "Couldn't find 'kind'. Install from https://kind.sigs.k8s.io/"
+  exit 1
+fi
+
+if ! command -v tilt &> /dev/null; then
+  echo "Couldn't find 'tilt'. Install from https://docs.tilt.dev/install.html"
+  exit 1
+fi
+
+source "$OPENSTACK_RC_PATH"
+echo "Configuring CAPO deployment for project: ${OS_PROJECT_NAME}"
+
+cat << EOF >/tmp/clouds.yaml
 clouds:
-  os_instance_1:
+  openstack:
     auth:
       auth_url: "${OS_AUTH_URL}"
       project_name: Default Project 37137
@@ -28,11 +65,5 @@ clouds:
       project_name: "${OS_PROJECT_NAME}"
       tenant_name: "${OS_PROJECT_NAME}"
     region_name: "${OS_REGION_NAME}"
-    cacert: /work_dir/cacert.pem
-" > "clouds.yaml"
-
-docker run -it \
-	-v /tmp/openstackrc:/tmp/openstackrc \
-	-v $(pwd):/work_dir \
-	-w /work_dir golang:yq > /tmp/capo_openstackrc
-
+    cacert: "${CACERT_PATH}"
+EOF
