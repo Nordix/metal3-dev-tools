@@ -1,27 +1,28 @@
 
 SHELL := /bin/bash
-CLUSTER_NAME := "basic-1"
-all: yq configure # change_me
-yq:
-	docker build -t golang:yq -f Dockerfile.yq .
-configure: #ok
-	./configure.sh cacert.pem
-	sed -i -e 's/^/export /' /tmp/capo_openstackrc
-capo-cluster: #ok
-	./createcapo-cluster.sh
-openstack: #ok
+CLUSTER_NAME := basic-1
+all: configure kind-create tilt-up 
+provision: capo-template capo-apply
+configure:
+	./configure.sh
+kind-create:
+	kind get clusters | grep -q kind-capo || kind create cluster --name kind-capo
+tilt-up:
+	./tilt_up.sh
+capo-template:
+	./clusterctl_template.sh $(CLUSTER_NAME)
+capo-apply:
+	kubectl apply -f /tmp/$(CLUSTER_NAME).yaml
+capo-kubeconfig:
+	kubectl get secrets $(CLUSTER_NAME)-kubeconfig -o json | jq -r '.data.value' | base64 -d > "/tmp/$(CLUSTER_NAME)-kubeconfig.yaml"
+	@echo Use kubectl --kubeconfig /tmp/$(CLUSTER_NAME)-kubeconfig.yaml to use the target cluster
+openstack:
 	docker run -it --rm \
 		-v /tmp/openstackrc:/tmp/openstackrc \
 		openstacktools/openstack-client \
 		/usr/bin/env BASH_ENV=/tmp/openstackrc /bin/bash -c openstack
-
-deploy-workload:
-	clusterctl config cluster $(CLUSTER_NAME) --kubernetes-version v1.19.1 > /tmp/$(CLUSTER_NAME).yaml 
-update-workload: # todo [replace ext network, ssh key]
-	docker run --rm \
-		-v /tmp/openstackrc:/tmp/openstackrc \
-		openstacktools/openstack-client \
-		/usr/bin/env BASH_ENV=/tmp/openstackrc /bin/bash -c "openstack network show airship-ci-ext-net -f value -c id"
-clean: # to do
-	kubectl delete cluster $(CLUSTER_NAME) # do not remove using /tmp/$(CLUSTER_NAME).yaml  as order of deletion matters
-	echo "remove resource in openstack if not removed with cluster" # to do
+deprovision:
+	kubectl delete cluster $(CLUSTER_NAME) --timeout=5m --ignore-not-found=true
+clean: deprovision
+	kind get clusters | grep -q kind-capo && kind delete cluster --name kind-capo
+	@echo Check there are no servers left over in OpenStack

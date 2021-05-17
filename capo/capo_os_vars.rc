@@ -1,0 +1,9 @@
+# Must be a keypair in the OpenStack project visible with `openstack keypair list`
+export OPENSTACK_SSH_KEY_NAME=capo-key
+export OPENSTACK_DNS_NAMESERVERS=8.8.8.8
+export OPENSTACK_FAILURE_DOMAIN=nova
+export OPENSTACK_EXTERNAL_NETWORK_ID=""
+export OPENSTACK_IMAGE_NAME="Ubuntu_20.04_node"
+export OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR=2C-4GB-100GB
+export OPENSTACK_NODE_MACHINE_FLAVOR=2C-4GB-100GB
+export OPENSTACK_SSH_AUTHORIZED_KEY="$(cat ~/.ssh/id_rsa.pub)"
