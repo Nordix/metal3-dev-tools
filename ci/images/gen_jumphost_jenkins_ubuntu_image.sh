@@ -34,7 +34,7 @@ render_user_data \
   "${SSH_USER_NAME}" \
   "${SSH_USER_GROUP}" \
   "${IMAGE_NAME}" \
-  "${IMAGES_DIR}/userdata.tpl" \
+  "${IMAGES_DIR}/ubuntu_userdata.tpl" \
   "${USER_DATA_FILE}"
 
 STARTER_SCRIPT_PATH="/tmp/build_starter.sh"
