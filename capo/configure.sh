@@ -8,6 +8,7 @@ CAPO_REPO=$(realpath "${GIT_ROOT}/../cluster-api-provider-openstack")
 
 CACERT_PATH="/tmp/cacert.pem"
 OPENSTACK_RC_PATH="/tmp/openstackrc"
+OS_CLOUD_NAME="$1"
 
 if ! [[ -d "$CAPI_REPO" ]]; then
   echo "Expected to find directory $CAPI_REPO, but couldn't find it."
@@ -53,7 +54,7 @@ echo "Configuring CAPO deployment for project: ${OS_PROJECT_NAME}"
 
 cat << EOF >/tmp/clouds.yaml
 clouds:
-  openstack:
+  "${OS_CLOUD_NAME}":
     auth:
       auth_url: "${OS_AUTH_URL}"
       project_name: Default Project 37137
@@ -66,4 +67,5 @@ clouds:
       tenant_name: "${OS_PROJECT_NAME}"
     region_name: "${OS_REGION_NAME}"
     cacert: "${CACERT_PATH}"
+    verify: false
 EOF

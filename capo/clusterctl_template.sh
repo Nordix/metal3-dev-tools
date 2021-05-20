@@ -3,6 +3,7 @@
 set -euxo pipefail
 
 CLUSTER_NAME="$1"
+OS_CLOUD_NAME="$2"
 
 GIT_ROOT=$(git rev-parse --show-toplevel)
 CAPI_REPO=$(realpath "${GIT_ROOT}/../cluster-api")
@@ -13,7 +14,9 @@ CAPO_ENVRC="${CAPO_REPO}/templates/env.rc"
 
 make -C "$CAPI_REPO" clusterctl
 
-source "$CAPO_ENVRC" /tmp/clouds.yaml openstack
+source "$CAPO_ENVRC" /tmp/clouds.yaml "${OS_CLOUD_NAME}"
+env | grep OPENSTACK_CLOUD | sed 's/^/export /' > /tmp/e2e_vars_openstack.sh
+
 source ./capo_os_vars.rc
 
 "$CLUSTERCTL" config cluster "$CLUSTER_NAME" \
