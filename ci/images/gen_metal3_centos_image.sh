@@ -10,7 +10,7 @@ CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
-CENTOS_VERSION="8.2"
+CENTOS_VERSION="8"
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.1"}
 
 # shellcheck disable=SC1090
@@ -38,7 +38,7 @@ fi
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
-SOURCE_IMAGE_NAME="ea0091dc-ccb5-401e-bc64-2615321b4087"
+SOURCE_IMAGE_NAME="0e8d7a25-9423-4a14-8dda-15c41fb15d04"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
