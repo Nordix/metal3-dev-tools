@@ -9,3 +9,4 @@ users:
 
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
+  - echo "Defaults:ubuntu !requiretty" >> /etc/sudoers

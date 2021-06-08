@@ -10,10 +10,11 @@ declare -A ssh_values=(
   [MaxAuthTries]=5
   [Ciphers]="aes128-ctr,aes192-ctr,aes256-ctr"
   [ClientAliveInterval]=900
-  [ClientAliveCountMax]=0
+  [ClientAliveCountMax]=15
   [UsePAM]=yes
   [Protocol]=2
 )
+
 
 # Parameters to secure networking /etc/sysctl.conf
 declare -A network_parameters=(
