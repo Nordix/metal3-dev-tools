@@ -30,7 +30,3 @@ deprovision:
 clean: deprovision
 	kind get clusters | grep -q $(KIND_CLUSTER) && kind delete cluster --name $(KIND_CLUSTER)
 	@echo Remove resources left over in OpenStack by running the os_cleanup target
-
-os_cleanup: $(eval KIND_CLUSTER="capo-e2e") clean
-	docker run --rm -v /tmp:/tmp -v ${PWD}:/workdir openstacktools/openstack-client \
-        bash -c "source /tmp/openstackrc && source /workdir/clean-os-resources.sh"
