@@ -10,4 +10,12 @@ export OPENSTACK_CLOUD_YAML_FILE='/tmp/clouds.yaml'
 
 export OPENSTACK_SSH_KEY_NAME="cluster-api-provider-openstack-sigs-k8s-io"
 export OPENSTACK_CLOUD="capo-e2e"
-export OPENSTACK_CLOUD_CACERT_B64="Cg=="
+
+export OPENSTACK_DNS_NAMESERVERS=8.8.8.8
+export OPENSTACK_FAILURE_DOMAIN=nova
+export OPENSTACK_EXTERNAL_NETWORK_ID=""
+
+GIT_ROOT=$(git rev-parse --show-toplevel)
+CAPO_REPO=$(realpath "${GIT_ROOT}/../cluster-api-provider-openstack")
+CAPO_E2E_SSH_KEY="${CAPO_REPO}/_artifacts/ssh/cluster-api-provider-openstack-sigs-k8s-io.pub"
+export OPENSTACK_SSH_AUTHORIZED_KEY='"'$(cat $CAPO_E2E_SSH_KEY)'"'

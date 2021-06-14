@@ -1,0 +1,18 @@
+
+SHELL := /bin/bash
+OS_CLOUD_NAME := "capo-e2e"
+
+all: configure capo-e2e 
+# ToDo: configure target requires an existing kind cluster, which does not exist until capo-e2e is run
+# fix this
+configure:
+	./configure.sh $(OS_CLOUD_NAME)
+
+openstack:
+	docker run -it --rm \
+		-v /tmp/openstackrc:/tmp/openstackrc \
+		openstacktools/openstack-client \
+		/usr/bin/env BASH_ENV=/tmp/openstackrc /bin/bash -c openstack
+
+capo-e2e: configure
+	./run-e2e-test.sh
