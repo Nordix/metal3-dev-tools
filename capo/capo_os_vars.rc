@@ -1,9 +1,30 @@
 # Must be a keypair in the OpenStack project visible with `openstack keypair list`
-export OPENSTACK_SSH_KEY_NAME="<add key here>"
 export OPENSTACK_DNS_NAMESERVERS=8.8.8.8
 export OPENSTACK_FAILURE_DOMAIN=nova
 export OPENSTACK_EXTERNAL_NETWORK_ID=""
 export OPENSTACK_IMAGE_NAME="Ubuntu_20.04_node"
 export OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR=2C-4GB-100GB
 export OPENSTACK_NODE_MACHINE_FLAVOR=2C-4GB-100GB
-export OPENSTACK_SSH_AUTHORIZED_KEY="<add key here>"
+
+
+# Get public key on the current machine
+read -e -p 'Enter path to ssh authorized key to access capo instances:' OPENSTACK_SSH_AUTHORIZED_KEY_FILE
+ssh-keygen -l -f "${OPENSTACK_SSH_AUTHORIZED_KEY_FILE}" 
+
+if [[ $? == 0 ]]; then
+    export OPENSTACK_SSH_AUTHORIZED_KEY="$(capt $OPENSTACK_SSH_AUTHORIZED_KEY_FILE)"
+else
+    echo "$OPENSTACK_SSH_AUTHORIZED_KEY_FILE is not a valid public key"
+    exit 1
+fi
+
+read -e -p 'Enter the corresponding private key in openstack cluster:' PROVIDED_OPENSTACK_SSH_KEY_NAME
+EXISTING_KEY=$(docker run --rm -v /tmp/openstackrc:/tmp/openstackrc openstacktools/openstack-client \
+           bash -c "source /tmp/openstackrc && openstack keypair show $PROVIDED_OPENSTACK_SSH_KEY_NAME -c name -f value")
+
+if [[ "$EXISTING_KEY" == "$PROVIDED_OPENSTACK_SSH_KEY_NAME" ]] ;then
+  export OPENSTACK_SSH_KEY_NAME="PROVIDED_OPENSTACK_SSH_KEY_NAME"
+else
+  echo "Unable to find they key $PROVIDED_OPENSTACK_SSH_KEY_NAME in openstack"
+  exit 1
+fi
