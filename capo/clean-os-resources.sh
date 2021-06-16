@@ -1,55 +1,71 @@
 #!/bin/bash
 
-_prefix=${1:-"cluster-e2e"}
+FILTER=${1:-"no-existing-resources"}
+datadir="/tmp/collectedresources"
 
-echo "===Removing openstack servers==="
-servers=$(openstack server list -c Name -f value | grep ${_prefix})
-for server in ${servers};do 
-  echo "Removing server: ${server}"
-  openstack server delete "${server}";
+run_after_confirmation() {
+    _command="${1}"
+    _message="${2}"
+    printf "\n\t${_message}\n"
+    read -p "Continue (y/n)?" USER_RESPONSE
+    case "${USER_RESPONSE}" in
+        y|Y ) echo "yes";;
+        n|N ) return;;
+        * ) echo "invalid option" && return;;
+    esac
+    ${_command}
+}
+gather_resources(){
+    rm -rf ${datadir} && mkdir ${datadir}
+    echo "Collecting top level resources"
+    openstack network list -c Name -f value | grep "${FILTER}" > "${datadir}/networks.list"
+    openstack server list -c Name -f value | grep "${FILTER}"  > "${datadir}/servers.list"
+    openstack router list -c Name -f value | grep "${FILTER}" > "${datadir}/routers.list"
+    openstack security group list -c Name -f value| grep "${FILTER}" > "${datadir}/sg.list"
+    # remove empty lines added due to nameless resources
+    sed -i '/^$/d' "${datadir}/*"
+}
+
+# Collect resources
+gather_resources
+printf "Resources to be deleted are listed in ${datadir}, you may review the list\n"
+read -p "Press Enter to proceed to deletion or CTRL-c to abort"
+
+# Remove resourcess
+[ -s ${datadir}/servers.list ] && for server in $(cat ${datadir}/servers.list);do
+    echo "Removing server: ${server}"
+    run_after_confirmation "openstack server delete ${server}" "Removing server: ${server}"
 done
 
-echo "===Removing floating IPs==="
-openstack router list -c Name -f value | grep ${_prefix} > routers.txt
-for router in $(cat routers.txt);do 
-	port=$(openstack floating ip list --router=${router} -c Port -f value)
-	echo "Deleting port: ${port}"
-	openstack port delete ${port}
+[ -s ${datadir}/routers.list ] && for router in "$(cat ${datadir}/routers.list)";do
+    port=$(openstack floating ip list --router=${router} -c Port -f value)
+    run_after_confirmation "openstack port delete ${port}" "Removing port associated with floating IP on router: ${router}"
+done
+[ -s ${datadir}/routers.list ] && for router in $(cat ${datadir}/routers.list);do
+    run_after_confirmation "openstack router unset --external-gateway ${router}" "Removing external gateway from ${router}"
 done
 
-echo "===Remove gateway from routers==="
-for router in $(cat routers.txt);do
-    echo "removing gateway from ${router}"
-	openstack router unset --external-gateway "${router}"
-done
-
-echo "===Removing ports from router==="
-for router in $(cat routers.txt);do
+# Remove ports associated with routers that are also to be removed
+[ -s ${datadir}/routers.list ] && for router in $(cat ${datadir}/routers.list);do
     port=$(openstack port list --router=${router} -c ID -f value)
-    echo "removing port: ${port} from router: ${router}"
-    openstack router remove port ${router} ${port}
+    run_after_confirmation "openstack router remove port ${router} ${port}" "removing port: ${port} from router: ${router}"
 done
 
-echo "===Remove router==="
-for router in $(cat routers.txt);do
-    echo "removing router: ${router}"
-    openstack router delete ${router}
+# Finally, Remove the routers themselves
+[ -s ${datadir}/routers.list ] && for router in $(cat ${datadir}/routers.list);do
+    run_after_confirmation "openstack router delete ${router}" "removing router: ${router}"
 done
 
-# Get networks
-openstack network list -c Name -f value| grep ${_prefix} > networks.txt
-
-echo "Removing networks"
-for net in $(cat networks.txt);do
-  ports=$(openstack port list --network=${net} -c id -f value)
-  for port in ${ports}; do openstack port delete ${port}; done
-  echo "Removing network: ${net}"
-  openstack network delete ${net}
+# Remove networks and associated ports"
+[ -s ${datadir}/networks.list ] && for net in $(cat ${datadir}/networks.list);do
+    ports=$(openstack port list --network=${net} -c id -f value)
+    for port in ${ports}; do
+        run_after_confirmation "openstack port delete ${port}" "removing port ${port} associated with network: ${net}"
+    done
+    run_after_confirmation "openstack network delete ${net}" "Removing network: ${net}"
 done
 
-echo "Removing security group"
-sgs=$(openstack security group list -c Name -f value | grep ${_prefix})
-for sg in ${sgs};do
-  echo "Deleting security group: ${sg}" 
-  openstack security group delete ${sg}
+# Remove security groups
+[ -s ${datadir}/sg.list ] && for sg in $(cat ${datadir}/sg.list);do
+    run_after_confirmation "openstack security group delete ${sg}" "Removing security group: ${sg}"
 done
