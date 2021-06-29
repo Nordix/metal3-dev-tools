@@ -17,14 +17,15 @@ echo $PATH|tr ':' '\n'
 sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo ls -la /usr/local/bin/retrieve.configuration.files.sh
-sudo dnf update -y  
+sudo dnf update -y
 sudo dnf install -y ebtables socat conntrack-tools
 sudo dnf install python3 -y
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo setenforce 0
-sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 sudo dnf install gcc kernel-headers kernel-devel keepalived -y
 sudo dnf install device-mapper-persistent-data lvm2 -y
+
+# Disable SELINUX enforcing
+sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
 echo  \"Installing kubernetes binaries\"
 if [[ $KUBERNETES_BINARIES_VERSION != "v1.21.1" && $KUBERNETES_BINARIES_VERSION != "v1.21.0" && $KUBERNETES_BINARIES_VERSION != "v1.20.4" ]]; then

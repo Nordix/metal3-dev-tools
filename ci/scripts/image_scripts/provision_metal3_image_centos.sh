@@ -23,6 +23,15 @@ sudo yum update -y
 sudo yum update -y curl nss
 sudo yum install -y git make
 
+# Without this minikube cannot start properly kvm and fails.
+# As a simple workaround, this will create an empty file which can 
+# disable the new firmware, more details here [1], look for firmware description.
+# [1] <https://libvirt.org/formatdomain.html#operating-system-booting>
+# upstream commit fixing the behavior to not print error messages for unknown features
+# will be included in RHEL-AV-8.5.0 by next rebase to libvirt 7.4.0.
+sudo mkdir -p /etc/qemu/firmware
+sudo touch /etc/qemu/firmware/50-edk2-ovmf-cc.json
+
 #Install Operator SDK
 OSDK_RELEASE_VERSION=v0.19.0
 curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OSDK_RELEASE_VERSION}/operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
