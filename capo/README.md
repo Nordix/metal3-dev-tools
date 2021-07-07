@@ -27,6 +27,72 @@ Then:
 * Run `make provision` to deploy a 2 node cluster on OpenStack and test your
   changes
 
+## Devstack setup
+
+In order to add more features, such as trunking, we need to create an Openstack instance using devstack.
+
+1. Create Centos-8 VM with 32GB of RAM and 8 CPU cores.
+2. From within the VM, clone the devstack repo
+
+```bash
+git clone https://opendev.org/openstack/devstack.git
+```
+3. Create stack user/group with the proper priviledge
+```bash
+cd devstack
+sudo ./tools/create-stack-user.sh
+```
+4. Install devstack as stack user
+
+```bash
+sudo su
+su - stack
+```
+
+```bash
+git clone https://opendev.org/openstack/devstack.git
+cd devstack
+sudo mkdir -p /opt/stack/logs
+sudo chown stack:stack /opt/stack/
+sudo chmod -R 755 /opt/stack/
+```
+
+The following error could be seen
+
+```bash
+OpenStack Wallaby Repository
+Error: Failed to download metadata for repo 'openstack-wallaby': Cannot prepare internal mirrorlist: No URLs in mirrorlist
+```
+If you see the above error, run the following to fix it.
+
+```bash
+sudo sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/rdo-release.repo
+yum update -y
+```
+
+configure trunk support, more information can be found [here](https://docs.openstack.org/ocata/networking-guide/config-trunking.html)
+
+To add trunk supoort edit `lib/neutron_plugins/ovn_agent`
+
+```
+ML2_L3_PLUGIN=${ML2_L3_PLUGIN-"ovn-router,trunk"}
+```
+
+Now, start the installation.
+
+```bash
+./stack.sh
+```
+
+Verify installation
+
+```bash
+openstack extension list -f json -c Description -f value | grep trunk
+  Extensions list not supported by Identity API
+  Provides support for trunk ports
+  Expose trunk port details
+```
+
 ## TODO
 
 [ ] Add kustomize config for editing the cluster templates
