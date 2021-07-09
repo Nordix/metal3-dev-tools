@@ -57,7 +57,6 @@ clouds:
   "${OS_CLOUD_NAME}":
     auth:
       auth_url: "${OS_AUTH_URL}"
-      project_name: Default Project 37137
       username: "${OS_USERNAME}"
       password: "${OS_PASSWORD}"
       version: "${OS_AUTH_VERSION}"

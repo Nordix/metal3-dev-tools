@@ -59,7 +59,7 @@ routers="$(cat ${datadir}/routers.list | jq -r '.|.Name+","+.ID')"
 [ -s ${datadir}/routers.list ] && for router in ${routers};do
     rname=$(echo $router | cut -f1 -d,)
     rid=$(sanitizeID $router)
-    ports=$(./run-openstack-command.sh openstack floating ip list --router=k8s-clusterapi-cluster-e2e-ceexfb-cluster-e2e-ceexfb -f json | jq -r '.[]|."Floating IP Address"+","+.Port')
+    ports=$(./run-openstack-command.sh openstack floating ip list --router=$rid -f json | jq -r '.[]|."Floating IP Address"+","+.Port')
     run_after_confirmation "openstack port delete" "Removing the following ports, associated with router $rname" "$ports"
 done
 [ -s ${datadir}/routers.list ] && for router in $routers;do
@@ -79,7 +79,7 @@ done
 [ -s ${datadir}/routers.list ] && run_after_confirmation "openstack router delete" "Removing the following routers" $routers
 
 # Remove networks and associated ports"
-networks="$(cat ${datadir}/networks.list -f json | jq -r '.|.Name+","+.ID')"
+networks="$(cat ${datadir}/networks.list | jq -r '.|.Name+","+.ID')"
 [ -s ${datadir}/networks.list ] && for net in $networks;do
     netid=$(sanitizeID $net)
     nname=$(echo $net | cut -f1 -d',')
