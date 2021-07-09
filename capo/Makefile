@@ -26,5 +26,5 @@ deprovision:
 clean: deprovision
 	kind get clusters | grep -q kind-capo && kind delete cluster --name kind-capo
 	@echo Remove resources left over in OpenStack by running the os_cleanup script
-capo-e2e: $(eval OS_CLOUD_NAME="capo-e2e") configure
-	./run-e2e-test.sh
+capo-e2e: configure
+	OS_CLOUD_NAME="capo-e2e" ./run-e2e-test.sh
