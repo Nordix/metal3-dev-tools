@@ -1,51 +1,89 @@
 {
- "extends": ["config:base"],
- "baseBranches": ["master"],
- "bumpVersion": null,
- "packageRules": [
-   {
-     "depTypeList": ["devDependencies"],
-     "updateTypes": ["minor"],
-     "automerge": false
-   }
- ],
- "prHourlyLimit": 5,
- "prConcurrentLimit": 10,
- "rangeStrategy": "bump",
- "renovateFork": true,
- "includeForks": true,
- "regexManagers": [
+  "extends": ["config:base"],
+  "baseBranches": ["master"],
+  "bumpVersion": null,
+  "packageRules": [
     {
-      "fileMatch": [".*$"],
-      "matchStrings": ["docker.io/calico/cni:(?<currentValue>v.*?)\"}"],
-      "depNameTemplate": "calico/cni",
-      "datasourceTemplate": "docker"
+      "depTypeList": ["devDependencies"],
+      "updateTypes": ["minor"],
+      "automerge": false     
     },
     {
-      "fileMatch": [".*$"],
-      "matchStrings": ["docker.io/calico/pod2daemon-flexvol:(?<currentValue>v.*?)\"}"],
-      "depNameTemplate": "calico/pod2daemon-flexvol",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": [".*$"],
-      "matchStrings": ["docker.io/calico/node:(?<currentValue>v.*?)\"}"],
-      "depNameTemplate": "calico/node",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": [".*$"],
-      "matchStrings": ["docker.io/calico/kube-controllers:(?<currentValue>v.*?)\"}"],
-      "depNameTemplate": "calico/kube-controllers",
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": ["^ci/.*$"],
-      "matchStrings": ["CRICTL_VERSION:-\"(?<currentValue>v.*?)\"}"],
-      "depNameTemplate": "kubernetes-sigs/cri-tools",
-      "datasourceTemplate": "github-tags"
+     "datasources": ["docker"],
+     "packageNames": ["kindest/node"],
+     "automerge": false,
+     "commitMessageTopic": "kindest/node"
     }
   ],
-  "assignees": ["kashifest", "fmuyassarov","furkatgofurov7", "Xenwar", "smoshiur1237", "macaptain", "jan-est", "namnx228"],
-  "assigneesSampleSize": 2
-}
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "rangeStrategy": "bump",
+  "renovateFork": true,
+  "includeForks": true,
+  "regexManagers": [
+     {
+       "fileMatch": [".*$"],
+       "matchStrings": ["docker.io/calico/cni:(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "calico/cni",
+       "datasourceTemplate": "docker"
+     },
+     {
+       "fileMatch": [".*$"],
+       "matchStrings": ["docker.io/calico/pod2daemon-flexvol:(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "calico/pod2daemon-flexvol",
+       "datasourceTemplate": "docker"
+     },
+     {
+       "fileMatch": [".*$"],
+       "matchStrings": ["docker.io/calico/node:(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "calico/node",
+       "datasourceTemplate": "docker"
+     },
+     {
+       "fileMatch": [".*$"],
+       "matchStrings": ["docker.io/calico/kube-controllers:(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "calico/kube-controllers",
+       "datasourceTemplate": "docker"
+     },
+     {
+       "fileMatch": ["^ci/.*$"],
+       "matchStrings": ["CRICTL_VERSION:-\"(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "kubernetes-sigs/cri-tools",
+       "datasourceTemplate": "github-tags"
+     },
+     {
+       "fileMatch": ["^ci/.*$"],
+       "matchStrings": ["CRICTL_VERSION:-\"(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "kubernetes-sigs/cri-tools",
+       "datasourceTemplate": "github-tags"
+     },
+     {
+       "fileMatch": ["^ci/.*$"],
+       "matchStrings": ["KUBERNETES_VERSION:-\"(?<currentValue>.*?)\"}"],
+       "depNameTemplate": "kubernetes/kubernetes",
+       "datasourceTemplate": "github-releases"
+     },
+     {
+       "fileMatch": ["^ci/.*$"],
+       "matchStrings": ["KIND_NODE_IMAGE_VERSION:-\"(?<currentValue>.*?)\"}"],
+       "depNameTemplate": "kindest/node",
+       "datasourceTemplate": "docker"
+     }
+   ],
+   "assignees": [ 
+     "fmuyassarov",
+     "furkatgofurov7",
+     "jan-est",
+     "kashifest",     
+     "lentzi90",
+     "macaptain",
+     "mboukhalfa",
+     "namnx228",
+     "Rozzii",
+     "smoshiur1237",
+     "Sunnatillo",
+     "wgslr",
+     "Xenwar"
+   ],
+   "assigneesSampleSize": 2
+ }
