@@ -19,6 +19,9 @@ sudo mv yq_linux_amd64 /usr/local/bin/yq
 * Copy the openstack.rc file for the project you want to use for CAPO
   deployment to /tmp/openstackrc
 
+Note:
+Changes on the CAPI side could break the CAPO setup. In order to avoid that, we are fixing the CAPI version to a known working one, `v0.4.0`. If more recent version is know, please update this document and `configure.sh` script.
+
 Then:
 
 * Run `make` in one tab to bring up a CAPI/CAPO master Kubernetes cluster
