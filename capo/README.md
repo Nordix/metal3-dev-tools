@@ -22,6 +22,20 @@ sudo mv yq_linux_amd64 /usr/local/bin/yq
 Note:
 Changes on the CAPI side could break the CAPO setup. In order to avoid that, we are fixing the CAPI version to a known working one, `v0.4.0`. If more recent version is know, please update this document and `configure.sh` script.
 
+Now you need to set up a keypair for SSH access to the machines.
+
+```
+# Source openstackrc
+. /tmp/openstackrc
+# Create the keypair in OpenStack and save the private key locally
+openstack keypair create capo-key > ~/.ssh/capo-key
+# Generate the pubkey from the private key
+ssh-keygen -f ~/.ssh/capo-key -y > ~/.ssh/capo-key.pub
+# Export the environment variables used in the dev environment to specify the use of your key
+export OPENSTACK_SSH_AUTHORIZED_KEY=~/.ssh/capo-key.pub
+export OPENSTACK_SSH_KEY_NAME=capo-key
+```
+
 Then:
 
 * Run `make` in one tab to bring up a CAPI/CAPO master Kubernetes cluster
