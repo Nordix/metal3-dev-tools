@@ -140,6 +140,11 @@ test: ## Run unit test for the code in repository
 integration_test: ## Run integration test
 	$(CURDIR)/ci/scripts/tests/integration_test.sh
 
+.PHONY: build_ipa
+build_ipa:
+	$(CURDIR)/ci/scripts/image_scripts/start_centos_ipa_build.sh
+
+
 .PHONY: integration_test_cleanup
 integration_test_cleanup: ## Clean integration test setup
 	$(CURDIR)/ci/scripts/tests/integration_delete.sh
