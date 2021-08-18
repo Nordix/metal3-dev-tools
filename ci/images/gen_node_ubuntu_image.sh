@@ -16,7 +16,7 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.2"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
 export UBUNTU_VERSION=${UBUNTU_VERSION:-"20.04"}
 
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
