@@ -35,15 +35,29 @@ echo "Waiting for the host ${BUILDER_VM_NAME} to come up"
 # Wait for the host to come up
 wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${BUILDER_IP}"
 
-# Send Remote script to Executer
+# Send IPA & Ironic script to remote executer
 scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${CI_DIR}/${IPA_BUILDER_SCRIPT_NAME}" "${CI_DIR}/../artifactory/utils.sh" \
+  "${CI_DIR}/run_build_ironic.sh" \
   "${AIRSHIP_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
 
-echo "Running the tests"
+echo "Running Ironic image building script"
+# Execute remote script
+# shellcheck disable=SC2029
+ssh \
+  -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null \
+  -o ServerAliveInterval=15 \
+  -o ServerAliveCountMax=10 \
+  -i "${AIRSHIP_CI_USER_KEY}" \
+  "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
+  PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
+  DOCKER_USER="${DOCKER_USER}" DOCKER_PASSWORD="${DOCKER_PASSWORD}" /tmp/run_build_ironic.sh
+
+echo "Running IPA building scripts"
 # Execute remote script
 # shellcheck disable=SC2029
 ssh \
