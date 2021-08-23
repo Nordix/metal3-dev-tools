@@ -55,5 +55,5 @@ ssh \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  "/tmp/${IPA_BUILDER_SCRIPT_NAME}" "${RT_USER}" "${RT_TOKEN}"
+  RT_USER="${RT_USER}" RT_TOKEN="${RT_TOKEN}" "/tmp/${IPA_BUILDER_SCRIPT_NAME}"
 
