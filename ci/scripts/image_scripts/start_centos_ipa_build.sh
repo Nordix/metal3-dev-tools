@@ -53,7 +53,7 @@ ssh \
   -o ServerAliveInterval=15 \
   -o ServerAliveCountMax=10 \
   -i "${AIRSHIP_CI_USER_KEY}" \
-  "${AIRSHIP_CI_USER}"@"${BUILD_EXECUTER_IP}" \
+  "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
   "/tmp/${IPA_BUILDER_SCRIPT_NAME}" "${RT_USER}" "${RT_TOKEN}"
 
