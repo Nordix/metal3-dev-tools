@@ -3,8 +3,7 @@
 set -eu
 
 # VM configuration variables
-VM_TIMELABEL="${VM_TIMELABEL:-$(date '+%Y%m%d%H%M%S')}"
-BUILDER_VM_NAME="${BUILDER_VM_NAME:-ci-builder-vm-${VM_TIMELABEL}}"
+BUILDER_VM_NAME="${VM_NAME}"
 BUILDER_PORT_NAME="${BUILDER_PORT_NAME:-${BUILDER_VM_NAME}-int-port}"
 BUILDER_FLAVOR="${BUILDER_FLAVOR:-2C-8GB-200GB}"
 CI_DIR="$(dirname "$(readlink -f "${0}")")"

@@ -144,6 +144,9 @@ integration_test: ## Run integration test
 build_ipa:
 	$(CURDIR)/ci/scripts/image_scripts/start_centos_ipa_build.sh
 
+.PHONY: clean_ipa_builder_vm
+clean_ipa_builder_vm:
+	$(CURDIR)/ci/scripts/openstack/delete_openstack_vm.sh
 
 .PHONY: integration_test_cleanup
 integration_test_cleanup: ## Clean integration test setup
