@@ -30,10 +30,14 @@ cd "${IPA_BUILD_WORKSPACE}"
 # Pull IPA builder repository
 git clone --single-branch --branch "${IPA_BUILDER_BRANCH}" "${IPA_BUILDER_REPO}"
 
+# Pull IPA repository to create IPA_IDENTIFIER
+git clone --single-branch --branch "${IPA_REF}" "${IPA_REPO}"
+
 # Generate the IPA image identifier string
-cd "${IPA_BUILDER_PATH}"
+cd "ironic-python-agent"
 # IDENTIFIER is the git commit of the HEAD and the ISO 8061 UTC timestamp
-IPA_IDENTIFIER="$(date --utc +"%Y-%m-%dT%H:%MZ")-$(git rev-parse HEAD)"
+IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-$(git rev-parse HEAD)"
+echo "IPA_IDENTIFIER is the following:${IPA_IDENTIFIER}"
 cd ..
 
 # Install the cloned IPA builder tool
