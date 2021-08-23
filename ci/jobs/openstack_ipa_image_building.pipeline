@@ -1,11 +1,15 @@
+import java.text.SimpleDateFormat
 
 ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_credential_id = "nordix-airship-ci-github-prod-token"
 ci_git_branch = "master"
 
 script {
+  def date = new Date()
+  def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
   def rand = new Random()
   VM_KEY = (1..4).collect { ('a'..'z').join("")[ rand.nextInt( 26 ) ] }.join("")
+  VM_NAME = "ci-builder-vm-" + dateFormat.format(date) + "-" + VM_KEY
 }
 
 pipeline {
@@ -13,6 +17,7 @@ pipeline {
   environment {
     AIRSHIP_CI_USER="airshipci"
     VM_KEY = "${VM_KEY}"
+    VM_NAME = "${VM_NAME}"
     RT_URL="https://artifactory.nordix.org/artifactory"
     OS_AUTH_URL="https://kna1.citycloud.com:5000"
     OS_USER_DOMAIN_NAME="CCP_Domain_37137"
@@ -53,13 +58,22 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-
-            /* IPA Image building script */
-            sh "make build_ipa"
+              /* IPA Image building script */
+              sh "make build_ipa"
             }
           }
         }
       }
     }
-  }      
+  }
+  post{
+    always{
+      withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+        withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+          /* Delete IPA image builder vm */
+          sh "make clean_ipa_builder_vm"
+        }
+      }
+    }
+  }
 }

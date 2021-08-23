@@ -77,7 +77,7 @@ fi
 if ! $DISABLE_UPLOAD ; then
     # shellcheck source=/dev/null
     source "${RT_UTILS}"
-    DST_PATH="airship/images/ipa/centos/${IPA_IDENTIFIER}/${IPA_IMAGE_NAME}"
+    DST_PATH="airship/images/ipa/centos/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
     rt_upload_artifact  "${IPA_IMAGE_TAR}" "${DST_PATH}" "0"
 fi
 
