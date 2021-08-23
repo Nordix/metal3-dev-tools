@@ -36,7 +36,7 @@ git clone --single-branch --branch "${IPA_REF}" "${IPA_REPO}"
 # Generate the IPA image identifier string
 cd "ironic-python-agent"
 # IDENTIFIER is the git commit of the HEAD and the ISO 8061 UTC timestamp
-IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-$(git rev-parse HEAD)"
+IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-$(git rev-parse --short HEAD)"
 echo "IPA_IDENTIFIER is the following:${IPA_IDENTIFIER}"
 cd ..
 
