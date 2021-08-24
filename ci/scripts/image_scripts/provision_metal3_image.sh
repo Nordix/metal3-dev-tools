@@ -62,6 +62,7 @@ fi
 # Download container images
 "${SCRIPTS_DIR}"/source_cluster_container_images.sh
 
+sudo "${CONTAINER_RUNTIME}" images
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
 # Reset cloud-init to run on next boot.
