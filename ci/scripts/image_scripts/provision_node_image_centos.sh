@@ -49,6 +49,8 @@ sudo rm "${HOME}"/.ssh/authorized_keys
 # Download container images
 "${SCRIPTS_DIR}"/target_cluster_container_images.sh
 
+sudo "${CONTAINER_RUNTIME}" images
+
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
 
