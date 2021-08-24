@@ -14,12 +14,6 @@ if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
     export IMG_KIND_NODE_IMAGE="${IMG_KIND_NODE_IMAGE:-"kindest/node:${KIND_NODE_IMAGE_VERSION}"}"
 fi
 
-if [[ "${CONTAINER_RUNTIME}" == "docker" ]]; then
-    for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
-      sudo "${CONTAINER_RUNTIME}" pull "${container}"
-    done
-else
-    for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
-      "${CONTAINER_RUNTIME}" pull "${container}"
-    done    
-fi
+for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
+  sudo "${CONTAINER_RUNTIME}" pull "${container}"
+done
