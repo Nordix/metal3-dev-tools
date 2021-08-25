@@ -142,7 +142,7 @@ integration_test: ## Run integration test
 
 .PHONY: build_ipa
 build_ipa:
-	$(CURDIR)/ci/scripts/image_scripts/start_centos_ipa_build.sh
+	$(CURDIR)/ci/scripts/image_scripts/start_centos_ipa_ironic_build.sh
 
 .PHONY: clean_ipa_builder_vm
 clean_ipa_builder_vm:
