@@ -486,6 +486,20 @@ replace_image() {
 }
 
 # Description:
+# deletes Openstack image.
+#
+# Usage:
+#   delete_image <image_name>
+#
+delete_image() {
+  local IMAGE_NAME
+
+  IMAGE_NAME="${1:?}"
+  
+  openstack image delete "${IMAGE_NAME}" > /dev/null
+}
+
+# Description:
 # Creates Openstack volume.
 #
 # Usage:
