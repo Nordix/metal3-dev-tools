@@ -127,6 +127,56 @@ rt_list_directory() {
   eval "${_CMD}"
 }
 
+# Description:
+# Deletes the artifacts in a directory. The function excludes the last x number of
+# artifacts from deletion where x is specified by the 3rd argument. The artifacts
+# specificed in the file that's path is passed as the second argument will be also
+# excluded from deletion.
+#    DIR_TO_CLEAN: the directory where the artifact deletion will take place.
+#    ANONYMOUS: enable/disable anonymous artifactory access
+#    PINNED_ARTIFACTS: a file path that points to a text file that contains the
+#        list artifact in "DIR_TO_CLEAN" that should not be deleted.
+#    RETENTION_NUM: in addition to the artifacts specified in "PINNED_ARTIFACTS"
+#        the newest x number of artifacts should be kept in the directory.
+#    DRY_RUN: boolean that makes the function print out the name of the artifacts
+#        instead of cleaning them.
+#
+#    Note: By default only the "DIR_TO_CLEAN" is requird. As the default behaviour
+#        "DIR_TO_CLEAN" will be cleaned and the last 10 artifact will be excluded from deletion.
+#
+#    Note: The function expects artifacts to have unique timestamp in their names. Timestamp
+#       format that is recommended could be created in bash with this command: "date --utc +"%Y%m%dT%H%MZ".
+#
+#    Usage:
+#      delete_multiple_artifacts <dir_to_clean> <anonymous:0/1> <dry_run:false/true> <pinned_artifacts_path> <retention_num>
+#
+rt_delete_multiple_artifacts() {
+  DIR_TO_CLEAN="${1:?}"
+  ANONYMOUS="${2:-0}"
+  DRY_RUN="${3:-false}"
+  PINNED_ARTIFACTS="${4:-/dev/null}"
+  RETENTION_NUM="${5:-10}"
+
+  # Create an array of the artifacts that should be deleted
+  mapfile -t < <(rt_list_directory "${DIR_TO_CLEAN}" "${ANONYMOUS}" |\
+    jq '.children | .[] | .uri' | \
+    diff - "${PINNED_ARTIFACTS}" | \
+    sed -ne 's/< //p' | \
+    sed -e 's/\"\/\([^"]*\)"/\1/g' | \
+    head -n "-${RETENTION_NUM}")
+
+  # Delete the artifacts
+  for item in "${MAPFILE[@]}"
+  do
+    if "${DRY_RUN}"; then
+      echo "INFO:DRY_RUN:${DIR_TO_CLEAN}/${item} has been deleted!"
+    else
+      rt_delete_artifact "${DIR_TO_CLEAN}/${item}" "${ANONYMOUS}"
+      echo "INFO:${DIR_TO_CLEAN}/${item} has been deleted!"
+    fi
+  done
+}
+
 # ================ Users Artifactory Helper Functions ===============
 
 RT_AIRSHIP_DIR="airship"
