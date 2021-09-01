@@ -65,5 +65,8 @@ fi
 sudo "${CONTAINER_RUNTIME}" images
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 
+# Install monitoring tools
+"${SCRIPTS_DIR}"/setup_monitoring_ubuntu.sh
+
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
