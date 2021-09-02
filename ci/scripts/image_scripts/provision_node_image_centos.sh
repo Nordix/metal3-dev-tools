@@ -6,6 +6,7 @@ SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.2.7"}
+export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
 # Install CRI-O
 "${SCRIPTS_DIR}"/install_crio_on_centos.sh
@@ -48,8 +49,6 @@ sudo rm "${HOME}"/.ssh/authorized_keys
 
 # Download container images
 "${SCRIPTS_DIR}"/target_cluster_container_images.sh
-
-sudo "${CONTAINER_RUNTIME}" images
 
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
