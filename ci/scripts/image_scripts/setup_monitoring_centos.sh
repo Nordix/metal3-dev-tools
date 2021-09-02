@@ -21,4 +21,4 @@ sudo mkdir -p /var/log/sysstat
 sudo sed -i 's|^SA_DIR=.*|SA_DIR="/var/log/sysstat"|' /etc/sysconfig/sysstat
 
 ## Enable services
-systemctl enable atop.service crond.service sysstat.service
+sudo systemctl enable atop.service crond.service sysstat.service
