@@ -4,6 +4,9 @@ ci_git_url = "https://github.com/Nordix/airship-dev-tools.git"
 ci_git_credential_id = "nordix-airship-ci-github-prod-token"
 ci_git_branch = "master"
 
+// 2 hours
+def TIMEOUT = 7200
+
 script {
   def date = new Date()
   def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
@@ -52,7 +55,7 @@ pipeline {
   stages {
     stage('Building ipa image'){
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: TIMEOUT, unit: 'SECONDS')
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
@@ -60,8 +63,11 @@ pipeline {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
               withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                 /* IPA Image building script */
+                script {
+          	  CURRENT_START_TIME = System.currentTimeMillis()
+                }
                 sh "make build_ipa"
-              } 
+              }
             }
           }
         }
@@ -70,6 +76,13 @@ pipeline {
   }
   post{
     always{
+      script {
+        CURRENT_END_TIME = System.currentTimeMillis()
+        if ((((CURRENT_END_TIME - CURRENT_START_TIME)/1000) - TIMEOUT) > 0) {
+          echo "Failed due to timeout"
+          currentBuild.result = 'FAILURE'
+        }
+      }
       withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
           /* Delete IPA image builder vm */
