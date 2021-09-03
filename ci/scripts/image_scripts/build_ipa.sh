@@ -85,7 +85,7 @@ fi
 # the Metal3 dev-env
 if $ENABLE_BOOTSTRAP_TEST; then
     git clone --single-branch --branch "master" "https://github.com/metal3-io/metal3-dev-env"
-    source "/tmp/var.sh"
+    source "/tmp/vars.sh"
     export IRONIC_IMAGE="${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"
     export USE_LOCAL_IPA=true
     export IPA_DOWNLOAD_ENABLED=false
