@@ -62,11 +62,13 @@ pipeline {
           withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
               withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
-                /* IPA Image building script */
-                script {
-          	  CURRENT_START_TIME = System.currentTimeMillis()
+                withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                  /* IPA Image building script */
+                  script {
+                    CURRENT_START_TIME = System.currentTimeMillis()
+                  }
+                  sh "make build_ipa"
                 }
-                sh "make build_ipa"
               }
             }
           }
@@ -86,9 +88,11 @@ pipeline {
       withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
           /* Delete IPA image builder vm */
+          sh "./ci/scripts/image_scripts/start_log_collection.sh"
           sh "make clean_ipa_builder_vm"
         }
       }
+      archiveArtifacts "logs-${env.BUILD_TAG}.tgz"
     }
   }
 }
