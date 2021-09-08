@@ -10,8 +10,11 @@ export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"docker.io/centos:centos8"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
     export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
-    export KIND_NODE_IMAGE_VERSION=${KIND_NODE_IMAGE_VERSION:-"v1.22.0"}   
+    export KIND_NODE_IMAGE_VERSION=${KIND_NODE_IMAGE_VERSION:-"v1.22.0"}
+    # Since capm3 v1a4 tests can only survive with k8s < v1.22
+    # the following docker image also needs to be a part of the disk image.
     export IMG_KIND_NODE_IMAGE="${IMG_KIND_NODE_IMAGE:-"kindest/node:${KIND_NODE_IMAGE_VERSION}"}"
+    export IMG_KIND_CAPM3_v1a4="kindest/node:v1.21.2"   
 fi
 
 for container in $(env | grep "IMG_*" | cut -f2 -d'='); do
