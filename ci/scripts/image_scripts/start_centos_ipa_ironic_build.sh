@@ -69,4 +69,4 @@ ssh \
   "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
   RT_USER="${RT_USER}" RT_TOKEN="${RT_TOKEN}" GITHUB_TOKEN="${GITHUB_TOKEN}" STAGING="${STAGING}" \
-  IPA_REPO_REF="${IPA_REPO_REF:-master}" "/tmp/${IPA_BUILDER_SCRIPT_NAME}"
+  IPA_BRANCH="${IPA_BRANCH:-master}" IPA_REPO_REF="${IPA_REPO_REF:-HEAD}" "/tmp/${IPA_BUILDER_SCRIPT_NAME}"

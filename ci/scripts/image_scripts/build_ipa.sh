@@ -14,7 +14,7 @@ IPA_IMAGE_TAR="${IPA_IMAGE_NAME}.tar"
 IPA_BUILDER_REPO="${IPA_BUILDER_REPO:-https://github.com/Nordix/ironic-python-agent-builder.git}"
 IPA_BUILDER_BRANCH="${IPA_BUILDER_BRANCH:-master}"
 IPA_REPO="${IPA_REPO:-https://github.com/Nordix/ironic-python-agent}"
-IPA_REF="${IPA_REPO_REF:-master}"
+IPA_REF="${IPA_REPO_REF:-HEAD}"
 IPA_BRANCH="${IPA_BRANCH:-master}"
 IPA_BASE_OS="${IPA_BASE_OS:-centos}"
 IPA_BASE_OS_RELEASE="${IPA_BASE_OS_RELEASE:-8-stream}"
@@ -36,11 +36,12 @@ cd "${IPA_BUILD_WORKSPACE}"
 git clone --single-branch --branch "${IPA_BUILDER_BRANCH}" "${IPA_BUILDER_REPO}"
 
 # Pull IPA repository to create IPA_IDENTIFIER
-git clone --single-branch --branch "${IPA_REF}" "${IPA_REPO}"
+git clone --single-branch --branch "${IPA_BRANCH}" "${IPA_REPO}"
 
 # Generate the IPA image identifier string
 pushd "./ironic-python-agent"
 # IDENTIFIER is the git commit of the HEAD and the ISO 8061 UTC timestamp
+git checkout "${IPA_REF}"
 IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-$(git rev-parse --short HEAD)"
 echo "IPA_IDENTIFIER is the following:${IPA_IDENTIFIER}"
 popd
