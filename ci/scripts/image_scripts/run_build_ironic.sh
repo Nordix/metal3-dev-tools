@@ -31,7 +31,7 @@ cat << EOF > /tmp/vars.sh
 IRONIC_TAG="${IRONIC_TAG}"
 EOF
 
-# Build & push the Ironic container image 
+# Build & push the Ironic container image
 # Push image only if it doesn't already exist in the registry
 if docker manifest inspect "${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"  > /dev/null; then
     echo "${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG} image already exist -> skipping pushing"
