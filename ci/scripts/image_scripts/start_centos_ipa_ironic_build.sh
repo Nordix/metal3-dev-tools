@@ -55,7 +55,8 @@ ssh \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  DOCKER_USER="${DOCKER_USER}" DOCKER_PASSWORD="${DOCKER_PASSWORD}" /tmp/run_build_ironic.sh
+  IRONIC_REFSPEC="${IRONIC_REFSPEC:-}" DOCKER_USER="${DOCKER_USER}" \
+  DOCKER_PASSWORD="${DOCKER_PASSWORD}" /tmp/run_build_ironic.sh
 
 echo "Running IPA building scripts"
 # Execute remote script
