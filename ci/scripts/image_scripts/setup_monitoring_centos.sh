@@ -3,7 +3,7 @@
 # https://aws.amazon.com/premiumsupport/knowledge-center/ec2-linux-configure-monitoring-tools/
 
 ## Install atop and sar
-sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y
+sudo dnf -y install epel-release
 sudo dnf -y install sysstat atop --enablerepo=epel
 
 ## Collect all metrics every minute
