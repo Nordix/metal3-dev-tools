@@ -3,7 +3,7 @@
 set -uex
 
 # Container images that we pre-pull into the target image.
-export CALICO_CNI_IMG="${CALICO_CNI_IMG:-"docker.io/calico/cni:v3.20.0"}"
+export CALICO_CNI_IMG="${CALICO_CNI_IMG:-"docker.io/calico/cni:v3.20.1"}"
 export CALICO_POD2DAEMON_IMG="${CALICO_POD2DAEMON_IMG:-"docker.io/calico/pod2daemon-flexvol:v3.20.1"}"
 export CALICO_NODE_IMG="${CALICO_NODE_IMG:-"docker.io/calico/node:v3.20.1"}"
 export CALICO_KUBE_CONTROLLERS_IMG="${CALICO_KUBE_CONTROLLERS_IMG:-"docker.io/calico/kube-controllers:v3.20.0"}"
