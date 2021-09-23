@@ -59,6 +59,7 @@ packer build \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "flavor=${IMAGE_FLAVOR}" \
+  -var "KUBERNETES_VERSION=${KUBERNETES_VERSION}" \
   "${IMAGES_DIR}/image_builder_template.json"
 
 # Replace any old image
