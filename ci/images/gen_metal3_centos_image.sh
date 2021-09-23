@@ -78,6 +78,7 @@ packer build \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "ssh_pty=true" \
   -var "flavor=${IMAGE_FLAVOR}" \
+  -var "KUBERNETES_VERSION=${KUBERNETES_VERSION}" \
   "${IMAGES_DIR}/${BUILDER_CONFIG_FILE}"
 
 # Replace any old image
