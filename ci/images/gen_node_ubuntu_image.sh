@@ -16,7 +16,7 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.2"}
 export UBUNTU_VERSION=${UBUNTU_VERSION:-"20.04"}
 
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
@@ -61,7 +61,6 @@ packer build \
   -var "floating_ip_net=${FLOATING_IP_NETWORK}" \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "flavor=${IMAGE_FLAVOR}" \
-  -var "KUBERNETES_VERSION=${KUBERNETES_VERSION}" \
   "${IMAGES_DIR}/image_builder_template_node.json"
 
 # Replace any old image
