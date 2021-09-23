@@ -54,7 +54,8 @@ render_user_data \
   "${SSH_USER_GROUP}" \
   "${IMAGE_NAME}" \
   "${IMAGES_DIR}/centos_userdata.tpl" \
-  "${USER_DATA_FILE}"
+  "${USER_DATA_FILE}" \
+  "${KUBERNETES_VERSION}"
 
 STARTER_SCRIPT_PATH="/tmp/build_starter.sh"
 echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
