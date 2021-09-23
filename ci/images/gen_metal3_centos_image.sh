@@ -11,7 +11,7 @@ IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 CENTOS_VERSION="8"
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.2"}
 
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
@@ -78,7 +78,6 @@ packer build \
   -var "local_scripts_dir=${SCRIPTS_DIR}" \
   -var "ssh_pty=true" \
   -var "flavor=${IMAGE_FLAVOR}" \
-  -var "KUBERNETES_VERSION=${KUBERNETES_VERSION}" \
   "${IMAGES_DIR}/${BUILDER_CONFIG_FILE}"
 
 # Replace any old image
