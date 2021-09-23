@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -eu
+set -eux
 
 SSH_PRIVATE_KEY_FILE="${1:?}"
 USE_FLOATING_IP="${2:?}"
