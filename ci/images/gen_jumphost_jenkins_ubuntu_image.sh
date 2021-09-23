@@ -35,8 +35,7 @@ render_user_data \
   "${SSH_USER_GROUP}" \
   "${IMAGE_NAME}" \
   "${IMAGES_DIR}/ubuntu_userdata.tpl" \
-  "${USER_DATA_FILE}" \
-  "${KUBERNETES_VERSION}"
+  "${USER_DATA_FILE}"
 
 STARTER_SCRIPT_PATH="/tmp/build_starter.sh"
 echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
