@@ -2,8 +2,6 @@
 
 set -uex
 
-DEPLOY_METAL3="${1:-false}"
-
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
 # Metal3 Dev Env variables
@@ -40,26 +38,24 @@ sudo mkdir -p /usr/local/bin/
 sudo mv operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
 
 
-if [[ "${DEPLOY_METAL3}" == "true" ]]; then
-  ## Install metal3 requirements
-  mkdir -p "${M3_DENV_ROOT}"
-  if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
-    sudo rm -rf "${M3_DENV_PATH}"
-  fi
-  if [ ! -d "${M3_DENV_PATH}" ] ; then
-    pushd "${M3_DENV_ROOT}"
-    git clone "${M3_DENV_URL}"
-    popd
-  fi
-  pushd "${M3_DENV_PATH}"
-  git checkout "${M3_DENV_BRANCH}"
-  git pull -r || true
-  make install_requirements
-  sudo su -l -c "minikube delete" "${USER}"
-  popd
-
-  rm -rf "${M3_DENV_PATH}"
+## Install metal3 requirements
+mkdir -p "${M3_DENV_ROOT}"
+if [[ -d "${M3_DENV_PATH}" && "${FORCE_REPO_UPDATE}" == "true" ]]; then
+  sudo rm -rf "${M3_DENV_PATH}"
 fi
+if [ ! -d "${M3_DENV_PATH}" ] ; then
+  pushd "${M3_DENV_ROOT}"
+  git clone "${M3_DENV_URL}"
+  popd
+fi
+pushd "${M3_DENV_PATH}"
+git checkout "${M3_DENV_BRANCH}"
+git pull -r || true
+make install_requirements
+sudo su -l -c "minikube delete" "${USER}"
+popd
+
+rm -rf "${M3_DENV_PATH}"
 
 # We need podman in order to
 #pull container images for Centos Jenkins image
