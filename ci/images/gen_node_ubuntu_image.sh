@@ -16,7 +16,7 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.2"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
 export UBUNTU_VERSION=${UBUNTU_VERSION:-"20.04"}
 
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
@@ -28,7 +28,7 @@ SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_node_image.sh"
+REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/provision_node_image.sh"
 SSH_USER_GROUP="sudo"
 
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
