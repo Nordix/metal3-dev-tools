@@ -24,7 +24,7 @@ SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( ([ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}"))" || true
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/provision_jumphost_jenkins_base_img.sh"
+REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/provision_jumphost_jenkins_base_img.sh"
 SSH_USER_GROUP="sudo"
 
 SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"

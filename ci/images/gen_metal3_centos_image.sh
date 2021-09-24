@@ -11,7 +11,7 @@ IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 CENTOS_VERSION="8"
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.21.2"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
 
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
@@ -44,7 +44,7 @@ SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
-REMOTE_EXEC_CMD="/home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
+REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
 SSH_USER_GROUP="wheel"
 SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
