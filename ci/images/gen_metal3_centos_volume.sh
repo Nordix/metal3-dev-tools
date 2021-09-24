@@ -121,7 +121,7 @@ ssh \
   -i "${SSH_PRIVATE_KEY_FILE}" \
   "${SSH_USER_NAME}"@"${PACKAGE_INSTALLER_VM_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  /tmp/provision_metal3_image_centos.sh true
+  /tmp/provision_metal3_image_centos.sh
 
 # Delete the floating IP of installer VM
 if [[ "$USE_FLOATING_IP" -ne 1 ]]; then
