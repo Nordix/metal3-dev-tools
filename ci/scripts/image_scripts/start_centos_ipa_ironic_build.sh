@@ -55,7 +55,11 @@ ssh \
   -i "${AIRSHIP_CI_USER_KEY}" \
   "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
-  IRONIC_REFSPEC="${IRONIC_REFSPEC:-}" DOCKER_USER="${DOCKER_USER}" \
+  IRONIC_REFSPEC="${IRONIC_REFSPEC:-}" \
+  IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-}" \
+  IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-}" \
+  IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC:-}" \
+  DOCKER_USER="${DOCKER_USER}" \
   DOCKER_PASSWORD="${DOCKER_PASSWORD}" /tmp/run_build_ironic.sh
 
 echo "Running IPA building scripts"

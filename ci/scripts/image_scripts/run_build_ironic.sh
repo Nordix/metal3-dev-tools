@@ -10,8 +10,12 @@ sudo apt update -y
 IMAGE_REGISTRY="registry.nordix.org"
 CONTAINER_IMAGE_REPO="airship"
 IRONIC_REFSPEC="${IRONIC_REFSPEC:-}"
+IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC:-}"
+IRONIC_INSPECTOR_REPO="https://opendev.org/openstack/ironic-inspector.git"
 IRONIC_REPO="https://opendev.org/openstack/ironic.git"
 IRONIC_IMAGE_REPO="https://github.com/metal3-io/ironic-image.git"
+IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-"HEAD"}"
+IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-"master"}"
 PATCH_LIST_FILE=patchList.txt
 
 # Login to the Nordix container registry
@@ -31,6 +35,18 @@ cat << EOF > /tmp/vars.sh
 IRONIC_TAG="${IRONIC_TAG}"
 EOF
 
+# Ironic and Ironic inspector vars are added to metaldata file
+touch /tmp/metadata.txt
+cat << EOF > /tmp/metadata.txt
+IRONIC_REFSPEC="${IRONIC_REFSPEC}"
+IRONIC_REPO="${IRONIC_REPO}"
+IRONIC_IMAGE_REPO="${IRONIC_IMAGE_REPO}"
+IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT}"
+IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH}"
+IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC}"
+IRONIC_INSPECTOR_REPO="${IRONIC_INSPECTOR_REPO}"
+EOF
+
 # Build & push the Ironic container image
 # Push image only if it doesn't already exist in the registry
 if docker manifest inspect "${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"  > /dev/null; then
@@ -39,6 +55,8 @@ else
     echo "${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG} image does not exist -> going to push to Harbor"
     git clone ${IRONIC_IMAGE_REPO}
     pushd ironic-image
+    git checkout "${IRONIC_IMAGE_BRANCH}"
+    git checkout "${IRONIC_IMAGE_REPO_COMMIT}"
 
     # Create a patchlist
     touch ${PATCH_LIST_FILE}
@@ -50,6 +68,7 @@ else
       PROJECT_DIR="openstack/ironic"
       cat << EOF | tee -a ${PATCH_LIST_FILE}
 ${PROJECT_DIR} ${IRONIC_REFSPEC}
+${PROJECT_DIR}-inspector ${IRONIC_INSPECTOR_REFSPEC}
 EOF
     # Build container image
       docker build -t "${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}" --build-arg PATCH_LIST=${PATCH_LIST_FILE} .
@@ -61,4 +80,3 @@ fi
 
 # Logout from the Nordix container registry
 docker logout "${IMAGE_REGISTRY}"
-
