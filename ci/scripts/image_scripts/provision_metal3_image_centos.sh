@@ -21,6 +21,9 @@ sudo yum update -y
 sudo yum update -y curl nss
 sudo yum install -y git make
 
+# Install EPEL repo (later required by atop, python3-bcrypt and python3-passlib)
+sudo yum install -y epel-release && sudo yum update -y
+
 # Without this minikube cannot start properly kvm and fails.
 # As a simple workaround, this will create an empty file which can 
 # disable the new firmware, more details here [1], look for firmware description.
