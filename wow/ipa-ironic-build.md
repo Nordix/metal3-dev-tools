@@ -38,7 +38,7 @@ located at `ci/scripts/image_scripts/build_ipa.sh`
 This script can be configured to build the a specific version of the Ironic container image based on a git `refspec` specified by the `IRONIC_REFSPEC` environment
 variable.
 
-The build process consits of the following steps:
+The build process consists of the following steps:
 
 1. The specified version of the [ironic repository](https://review.opendev.org/openstack/ironic) is cloned and a container image tag is created out of the
 git `sha` hash of the commit referenced by the `HEAD` pointer on the current branch.
@@ -61,11 +61,11 @@ The IPA build process uses the python tool called [IPA builder](https://github.c
 
 The build process consists of the following steps:
 
-1. Create a working directory and clone both the IPA and IPA builder reposirories
+1. Create a working directory and clone both the IPA and IPA builder repositories
 
 2. Create an indentifier tag from `ISO 8061` timestamp an IPA's git commit `sha hash`
 
-3. Install the dependencies and the IPA builder tool to a python virtual enviorment
+3. Install the dependencies and the IPA builder tool to a python virtual environment
 
 4. Build the IPA initramfs and kernel images in the python virtual environment then exit the virtual environment
 
@@ -96,8 +96,8 @@ bootstrap cluster.
 As part of 5. step of the Ironic build process the versioned ironic OCI images are uploaded to [this repository](https://registry.nordix.org/harbor/projects/10/repositories/ironic-image).
 
 All of the IPA images are stored in Nordix Artifactory at this [location](https://artifactory.nordix.org/artifactory/airship/images/ipa) and under these location
-the IPA artifacts are groupped into different groups based on their characteristics.
-The versioned IPA images are sorted to different groups, the artifacts are groupped based on what Linux distribution is used as a base image, the grouping also
+the IPA artifacts are grouped into different groups based on their characteristics.
+The versioned IPA images are sorted to different groups, the artifacts are grouped based on what Linux distribution is used as a base image, the grouping also
 takes into consideration the version of the distribution and whether the artifact was created as part of a review process or is it already in a finalized format
 called staging.
 
@@ -107,3 +107,40 @@ Example of the location of a `Centos 8 Stream` based staging and review artifact
   - staging:  https://artifactory.nordix.org/artifactory/airship/images/ipa/staging/centos/8-stream/20210918T0020Z-47a7fb5
 
 As an example shows the directory structure is the following: `ipa/<staging or review>/<linux distribution>/<distribution version>/<artifact version>`
+
+# Metadata and customization
+
+The pipeline that handles the IPA and Ironic build offers a number of customization options:
+
+  - `IRONIC_REFSPEC`: Gerrit refspec of the patch we want to test. `Example: refs/changes/84/800084/22`
+  - `IRONIC_IMAGE_REPO_COMMIT`: Ironic Image repository commit hash to build
+  - `IRONIC_IMAGE_BRANCH`: Ironic image repository branch to build
+  - `IRONIC_INSPECTOR_REFSPEC`: Gerrit refspec of the patch we want to test. `Example: refs/changes/84/800084/22`
+  - `BMO_BRANCH`: Git branch of the BMO repository to be used
+  - `BMO_COMMIT`: Git commit of the BMO repository to be used
+  - `IPA_COMMIT`: Ironic Python Agent repository commit hash to build
+  - `IPA_BRANCH`: Ironic Python Agent repository branch to build
+  - `IPA_BUILDER_BRANCH`: Ironic Python Agent builder repository tool branch
+  - `IPA_BUILDER_COMMIT`: Ironic Python Agent builder repository tool commit
+  - `METAL3_DEV_ENV_BRANCH`: Metal3 dev env repository branch
+  - `METAL3_DEV_ENV_COMMIT`: Metal3 dev env repository commit
+  - `STAGING`: Configures IPA builder upload mode (staging/review)
+
+The custumization options provide git branch, commit and refspec customization options in case of a manually triggered IPA-Ironic build job.
+There is one additional type of custumization option that is called `STAGING` this controls whether the IPA artifact will be uploaded to
+`Artifactory` as part of a review or a staging group.
+
+The IPA build script also creates a metadata file and packages into the IPA `.tar` archive. The metadata file contains git metadata
+such as repositories, branches and commit hashes and in some cases refspec and container image version for components used for
+Ironic and IPA build.
+
+Metadata is generated for the following components:
+ - IPA builder
+ - IPA
+ - Ironic-image
+ - Ironic-inspector
+ - Ironic
+ - Metal3-dev-env
+ - BMO
+ - CAPI
+ - CAPM3

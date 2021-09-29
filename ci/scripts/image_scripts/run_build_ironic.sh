@@ -25,7 +25,8 @@ docker login "${IMAGE_REGISTRY}" -u $DOCKER_USER -p $DOCKER_PASSWORD
 git clone ${IRONIC_REPO}
 pushd ironic
 git fetch "https://review.opendev.org/openstack/ironic" ${IRONIC_REFSPEC} && git checkout FETCH_HEAD
-IRONIC_TAG=${IRONIC_TAG:-"$(git rev-parse --short HEAD)"}
+IRONIC_TAG="${IRONIC_TAG:-"$(git rev-parse --short HEAD)"}"
+IRONIC_COMMIT="$(git rev-parse HEAD)"
 echo "IRONIC_TAG is: ${IRONIC_TAG}"
 popd
 
@@ -35,17 +36,6 @@ cat << EOF > /tmp/vars.sh
 IRONIC_TAG="${IRONIC_TAG}"
 EOF
 
-# Ironic and Ironic inspector vars are added to metaldata file
-touch /tmp/metadata.txt
-cat << EOF > /tmp/metadata.txt
-IRONIC_REFSPEC="${IRONIC_REFSPEC}"
-IRONIC_REPO="${IRONIC_REPO}"
-IRONIC_IMAGE_REPO="${IRONIC_IMAGE_REPO}"
-IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT}"
-IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH}"
-IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC}"
-IRONIC_INSPECTOR_REPO="${IRONIC_INSPECTOR_REPO}"
-EOF
 
 # Build & push the Ironic container image
 # Push image only if it doesn't already exist in the registry
@@ -57,6 +47,7 @@ else
     pushd ironic-image
     git checkout "${IRONIC_IMAGE_BRANCH}"
     git checkout "${IRONIC_IMAGE_REPO_COMMIT}"
+    IRONIC_IMAGE_REPO_COMMIT="$(git rev-parse HEAD)"
 
     # Create a patchlist
     touch ${PATCH_LIST_FILE}
@@ -80,3 +71,16 @@ fi
 
 # Logout from the Nordix container registry
 docker logout "${IMAGE_REGISTRY}"
+
+# Create Ironic metadata and save it to file
+touch /tmp/metadata.txt
+cat << EOF > /tmp/metadata.txt
+IRONIC_REFSPEC="${IRONIC_REFSPEC}"
+IRONIC_REPO="${IRONIC_REPO}"
+IRONIC_COMMIT="${IRONIC_COMMIT}"
+IRONIC_IMAGE_REPO="${IRONIC_IMAGE_REPO}"
+IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT}"
+IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH}"
+IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC}"
+IRONIC_INSPECTOR_REPO="${IRONIC_INSPECTOR_REPO}"
+EOF
