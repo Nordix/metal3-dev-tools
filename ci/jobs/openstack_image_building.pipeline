@@ -169,6 +169,24 @@ pipeline {
           }
         }
       }
+      post {
+        always {
+          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+ 
+            /* Clean up Metal3 ubuntu volume */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/cleanup_volume.sh \
+              /data/id_rsa_airshipci 1"
+            }
+          }
+        }
+      }
+    }
     stage('Building Metal3 Ubuntu image for Frankfurt region'){
       options {
         timeout(time: 60, unit: 'MINUTES')
@@ -243,20 +261,10 @@ pipeline {
           }
         }
       }
-    }
       post {
         always {
           withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
             withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
-              
-            /* Clean up Metal3 ubuntu volume */
-            sh "docker run --rm \
-              ${DOCKER_CMD_ENV}\
-              -v ${CURRENT_DIR}:/data \
-              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-              registry.nordix.org/airship/image-builder \
-              /data/ci/images/cleanup_volume.sh \
-              /data/id_rsa_airshipci 1"
             
             /* Clean up Metal3 ubuntu volume from Fra1 */
             sh "export OS_AUTH_URL=https://fra1.citycloud.com:5000; export OS_REGION_NAME=Fra1; \
