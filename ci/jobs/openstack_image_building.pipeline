@@ -187,6 +187,31 @@ pipeline {
         }
       }
     }
+    stage('Building base image for Frankfurt region'){
+      options {
+        timeout(time: 30, unit: 'MINUTES')
+      }
+      environment {
+        OS_AUTH_URL="https://fra1.citycloud.com:5000"
+        OS_REGION_NAME="Fra1"
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+
+            /* Generate base ubuntu image */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/gen_base_ubuntu_image.sh \
+              /data/id_rsa_airshipci 1"
+
+          }
+        }
+      }
+    }
     stage('Building Metal3 Ubuntu image for Frankfurt region'){
       options {
         timeout(time: 60, unit: 'MINUTES')
