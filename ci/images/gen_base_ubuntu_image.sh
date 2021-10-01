@@ -18,7 +18,7 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_BASE_IMAGE}-$(get_random_string 10)"
 FINAL_IMAGE_NAME="${CI_BASE_IMAGE}"
-SOURCE_IMAGE="dba1e718-a102-46be-b8e9-ae1b1f2fd2fb"
+SOURCE_IMAGE_NAME="Ubuntu-20.04"
 IMAGE_FLAVOR="1C-4GB-20GB"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
@@ -28,6 +28,7 @@ FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/provision_base_image.sh"
 SSH_USER_GROUP="sudo"
 
+SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \
