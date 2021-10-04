@@ -57,7 +57,8 @@ pushd "./ironic-python-agent"
 # IDENTIFIER is the git commit of the HEAD and the ISO 8061 UTC timestamp
 git checkout "${IPA_COMMIT}"
 IPA_COMMIT="$(git rev-parse HEAD)"
-IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-${IPA_COMMIT}"
+IPA_BUILDER_COMMIT_SHORT="$(git rev-parse --short HEAD)"
+IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-${IPA_BUILDER_COMMIT_SHORT}"
 echo "IPA_IDENTIFIER is the following:${IPA_IDENTIFIER}"
 popd
 
@@ -85,8 +86,8 @@ deactivate
 
 # Package the initramfs and kernel images to a tar archive
 tar --create --verbose --file="${IPA_IMAGE_TAR}" \
-    "./${IPA_IMAGE_NAME}.kernel" \
-    "./${IPA_IMAGE_NAME}.initramfs"
+    "${IPA_IMAGE_NAME}.kernel" \
+    "${IPA_IMAGE_NAME}.initramfs"
 
 # Check the size of the archive
 filesize=$(stat --printf="%s" /tmp/dib/ironic-python-agent.tar)
@@ -110,10 +111,12 @@ if $ENABLE_BOOTSTRAP_TEST; then
     export BMOBRANCH="${BMO_BRANCH}"
     pushd "${DEV_ENV_REPO_LOCATION}"
     git checkout "${METAL3_DEV_ENV_COMMIT}"
-    METAL3_COMMIT="$(git rev-parse HEAD)"
+    METAL3_DEV_ENV_COMMIT="$(git rev-parse HEAD)"
     make
     make test
+    # shellcheck source=/dev/null
     source "./lib/common.sh"
+    # shellcheck source=/dev/null
     source "./lib/releases.sh"
     cat << EOF >> "${METADATA_PATH}"
 METAL3_DEV_ENV_REPO="${METAL3_DEV_ENV_REPO}"
@@ -142,8 +145,8 @@ EOF
     popd
     pushd "${IPAMPATH}"
     cat << EOF >> "${METADATA_PATH}"
-IPAM_REPO="${IPAMREPO}"
-IPAM_BRANCH="${IPAMBRANCH}"
+IPAM_REPO="${IPAMREPO:-}"
+IPAM_BRANCH="${IPAMBRANCH:-}"
 IPAM_PATH="$(git rev-parse HEAD)"
 EOF
     popd
@@ -154,7 +157,8 @@ EOF
     popd
 fi
 
-tar -rf "${IPA_IMAGE_TAR}" "${METADATA_PATH}"
+mv "${METADATA_PATH}" "metadata.txt"
+tar -r -f "${IPA_IMAGE_TAR}" "metadata.txt"
 
 REVIEW_ARTIFACTORY_PATH="airship/images/ipa/review/${IPA_BASE_OS}/${IPA_BASE_OS_RELEASE}/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
 STAGING_ARTIFACTORY_PATH="airship/images/ipa/staging/${IPA_BASE_OS}/${IPA_BASE_OS_RELEASE}/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
