@@ -19,7 +19,6 @@ pipeline {
     VM_KEY = "${VM_KEY}"
     VM_NAME = "${VM_NAME}"
     RT_URL="https://artifactory.nordix.org/artifactory"
-    RT_UTILS="/data/ci/scripts/artifactory/utils.sh"
     OS_AUTH_URL="https://kna1.citycloud.com:5000"
     OS_USER_DOMAIN_NAME="CCP_Domain_37137"
     OS_PROJECT_DOMAIN_NAME="CCP_Domain_37137"
@@ -32,6 +31,7 @@ pipeline {
                       script: 'readlink -f "."',
                       returnStdout: true
                      ).trim()
+    RT_UTILS="${CURRENT_DIR}/ci/scripts/artifactory/utils.sh"
   }
   stages {
     stage('Cleaning Artifactory'){
