@@ -28,28 +28,10 @@ pipeline {
     OS_TENANT_NAME="Default Project 37137"
     OS_AUTH_VERSION=3
     OS_IDENTITY_API_VERSION=3
-    DOCKER_CMD_ENV="--env AIRSHIP_CI_USER \
-      --env AIRSHIP_CI_USER_KEY=/data/id_rsa_airshipci \
-      --env VM_KEY \
-      --env RT_UTILS \
-      --env RT_URL \
-      --env RT_TOKEN \
-      --env RT_USER \
-      --env OS_AUTH_URL \
-      --env OS_USER_DOMAIN_NAME \
-      --env OS_PROJECT_DOMAIN_NAME \
-      --env OS_REGION_NAME \
-      --env OS_PROJECT_NAME \
-      --env OS_TENANT_NAME \
-      --env OS_AUTH_VERSION \
-      --env OS_IDENTITY_API_VERSION \
-      --env OS_USERNAME \
-      --env OS_PASSWORD "
     CURRENT_DIR = sh (
                       script: 'readlink -f "."',
                       returnStdout: true
                      ).trim()
-
   }
   stages {
     stage('Cleaning Artifactory'){
@@ -61,11 +43,7 @@ pipeline {
           withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
                 /* Artifactory cleanup script */
-                sh "docker run --rm \
-                  ${DOCKER_CMD_ENV}\
-                  -v ${CURRENT_DIR}:/data \
-                  registry.nordix.org/airship/image-builder \
-                  /data/ci/scripts/image_scripts/artifactory_cleanup.sh"
+                sh "\${CURRENT_DIR}/ci/scripts/image_scripts/artifactory_cleanup.sh"
             }
           }
         }
