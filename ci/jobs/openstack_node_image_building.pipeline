@@ -51,23 +51,19 @@ pipeline {
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
-              withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
 
-              catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the node Ubuntu image']) {
-                /* Generate node ubuntu image */
-                sh "exit 1"
-                sh "docker run --rm \
-                  ${DOCKER_CMD_ENV}\
-                  -v ${CURRENT_DIR}:/data \
-                  -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-                  registry.nordix.org/airship/image-builder \
-                  /data/ci/images/gen_node_ubuntu_image.sh \
-                  /data/id_rsa_airshipci 1"
-              
-              }
+            /* Generate node ubuntu image */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/gen_node_ubuntu_image.sh \
+              /data/id_rsa_airshipci 1"
             }
           }
         }
@@ -77,23 +73,20 @@ pipeline {
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
-              withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
 
-              catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the node CentOS image']) {
-                /* Generate node CentOS dev-env image */
-                sh "docker run --rm \
-                  ${DOCKER_CMD_ENV}\
-                  -v ${CURRENT_DIR}:/data \
-                  -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-                  registry.nordix.org/airship/image-builder \
-                  /data/ci/images/gen_metal3_centos_image.sh \
-                  /data/id_rsa_airshipci 1 \
-                  provision_node_image_centos.sh"
-                }
-              }
+            /* Generate node CentOS dev-env image */
+            sh "docker run --rm \
+              ${DOCKER_CMD_ENV}\
+              -v ${CURRENT_DIR}:/data \
+              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              registry.nordix.org/airship/image-builder \
+              /data/ci/images/gen_metal3_centos_image.sh \
+              /data/id_rsa_airshipci 1 \
+              provision_node_image_centos.sh"
             }
           }
         }
