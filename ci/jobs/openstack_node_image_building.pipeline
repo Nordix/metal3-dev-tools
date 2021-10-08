@@ -51,13 +51,13 @@ pipeline {
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the node Ubuntu image']) {
         steps {
           withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
             withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
               withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
 
               /* Generate node ubuntu image */
+      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the node Ubuntu image']) {
               sh "exit 1"
               // sh "docker run --rm \
               //   ${DOCKER_CMD_ENV}\
