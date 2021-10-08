@@ -51,33 +51,31 @@ pipeline {
       options {
         timeout(time: 5, unit: 'MINUTES')
       }
-      
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed SCM']) {
-        steps {
-          /* Checkout CI Repo */
-          checkout([$class: 'GitSCM',
-                  branches: [[name: ci_git_branch]],
-                  doGenerateSubmoduleConfigurations: false,
-                  extensions: [[$class: 'WipeWorkspace'],
-                  [$class: 'CleanCheckout'],
-                  [$class: 'CleanBeforeCheckout']],
-                  submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: ci_git_credential_id,
-                  url: ci_git_url]]])
-           sh "exit 1"
-        }
-      }
+      steps {
+        /* Checkout CI Repo */
+        checkout([$class: 'GitSCM',
+                branches: [[name: ci_git_branch]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'WipeWorkspace'],
+                [$class: 'CleanCheckout'],
+                [$class: 'CleanBeforeCheckout']],
+                submoduleCfg: [],
+                userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                url: ci_git_url]]])
+
+       }
     }
     stage('Building base image'){
       options {
         timeout(time: 30, unit: 'MINUTES')
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the base image']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the base image']) {
               /* Generate base ubuntu image */
+              sh "exit 1"
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
                 -v ${CURRENT_DIR}:/data \
@@ -95,11 +93,11 @@ pipeline {
       options {
         timeout(time: 30, unit: 'MINUTES')
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Jenkins image']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Jenkins image']) {
               /* Generate Jumphost / Jenkins ubuntu image */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
@@ -118,11 +116,11 @@ pipeline {
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image']) {
               /* Generate Metal3 ubuntu image */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
@@ -140,12 +138,12 @@ pipeline {
     stage('Building Metal3 CentOS image'){
       options {
         timeout(time: 60, unit: 'MINUTES')
-      }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      }      
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image']) {
               /* Generate Metal3 CentOS dev-env image */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
@@ -164,13 +162,13 @@ pipeline {
     stage('Building Metal3 Ubuntu volume'){
       options {
         timeout(time: 60, unit: 'MINUTES')
-      }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu volume']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      }      
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
-              /* Generate Metal3 ubuntu volume */
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu volume']) {
+            /* Generate Metal3 ubuntu volume */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
                 -v ${CURRENT_DIR}:/data \
@@ -178,6 +176,7 @@ pipeline {
                 registry.nordix.org/airship/image-builder \
                 /data/ci/images/gen_metal3_ubuntu_volume.sh \
                 /data/id_rsa_airshipci 1"
+
             }
           }
         }
@@ -208,12 +207,12 @@ pipeline {
         OS_AUTH_URL="https://fra1.citycloud.com:5000"
         OS_REGION_NAME="Fra1"
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the base image for Frankfurt region']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
-              /* Generate base ubuntu image */
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the base image for Frankfurt region']) {
+            /* Generate base ubuntu image */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
                 -v ${CURRENT_DIR}:/data \
@@ -234,13 +233,13 @@ pipeline {
       environment {
         OS_AUTH_URL="https://fra1.citycloud.com:5000"
         OS_REGION_NAME="Fra1"
-      }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image for Frankfurt region']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      }      
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
-              /* Generate Metal3 ubuntu image */
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image for Frankfurt region']) {
+            /* Generate Metal3 ubuntu image */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
                 -v ${CURRENT_DIR}:/data \
@@ -262,12 +261,12 @@ pipeline {
         OS_AUTH_URL="https://fra1.citycloud.com:5000"
         OS_REGION_NAME="Fra1"
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image for Frankfurt region']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
-              /* Generate Metal3 CentOS dev-env image */
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image for Frankfurt region']) {
+            /* Generate Metal3 CentOS dev-env image */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
                 -v ${CURRENT_DIR}:/data \
@@ -290,12 +289,12 @@ pipeline {
         OS_AUTH_URL="https://fra1.citycloud.com:5000"
         OS_REGION_NAME="Fra1"
       }
-      catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu volume for Frankfurt region']) {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
 
-              /* Generate Metal3 ubuntu volume */
+            catchError([buildResult: 'SUCCESS', stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu volume for Frankfurt region']) {
+            /* Generate Metal3 ubuntu volume */
               sh "docker run --rm \
                 ${DOCKER_CMD_ENV}\
                 -v ${CURRENT_DIR}:/data \
@@ -303,6 +302,7 @@ pipeline {
                 registry.nordix.org/airship/image-builder \
                 /data/ci/images/gen_metal3_ubuntu_volume.sh \
                 /data/id_rsa_airshipci 1"
+                
             }
           }
         }
