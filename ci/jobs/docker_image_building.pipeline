@@ -51,6 +51,16 @@ pipeline {
                 sh "make push-lint-go"
             }
         }
+        stage('Synchronize Nordix Harbor container images with quay.io'){
+            options {
+              timeout(time: 60, unit: 'MINUTES')
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
+                sh "make sync_nordix_harbor"
+                }
+            }
+        }
     }
     post {
       cleanup {

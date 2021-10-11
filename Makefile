@@ -144,6 +144,10 @@ integration_test: ## Run integration test
 build_ipa:
 	$(CURDIR)/ci/scripts/image_scripts/start_centos_ipa_ironic_build.sh
 
+.PHONY: sync_nordix_harbor
+sync_nordix_harbor:
+	$(CURDIR)/ci/scripts/image_scripts/synchronize_container_images.sh
+
 .PHONY: clean_ipa_builder_vm
 clean_ipa_builder_vm:
 	$(CURDIR)/ci/scripts/openstack/delete_openstack_vm.sh
