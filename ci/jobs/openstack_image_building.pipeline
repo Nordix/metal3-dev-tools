@@ -160,7 +160,6 @@ pipeline {
           sh "docker run --rm \
             ${DOCKER_CMD_ENV}\
             -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
             registry.nordix.org/airship/image-builder \
             /data/ci/images/gen_metal3_ubuntu_volume.sh"
         }
@@ -176,7 +175,6 @@ pipeline {
           sh "docker run --rm \
             ${DOCKER_CMD_ENV}\
             -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
             registry.nordix.org/airship/image-builder \
             /data/ci/images/gen_metal3_centos_volume.sh"
         }
@@ -272,7 +270,6 @@ pipeline {
           sh "docker run --rm \
             ${DOCKER_CMD_ENV}\
             -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
             registry.nordix.org/airship/image-builder \
             /data/ci/images/gen_metal3_ubuntu_volume.sh"
         }
@@ -292,7 +289,6 @@ pipeline {
           sh "docker run --rm \
             ${DOCKER_CMD_ENV}\
             -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
             registry.nordix.org/airship/image-builder \
             /data/ci/images/gen_metal3_centos_volume.sh"
         }
