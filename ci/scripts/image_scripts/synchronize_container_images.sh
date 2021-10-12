@@ -12,7 +12,7 @@ HARBOR_IMAGE_REGISTRY="registry.nordix.org"
 HARBOR_CONTAINER_IMAGE_REPO="airship"
 CAPM3_v1a4_RELEASE_TAG="release-0.4"
 IPAM_v1a4_RELEASE_TAG="release-0.0"
-CAPM3_IPAM_v1a5_RELEASE_TAG="master"
+v1a5_RELEASE_TAG="master"
 
 # Container runtime
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
@@ -22,9 +22,9 @@ declare -a ContainerImagesArray=(
     "vbmc" "sushy-tools" "ironic-ipa-downloader" "ironic" \
     "ironic-client" "keepalived" "baremetal-operator" \
     "cluster-api-provider-metal3:${CAPM3_v1a4_RELEASE_TAG}" \
-    "cluster-api-provider-metal3:${CAPM3_IPAM_v1a5_RELEASE_TAG}" \
+    "cluster-api-provider-metal3:${v1a5_RELEASE_TAG}" \
     "ip-address-manager:${IPAM_v1a4_RELEASE_TAG}" \
-    "ip-address-manager:${CAPM3_IPAM_v1a5_RELEASE_TAG}"
+    "ip-address-manager:${v1a5_RELEASE_TAG}"
 )
 
 # Loop over the container images and do:

@@ -57,8 +57,9 @@ pipeline {
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
-                sh "make sync_nordix_harbor"
+                    sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
                 }
+                sh "make sync_nordix_harbor"
             }
         }
     }
