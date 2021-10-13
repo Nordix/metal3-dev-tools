@@ -11,7 +11,7 @@
     "floating_ip_net": "",
     "local_scripts_dir": "../scripts",
     "ssh_pty": "false",
-    "flavor":"4C-16GB-50GB"
+    "flavor":"2C-16GB-20GB"
   },
   "builders": [{
     "type": "openstack",

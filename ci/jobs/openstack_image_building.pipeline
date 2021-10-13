@@ -150,38 +150,6 @@ pipeline {
         }
       }
     }
-    stage('Building Metal3 Ubuntu volume'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          /* Generate Metal3 ubuntu volume */
-          sh "docker run --rm \
-            ${DOCKER_CMD_ENV}\
-            -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-            registry.nordix.org/airship/image-builder \
-            /data/ci/images/gen_metal3_ubuntu_volume.sh"
-        }
-      }
-    }
-    stage('Building Metal3 Centos volume'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          /* Generate Metal3 centos volume */
-          sh "docker run --rm \
-            ${DOCKER_CMD_ENV}\
-            -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-            registry.nordix.org/airship/image-builder \
-            /data/ci/images/gen_metal3_centos_volume.sh"
-        }
-      }
-    }
     stage('Building base image for Frankfurt region'){
       options {
         timeout(time: 30, unit: 'MINUTES')
@@ -255,46 +223,6 @@ pipeline {
               provision_metal3_image_centos.sh"
 
           }
-        }
-      }
-    }
-    stage('Building Metal3 Ubuntu volume for Frankfurt region'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      environment {
-        OS_AUTH_URL="https://fra1.citycloud.com:5000"
-        OS_REGION_NAME="Fra1"
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          /* Generate Metal3 ubuntu volume */
-          sh "docker run --rm \
-            ${DOCKER_CMD_ENV}\
-            -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-            registry.nordix.org/airship/image-builder \
-            /data/ci/images/gen_metal3_ubuntu_volume.sh"
-        }
-      }
-    }
-    stage('Building Metal3 Centos volume for Frankfurt region'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      environment {
-        OS_AUTH_URL="https://fra1.citycloud.com:5000"
-        OS_REGION_NAME="Fra1"
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          /* Generate Metal3 centos volume */
-          sh "docker run --rm \
-            ${DOCKER_CMD_ENV}\
-            -v ${CURRENT_DIR}:/data \
-            -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-            registry.nordix.org/airship/image-builder \
-            /data/ci/images/gen_metal3_centos_volume.sh"
         }
       }
     }
