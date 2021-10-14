@@ -22,7 +22,7 @@ sudo yum update -y curl nss
 sudo yum install -y git make
 
 # Install EPEL repo (later required by atop, python3-bcrypt and python3-passlib)
-sudo yum install -y epel-release && sudo yum update -y
+sudo yum update -y && sudo yum install -y epel-release
 
 # Without this minikube cannot start properly kvm and fails.
 # As a simple workaround, this will create an empty file which can 
@@ -32,14 +32,6 @@ sudo yum install -y epel-release && sudo yum update -y
 # will be included in RHEL-AV-8.5.0 by next rebase to libvirt 7.4.0.
 sudo mkdir -p /etc/qemu/firmware
 sudo touch /etc/qemu/firmware/50-edk2-ovmf-cc.json
-
-#Install Operator SDK
-OSDK_RELEASE_VERSION=v0.19.0
-curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OSDK_RELEASE_VERSION}/operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
-chmod +x operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
-sudo mkdir -p /usr/local/bin/
-sudo mv operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
-
 
 ## Install metal3 requirements
 mkdir -p "${M3_DENV_ROOT}"
