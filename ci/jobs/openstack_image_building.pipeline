@@ -113,7 +113,7 @@ pipeline {
     }
     stage('Building Metal3 Ubuntu image'){
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
@@ -136,7 +136,7 @@ pipeline {
     }
     stage('Building Metal3 CentOS image'){
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
@@ -187,7 +187,7 @@ pipeline {
     }
     stage('Building Metal3 Ubuntu image for Frankfurt region'){
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
       }
       environment {
         OS_AUTH_URL="https://fra1.citycloud.com:5000"
@@ -214,7 +214,7 @@ pipeline {
     }
     stage('Building Metal3 CentOS image for Frankfurt region'){
       options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
       }
       environment {
         OS_AUTH_URL="https://fra1.citycloud.com:5000"
