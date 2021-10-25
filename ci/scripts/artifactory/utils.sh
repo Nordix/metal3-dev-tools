@@ -160,9 +160,9 @@ rt_delete_multiple_artifacts() {
   # Create an array of the artifacts that should be deleted
   mapfile -t < <(rt_list_directory "${DIR_TO_CLEAN}" "${ANONYMOUS}" |\
     jq '.children | .[] | .uri' | \
-    diff - "${PINNED_ARTIFACTS}" | \
-    sed -ne 's/< //p' | \
     sed -e 's/\"\/\([^"]*\)"/\1/g' | \
+    diff --suppress-common-lines - "${PINNED_ARTIFACTS}" | \
+    sed -ne 's/< //p' | \
     head -n "-${RETENTION_NUM}")
 
   # Delete the artifacts
