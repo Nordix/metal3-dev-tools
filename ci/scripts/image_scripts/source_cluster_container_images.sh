@@ -9,7 +9,7 @@ export IMG_GOLANG_IMG="${IMG_GOLANG_IMG:-"registry.hub.docker.com/library/golang
 export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"docker.io/centos:centos8"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
-    export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.0"}
+    export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.2"}
     export KIND_NODE_IMAGE_VERSION=${KIND_NODE_IMAGE_VERSION:-"v1.22.2"}
     # Since capm3 v1a4 tests can only survive with k8s < v1.22
     # the following docker image also needs to be a part of the disk image.
