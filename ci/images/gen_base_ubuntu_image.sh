@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
-
 set -eux
+export KUBERNETES_VERSION="v1.22.2"
 
 SSH_PRIVATE_KEY_FILE="${1:?}"
 USE_FLOATING_IP="${2:?}"
