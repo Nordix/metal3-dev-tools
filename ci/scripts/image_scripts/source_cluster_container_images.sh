@@ -7,6 +7,7 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME}"
 export IMG_REGISTRY="${IMG_REGISTRY:-"docker.io/registry:latest"}"
 export IMG_GOLANG_IMG="${IMG_GOLANG_IMG:-"registry.hub.docker.com/library/golang:1.16"}"
 export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"docker.io/centos:centos8"}"
+export IMG_UBUNTU_IMG="${IMG_CENTOS_IMG:-"docker.io/ubuntu:20.04"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
     export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.22.2"}
