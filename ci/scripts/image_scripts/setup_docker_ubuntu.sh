@@ -16,7 +16,8 @@ sudo add-apt-repository -y \
    stable"
 sudo apt-get update
 sudo apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-focal docker-ce-cli=5:19.03.14~3-0~ubuntu-focal containerd.io jq
-sudo groupadd docker
+sudo groupadd docker || true
+sudo useradd ubuntu || true
 sudo usermod -aG docker "${USER}"
 sudo usermod -aG docker ubuntu
 sudo systemctl enable docker
