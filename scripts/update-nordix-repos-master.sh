@@ -8,7 +8,7 @@ set -u
 # -push jenkins local repos to Nordix forks
 #------------------------------------------
 
-WORKSPACE=${WORKSPACE:=/tmp}
+WORKSPACE="${WORKSPACE:=/tmp}"
 
 SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
@@ -54,50 +54,52 @@ LOCAL_HWCC_REPO="${WORKSPACE}/hardware-classification-controller"
 LOCAL_IPA_REPO="${WORKSPACE}/ironic-python-agent.git"
 LOCAL_IPA_BUILDER_REPO="${WORKSPACE}/ironic-python-agent-builder.git"
 
-pushd "${SCRIPTPATH}"
+pushd "${SCRIPTPATH}" || exit
 cd ..
 
 UPDATE_REPO="${1:-${LOCAL_CAPM3_REPO} ${LOCAL_CAPO_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO} ${LOCAL_PROJECTINFRA_REPO} ${LOCAL_IRONIC_IMAGE_REPO} ${LOCAL_IPAM_REPO} ${LOCAL_METAL3GITHUBIO_REPO} ${LOCAL_HWCC_REPO} ${LOCAL_IPA_REPO} ${LOCAL_IPA_BUILDER_REPO}}"
+# shellcheck disable=SC2034
 UPDATE_BRANCH="${2:-master}"
 UPSTREAM_REPO="${3:-${CAPM3_REPO} ${CAPO_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO} ${PROJECTINFRA_REPO} ${IRONIC_IMAGE_REPO} ${IPAM_REPO} ${METAL3GITHUBIO_REPO} ${HWCC_REPO} ${IPA_REPO} ${IPA_BUILDER_REPO}}"
 NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO} ${NORDIX_PROJECTINFRA_REPO} ${NORDIX_IRONIC_IMAGE_REPO} ${NORDIX_IPAM_REPO} ${NORDIX_METAL3GITHUBIO_REPO} ${NORDIX_HWCC_REPO} ${NORDIX_IPA_REPO} ${NORDIX_IPA_BUILDER_REPO}}"
 
 # clone upstream repos to jenkins if not found
 i=0
-locarray=(${UPDATE_REPO})
-upsarray=(${UPSTREAM_REPO})
-ndxarray=(${NORDIX_REPO})
+locarray=("${UPDATE_REPO}")
+upsarray=("${UPSTREAM_REPO}")
+ndxarray=("${NORDIX_REPO}")
 
-pushd ${WORKSPACE}
+pushd "${WORKSPACE}" || exit
 
+# shellcheck disable=SC2034
 for index in ${UPDATE_REPO}
 do
     if [ ! -d "${locarray[$i]}" ]; then
-      echo "CLONE "${upsarray[$i]}""
+      echo "CLONE ${upsarray[$i]}"
       git clone "${upsarray[$i]}" "${locarray[$i]}"
     fi
-i=$(($i+1));
+  i=$((i+1))
 done
 
-cd -
+cd - || exit
 
 i=0
 for repo in ${UPDATE_REPO}
 do
   echo "Updating master branch in ${repo}"
-  pushd "${repo}"
+  pushd "${repo}" || exit
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
   git checkout "${BRANCH}"
   # origin points to upstream repos
   git fetch origin
   git rebase origin/"${BRANCH}"
-  git remote add nordixrepo ${ndxarray[$i]}
+  git remote add nordixrepo "${ndxarray[$i]}"
   git push -uf nordixrepo "${BRANCH}"
-  echo "Push done to "${ndxarray[$i]}""
+  echo "Push done to ${ndxarray[$i]}"
   git checkout "${BRANCH}"
-  popd
+  popd || exit
   echo -e "\n"
-i=$(($i+1));
+  i=$((i+1))
 done
 
 # Example: sync other than master branch
@@ -115,4 +117,18 @@ done
 #  popd
 #  echo -e "\n"
 
-popd
+CAPM3_RELEASE_BRANCHES="release-0.3 release-0.4 release-0.5"
+for branch in ${CAPM3_RELEASE_BRANCHES}
+do
+  echo "Updating ${branch} branch in ${LOCAL_CAPM3_REPO}"
+  pushd "${LOCAL_CAPM3_REPO}" || exit
+  git checkout "origin/${branch}"
+  git fetch "origin" "${branch}"
+  git rebase "origin/${branch}"
+  git remote add "remote-${branch}" "${NORDIX_CAPM3_REPO}"
+  git push -uf "remote-${branch}" "HEAD:${branch}"
+  echo "Push done to ${branch} branch in ${NORDIX_CAPM3_REPO}"
+  popd || exit
+done
+
+popd || exit
