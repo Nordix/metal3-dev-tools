@@ -78,7 +78,7 @@ do
       echo "CLONE ${upsarray[$i]}"
       git clone "${upsarray[$i]}" "${locarray[$i]}"
     fi
-  i=$((i+1))
+  i=$((i+1));
 done
 
 cd - || exit
@@ -99,7 +99,7 @@ do
   git checkout "${BRANCH}"
   popd || exit
   echo -e "\n"
-  i=$((i+1))
+  i=$((i+1));
 done
 
 # Example: sync other than master branch
@@ -126,7 +126,7 @@ do
   git fetch "origin" "${branch}"
   git rebase "origin/${branch}"
   git remote add "remote-${branch}" "${NORDIX_CAPM3_REPO}"
-  git push -uf "remote-${branch}" "HEAD:${branch}"
+  git push -uf "remote-${branch}" "HEAD:refs/heads/${branch}"
   echo "Push done to ${branch} branch in ${NORDIX_CAPM3_REPO}"
   popd || exit
 done
