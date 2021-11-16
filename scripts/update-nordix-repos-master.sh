@@ -65,9 +65,9 @@ NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} $
 
 # clone upstream repos to jenkins if not found
 i=0
-locarray=("${UPDATE_REPO}")
-upsarray=("${UPSTREAM_REPO}")
-ndxarray=("${NORDIX_REPO}")
+locarray=(${UPDATE_REPO})
+upsarray=(${UPSTREAM_REPO})
+ndxarray=(${NORDIX_REPO})
 
 pushd "${WORKSPACE}" || exit
 
