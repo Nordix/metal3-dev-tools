@@ -60,6 +60,19 @@ sudo retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernete
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
 sudo rm "${HOME}"/.ssh/authorized_keys
 
+# Install haveged to workaround random input issue
+sudo apt-get update
+sudo dpkg --configure -a
+sudo apt-get dist-upgrade -y
+sudo apt-get -f install
+
+
+sudo update-initramfs -uk all
+sudo apt install haveged -y
+sudo systemctl enable haveged
+sudo apt-get install rng-tools
+sudo update-grub
+
 # Download container images
 "${SCRIPTS_DIR}"/target_cluster_container_images.sh
 

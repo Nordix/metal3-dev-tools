@@ -202,7 +202,7 @@ EOF
           /* Delete temporary image from artifactory */          
           sh """#!/bin/bash
           source <(curl -s https://raw.githubusercontent.com/Nordix/airship-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
-          rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
+          #rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
           """
       }
     }
