@@ -63,10 +63,34 @@ UPDATE_BRANCH="${2:-master}"
 UPSTREAM_REPO="${3:-${CAPM3_REPO} ${CAPO_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO} ${PROJECTINFRA_REPO} ${IRONIC_IMAGE_REPO} ${IPAM_REPO} ${METAL3GITHUBIO_REPO} ${HWCC_REPO} ${IPA_REPO} ${IPA_BUILDER_REPO}}"
 NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO} ${NORDIX_PROJECTINFRA_REPO} ${NORDIX_IRONIC_IMAGE_REPO} ${NORDIX_IPAM_REPO} ${NORDIX_METAL3GITHUBIO_REPO} ${NORDIX_HWCC_REPO} ${NORDIX_IPA_REPO} ${NORDIX_IPA_BUILDER_REPO}}"
 
+# This function syncs a single branch between Nordix and upstream (usually Metal3) repository
+function update_custom_branch {
+    local BRANCHES="$1"
+    local LOCAL_REPO="$2"
+    local NORDIX_REPO="$3"
+
+    pushd "${LOCAL_REPO}" || exit
+    for branch in ${BRANCHES}
+    do
+        echo "Updating ${branch} branch in ${LOCAL_REPO}"
+        git checkout "origin/${branch}"
+        git fetch "origin" "${branch}"
+        git rebase "origin/${branch}"
+        git remote add "remote-${branch}" "${NORDIX_REPO}"
+        git push -uf "remote-${branch}" "HEAD:refs/heads/${branch}"
+        echo "Push done to ${branch} branch in ${NORDIX_REPO}"
+    done
+    popd || exit
+}
+
+
 # clone upstream repos to jenkins if not found
 i=0
+# shellcheck disable=SC2206
 locarray=(${UPDATE_REPO})
+# shellcheck disable=SC2206
 upsarray=(${UPSTREAM_REPO})
+# shellcheck disable=SC2206
 ndxarray=(${NORDIX_REPO})
 
 pushd "${WORKSPACE}" || exit
@@ -75,60 +99,40 @@ pushd "${WORKSPACE}" || exit
 for index in ${UPDATE_REPO}
 do
     if [ ! -d "${locarray[$i]}" ]; then
-      echo "CLONE ${upsarray[$i]}"
-      git clone "${upsarray[$i]}" "${locarray[$i]}"
+        echo "CLONE ${upsarray[$i]}"
+        git clone "${upsarray[$i]}" "${locarray[$i]}"
     fi
-  i=$((i+1));
+    i=$((i+1))
 done
 
 cd - || exit
 
+# Update master branch
 i=0
 for repo in ${UPDATE_REPO}
 do
-  echo "Updating master branch in ${repo}"
-  pushd "${repo}" || exit
-  BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  git checkout "${BRANCH}"
-  # origin points to upstream repos
-  git fetch origin
-  git rebase origin/"${BRANCH}"
-  git remote add nordixrepo "${ndxarray[$i]}"
-  git push -uf nordixrepo "${BRANCH}"
-  echo "Push done to ${ndxarray[$i]}"
-  git checkout "${BRANCH}"
-  popd || exit
-  echo -e "\n"
-  i=$((i+1));
+    echo "Updating master branch in ${repo}"
+    pushd "${repo}" || exit
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    git checkout "${BRANCH}"
+    # origin points to upstream repos
+    git fetch origin
+    git rebase origin/"${BRANCH}"
+    git remote add nordixrepo "${ndxarray[$i]}"
+    git push -uf nordixrepo "${BRANCH}"
+    echo "Push done to ${ndxarray[$i]}"
+    git checkout "${BRANCH}"
+    popd || exit
+    echo -e "\n"
+    i=$((i+1))
 done
 
-# Example: sync other than master branch
-#
-# v1alpha2 branch present in CAPIPB_REPO
-# echo "Updating v1alpha2 branch in ${LOCAL_CAPIPB_REPO}"
-#  pushd "${LOCAL_CAPIPB_REPO}"
-#  git checkout origin/v1alpha2
-  # origin points to upstream repos
-#  git fetch origin v1alpha2
-#  git rebase origin/v1alpha2
-#  git remote add nordixrepov1a2 ${NORDIX_CAPIPB_REPO}
-#  git push nordixrepov1a2 HEAD:v1alpha2
-#  echo "Push done to v1alpha2 branch in "${NORDIX_CAPIPB_REPO}""
-#  popd
-#  echo -e "\n"
+# Sync non master branches on selected repos
 
 CAPM3_RELEASE_BRANCHES="release-0.3 release-0.4 release-0.5"
-for branch in ${CAPM3_RELEASE_BRANCHES}
-do
-  echo "Updating ${branch} branch in ${LOCAL_CAPM3_REPO}"
-  pushd "${LOCAL_CAPM3_REPO}" || exit
-  git checkout "origin/${branch}"
-  git fetch "origin" "${branch}"
-  git rebase "origin/${branch}"
-  git remote add "remote-${branch}" "${NORDIX_CAPM3_REPO}"
-  git push -uf "remote-${branch}" "HEAD:refs/heads/${branch}"
-  echo "Push done to ${branch} branch in ${NORDIX_CAPM3_REPO}"
-  popd || exit
-done
+update_custom_branch "$CAPM3_RELEASE_BRANCHES" "$LOCAL_CAPM3_REPO" "$NORDIX_CAPM3_REPO"
+
+IPAM_RELEASE_BRANCHES="release-0.0 release-0.1"
+update_custom_branch "$IPAM_RELEASE_BRANCHES" "$LOCAL_IPAM_REPO" "$NORDIX_IPAM_REPO"
 
 popd || exit
