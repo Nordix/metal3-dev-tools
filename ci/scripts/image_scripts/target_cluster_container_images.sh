@@ -5,7 +5,7 @@ set -uex
 # Container images that we pre-pull into the target image.
 export CALICO_CNI_IMG="${CALICO_CNI_IMG:-"docker.io/calico/cni:v3.21.0"}"
 export CALICO_POD2DAEMON_IMG="${CALICO_POD2DAEMON_IMG:-"docker.io/calico/pod2daemon-flexvol:v3.21.0"}"
-export CALICO_NODE_IMG="${CALICO_NODE_IMG:-"docker.io/calico/node:v3.21.0"}"
+export CALICO_NODE_IMG="${CALICO_NODE_IMG:-"docker.io/calico/node:v3.21.1"}"
 export CALICO_KUBE_CONTROLLERS_IMG="${CALICO_KUBE_CONTROLLERS_IMG:-"docker.io/calico/kube-controllers:v3.21.0"}"
 
 sudo systemctl enable --now crio
