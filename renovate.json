@@ -6,7 +6,7 @@
     {
       "depTypeList": ["devDependencies"],
       "updateTypes": ["minor"],
-      "automerge": false     
+      "automerge": false
     },
     {
      "datasources": ["docker"],
@@ -21,30 +21,6 @@
   "renovateFork": true,
   "includeForks": true,
   "regexManagers": [
-     {
-       "fileMatch": [".*$"],
-       "matchStrings": ["docker.io/calico/cni:(?<currentValue>v.*?)\"}"],
-       "depNameTemplate": "calico/cni",
-       "datasourceTemplate": "docker"
-     },
-     {
-       "fileMatch": [".*$"],
-       "matchStrings": ["docker.io/calico/pod2daemon-flexvol:(?<currentValue>v.*?)\"}"],
-       "depNameTemplate": "calico/pod2daemon-flexvol",
-       "datasourceTemplate": "docker"
-     },
-     {
-       "fileMatch": [".*$"],
-       "matchStrings": ["docker.io/calico/node:(?<currentValue>v.*?)\"}"],
-       "depNameTemplate": "calico/node",
-       "datasourceTemplate": "docker"
-     },
-     {
-       "fileMatch": [".*$"],
-       "matchStrings": ["docker.io/calico/kube-controllers:(?<currentValue>v.*?)\"}"],
-       "depNameTemplate": "calico/kube-controllers",
-       "datasourceTemplate": "docker"
-     },
      {
        "fileMatch": ["^ci/.*$"],
        "matchStrings": ["CRICTL_VERSION:-\"(?<currentValue>v.*?)\"}"],
@@ -70,11 +46,11 @@
        "datasourceTemplate": "docker"
      }
    ],
-   "assignees": [ 
+   "assignees": [
      "fmuyassarov",
      "furkatgofurov7",
      "jan-est",
-     "kashifest",     
+     "kashifest",
      "lentzi90",
      "macaptain",
      "mboukhalfa",
