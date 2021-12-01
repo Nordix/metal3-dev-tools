@@ -25,6 +25,7 @@ METAL3GITHUBIO_REPO="https://github.com/metal3-io/metal3-io.github.io.git"
 HWCC_REPO="https://github.com/metal3-io/hardware-classification-controller.git"
 IPA_REPO="https://github.com/openstack/ironic-python-agent.git"
 IPA_BUILDER_REPO="https://github.com/openstack/ironic-python-agent-builder.git"
+TOPOLVM_REPO="https://github.com/topolvm/topolvm.git"
 
 NORDIX_CAPM3_REPO="git@github.com:Nordix/cluster-api-provider-metal3.git"
 NORDIX_CAPO_REPO="git@github.com:Nordix/cluster-api-provider-openstack.git"
@@ -39,6 +40,7 @@ NORDIX_METAL3GITHUBIO_REPO="git@github.com:Nordix/metal3-io.github.io.git"
 NORDIX_HWCC_REPO="git@github.com:Nordix/metal3-hardware-classification-controller.git"
 NORDIX_IPA_REPO="git@github.com:Nordix/ironic-python-agent.git"
 NORDIX_IPA_BUILDER_REPO="git@github.com:Nordix/ironic-python-agent-builder.git"
+NORDIX_TOPOLVM="git@github.com:Nordix/topolvm.git"
 
 LOCAL_CAPM3_REPO="${WORKSPACE}/cluster-api-provider-metal3"
 LOCAL_CAPO_REPO="${WORKSPACE}/cluster-api-provider-openstack"
@@ -53,15 +55,14 @@ LOCAL_METAL3GITHUBIO_REPO="${WORKSPACE}/metal3-io.github.io"
 LOCAL_HWCC_REPO="${WORKSPACE}/hardware-classification-controller"
 LOCAL_IPA_REPO="${WORKSPACE}/ironic-python-agent.git"
 LOCAL_IPA_BUILDER_REPO="${WORKSPACE}/ironic-python-agent-builder.git"
+LOCAL_TOPOLVM="${WORKSPACE}/topolvm.git"
 
 pushd "${SCRIPTPATH}" || exit
 cd ..
 
-UPDATE_REPO="${1:-${LOCAL_CAPM3_REPO} ${LOCAL_CAPO_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO} ${LOCAL_PROJECTINFRA_REPO} ${LOCAL_IRONIC_IMAGE_REPO} ${LOCAL_IPAM_REPO} ${LOCAL_METAL3GITHUBIO_REPO} ${LOCAL_HWCC_REPO} ${LOCAL_IPA_REPO} ${LOCAL_IPA_BUILDER_REPO}}"
-# shellcheck disable=SC2034
-UPDATE_BRANCH="${2:-master}"
-UPSTREAM_REPO="${3:-${CAPM3_REPO} ${CAPO_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO} ${PROJECTINFRA_REPO} ${IRONIC_IMAGE_REPO} ${IPAM_REPO} ${METAL3GITHUBIO_REPO} ${HWCC_REPO} ${IPA_REPO} ${IPA_BUILDER_REPO}}"
-NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO} ${NORDIX_PROJECTINFRA_REPO} ${NORDIX_IRONIC_IMAGE_REPO} ${NORDIX_IPAM_REPO} ${NORDIX_METAL3GITHUBIO_REPO} ${NORDIX_HWCC_REPO} ${NORDIX_IPA_REPO} ${NORDIX_IPA_BUILDER_REPO}}"
+UPDATE_REPO="${1:-${LOCAL_CAPM3_REPO} ${LOCAL_CAPO_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO} ${LOCAL_PROJECTINFRA_REPO} ${LOCAL_IRONIC_IMAGE_REPO} ${LOCAL_IPAM_REPO} ${LOCAL_METAL3GITHUBIO_REPO} ${LOCAL_HWCC_REPO} ${LOCAL_IPA_REPO} ${LOCAL_IPA_BUILDER_REPO} ${LOCAL_TOPOLVM}}"
+UPSTREAM_REPO="${3:-${CAPM3_REPO} ${CAPO_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO} ${PROJECTINFRA_REPO} ${IRONIC_IMAGE_REPO} ${IPAM_REPO} ${METAL3GITHUBIO_REPO} ${HWCC_REPO} ${IPA_REPO} ${IPA_BUILDER_REPO} ${TOPOLVM_REPO}}"
+NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO} ${NORDIX_PROJECTINFRA_REPO} ${NORDIX_IRONIC_IMAGE_REPO} ${NORDIX_IPAM_REPO} ${NORDIX_METAL3GITHUBIO_REPO} ${NORDIX_HWCC_REPO} ${NORDIX_IPA_REPO} ${NORDIX_IPA_BUILDER_REPO} ${NORDIX_TOPOLVM}}"
 
 # This function syncs a single branch between Nordix and upstream (usually Metal3) repository
 function update_custom_branch {
@@ -107,13 +108,13 @@ done
 
 cd - || exit
 
-# Update master branch
+# Update the default branch (main/master)
 i=0
 for repo in ${UPDATE_REPO}
 do
-    echo "Updating master branch in ${repo}"
     pushd "${repo}" || exit
     BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    echo "Updating ${BRANCH} branch in ${repo}"
     git checkout "${BRANCH}"
     # origin points to upstream repos
     git fetch origin
@@ -127,7 +128,7 @@ do
     i=$((i+1))
 done
 
-# Sync non master branches on selected repos
+# Sync non default branches on selected repos
 
 CAPM3_RELEASE_BRANCHES="release-0.3 release-0.4 release-0.5"
 update_custom_branch "$CAPM3_RELEASE_BRANCHES" "$LOCAL_CAPM3_REPO" "$NORDIX_CAPM3_REPO"
