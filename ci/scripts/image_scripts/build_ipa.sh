@@ -118,6 +118,7 @@ if $ENABLE_BOOTSTRAP_TEST; then
     source "./lib/common.sh"
     # shellcheck source=/dev/null
     source "./lib/releases.sh"
+    CERT_MANAGER_VERSION="$(grep -r "Installing cert-manager Version" |sed -n 's/.*\(v[0-9]\.[0-9]\.[0-9]\)"/\1/p' | head -n 1)"
     cat << EOF >> "${METADATA_PATH}"
 METAL3_DEV_ENV_REPO="${METAL3_DEV_ENV_REPO}"
 METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH}"
@@ -128,6 +129,7 @@ IPA_COMMIT="${IPA_COMMIT}"
 IPA_BUILDER_REPO="${IPA_BUILDER_REPO}"
 IPA_BUILDER_BRANCH="${IPA_BUILDER_BRANCH}"
 IPA_BUILDER_COMMIT="${IPA_BUILDER_COMMIT}"
+CERT_MANAGER_VERSION="${CERT_MANAGER_VERSION}"
 EOF
     pushd "${BMOPATH}"
     cat << EOF >> "${METADATA_PATH}"
