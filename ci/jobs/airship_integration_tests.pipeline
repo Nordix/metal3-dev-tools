@@ -168,6 +168,7 @@ pipeline {
               sh """  cat <<-EOF > "./jenkins/scripts/files/vars.sh"
                 IMAGE_LOCATION="${IMAGE_LOCATION}"
                 IMAGE_NAME="${FINAL_IMAGE_NAME}.qcow2"
+                KUBERNETES_VERSION="v1.23.0"
 EOF
                 """
               sh "./jenkins/scripts/integration_test.sh"               
