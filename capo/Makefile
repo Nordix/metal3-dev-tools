@@ -4,7 +4,7 @@ OS_CLOUD_NAME := "openstack-1"
 all: configure kind-create tilt-up 
 provision: capo-template capo-apply
 configure:
-	./configure.sh $(OS_CLOUD_NAME)
+	source capo_os_vars.rc && ./configure.sh $(OS_CLOUD_NAME)
 kind-create:
 	kind get clusters | grep -q kind-capo || kind create cluster --name kind-capo
 tilt-up:

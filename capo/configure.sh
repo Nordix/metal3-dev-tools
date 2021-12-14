@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -x
 
 GIT_ROOT=$(git rev-parse --show-toplevel)
 CAPI_REPO=$(realpath "${GIT_ROOT}/../cluster-api")
@@ -11,48 +11,54 @@ OPENSTACK_RC_PATH="/tmp/openstackrc"
 OS_CLOUD_NAME="$1"
 
 if ! [[ -d "$CAPI_REPO" ]]; then
-  echo "Expected to find directory $CAPI_REPO, but couldn't find it."
-  echo "Clone this repo from https://github.com/kubernetes-sigs/cluster-api"
-  exit 1
+	echo "Unable to find cluster-api repo, please clone it."
+	return
+fi
+
+if ! [[ -d "$CAPO_REPO" ]]; then
+	echo "Unable to find cluster-api-provider-openstack, please clone it."
+	return
+fi
+
+if ! [[ -f "$CACERT_PATH" ]];then
+	echo "Unable to find cacert.pem file, please the cert file"
+	return
+fi
+if ! [[ -f "$OPENSTACK_RC_PATH" ]];then
+	echo "Unable to find OpenStackrc file, It can be retrieved the PEM file from 1Password."
+	return
+fi
+
+if ! command -v kind &> /dev/null;then
+	echo "Couldn't find 'kind'. Install from https://kind.sigs.k8s.io/"
+	return
+fi
+if ! command -v tilt &> /dev/null;then
+	echo "Couldn't find 'tilt'. Install from https://docs.tilt.dev/install.html"
+	return
+fi
+
+if ! ssh-keygen -l -f <(echo $OPENSTACK_SSH_AUTHORIZED_KEY);then
+  echo "Invalid public key"
+	return
+fi
+PRIVATE_KEY="~/.ssh/$OPENSTACK_SSH_KEY_NAME"
+if ! ssh-keygen -l -f $(eval echo $PRIVATE_KEY);then
+	echo "Invalid or non-existing private key"
+	return
+fi
+
+pubKey=$(ssh-keygen -l -f <(echo $OPENSTACK_SSH_AUTHORIZED_KEY) | cut -f1,2 -d' ')
+priKey=$(ssh-keygen -l -f $(eval echo $OPENSTACK_SSH_PRIVATE_KEY_PATH) | cut -f1,2 -d' ')
+priKey=$(ssh-keygen -l -f $(eval echo $PRIVATE_KEY) | cut -f1,2 -d' ')
+if ! diff  <(echo "$pubKey" ) <(echo "$priKey");then
+	echo "public and private key do not match, export the correct values in capo_os_vars.rc"
+	return
 fi
 # use a known working CAPI version
 pushd  "$CAPI_REPO"
-git fetch --all --tags --prune
-git checkout  v0.4.0
+git fetch --all --tags --prune && git checkout v1.0.1
 popd
-
-if ! [[ -d "$CAPO_REPO" ]]; then
-  echo "Expected to find directory $CAPO_REPO, but couldn't find it."
-  echo "Clone this repo from https://github.com/Nordix/cluster-api-provider-openstack"
-  exit 1
-fi
-
-if ! [[ -f "$CACERT_PATH" ]]; then
-  echo "Expected to find OpenStack auth cacert.pem at $CACERT_PATH"
-  exit 1
-fi
-
-if ! [[ -f "$OPENSTACK_RC_PATH" ]]; then
-  echo "Expected to find OpenStack RC file at $OPENSTACK_RC_PATH"
-  echo "You can get this PEM file from 1Password."
-  exit 1
-fi
-
-if ! [[ -f ~/.ssh/id_rsa.pub ]]; then
-  echo "Couldn't find a pubkey to use at ~/.ssh/id_rsa.pub"
-  echo "Set your pubkey in capo_os_vars.rc"
-  exit 1
-fi
-
-if ! command -v kind &> /dev/null; then
-  echo "Couldn't find 'kind'. Install from https://kind.sigs.k8s.io/"
-  exit 1
-fi
-
-if ! command -v tilt &> /dev/null; then
-  echo "Couldn't find 'tilt'. Install from https://docs.tilt.dev/install.html"
-  exit 1
-fi
 
 source "$OPENSTACK_RC_PATH"
 echo "Configuring CAPO deployment for project: ${OS_PROJECT_NAME}"
@@ -73,3 +79,5 @@ clouds:
     cacert: "${CACERT_PATH}"
     verify: false
 EOF
+
+set +x

@@ -1,0 +1,15 @@
+export CINDER_VERSION=3
+export OS_AUTH_TYPE=password
+export OS_AUTH_URL=http://<devstack vm default interface IP>/identity
+export OS_DOMAIN_NAME=default
+export OS_IDENTITY_API_VERSION=3
+export OS_PASSWORD=<password from ~/devstack/.localrc.password file>
+export OS_PROJECT_DOMAIN_ID=${OS_PROJECT_DOMAIN_ID:-"default"}
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_PROJECT_NAME=demo 
+export OS_REGION_NAME=RegionOne
+export OS_TENANT_NAME=demo
+export OS_USERNAME=demo
+export OS_USER_DOMAIN_ID=${OS_USER_DOMAIN_ID:-"default"}
+export OS_USER_DOMAIN_NAME=default
+export OS_VOLUME_API_VERSION=3

@@ -5,36 +5,8 @@ export OPENSTACK_DNS_NAMESERVERS=8.8.8.8
 export OPENSTACK_FAILURE_DOMAIN=nova
 export OPENSTACK_EXTERNAL_NETWORK_ID=""
 export OPENSTACK_IMAGE_NAME="Ubuntu_20.04_node"
-export OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR=2C-4GB-100GB
-export OPENSTACK_NODE_MACHINE_FLAVOR=2C-4GB-100GB
-
-
-function setAuthKey {
-
-    read -e -p "Enter a full path (e.g /home/ubuntu/.ssh/...) path to ssh authorized key to access capo instances:" OPENSTACK_SSH_AUTHORIZED_KEY_FILE
-    echo $OPENSTACK_SSH_AUTHORIZED_KEY_FILE
-    ssh-keygen -l -f "${OPENSTACK_SSH_AUTHORIZED_KEY_FILE}"
-
-    if [[ $? == 0 ]]; then
-        export OPENSTACK_SSH_AUTHORIZED_KEY="$(cat ${OPENSTACK_SSH_AUTHORIZED_KEY_FILE})"
-    else
-        echo "${OPENSTACK_SSH_AUTHORIZED_KEY_FILE} is not a valid public key"
-        return 1
-    fi
-}
-
-function setKeyName {
-
-    read -e -p 'Enter the corresponding private key in openstack cluster:' PROVIDED_OPENSTACK_SSH_KEY_NAME
-    EXISTING_KEY=$(./run-openstack-command.sh openstack keypair show $PROVIDED_OPENSTACK_SSH_KEY_NAME -c name -f value | tr -d '\r')
-
-    if [ "${EXISTING_KEY}" = "${PROVIDED_OPENSTACK_SSH_KEY_NAME}" ] ;then
-        export OPENSTACK_SSH_KEY_NAME="${PROVIDED_OPENSTACK_SSH_KEY_NAME}"
-    else
-        echo "Unable to find they key ${PROVIDED_OPENSTACK_SSH_KEY_NAME} in openstack"
-        return 1
-    fi
-}
-
-[ -z "${OPENSTACK_SSH_AUTHORIZED_KEY-}" ] && setAuthKey
-[ -z "${OPENSTACK_SSH_KEY_NAME-}" ] && setKeyName
+export OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR=ds4G
+export OPENSTACK_NODE_MACHINE_FLAVOR=ds4G
+export OPENSTACK_SSH_KEY_NAME="<capo private key name>"
+export OPENSTACK_SSH_AUTHORIZED_KEY="<capo public key content>"
+export KUBERNETES_VERSION="v1.22.2"

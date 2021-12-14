@@ -20,11 +20,20 @@ env | grep OPENSTACK_CLOUD | sed 's/^/export /' > /tmp/capo_vars_openstack.sh
 source ./capo_os_vars.rc
 source /tmp/capo_vars_openstack.sh
 
-"$CLUSTERCTL" config cluster "$CLUSTER_NAME" \
-    --kubernetes-version v1.19.1 \
+"$CLUSTERCTL" generate cluster "$CLUSTER_NAME" \
+    --kubernetes-version "$KUBERNETES_VERSION" \
     --from "${CAPO_REPO}/templates/cluster-template-without-lb.yaml" \
     --control-plane-machine-count=1 \
     --worker-machine-count=1 > /tmp/$CLUSTER_NAME.yaml
 
 # Required to run in our openstack instances
 sed -i 's/cloud-provider: openstack/cloud-provider: external/' /tmp/$CLUSTER_NAME.yaml
+
+# inset provider-id field
+sed -i '/kubeletExtraArgs/a provider-id: "openstack:///{{ ds.meta_data.uuid }}"' /tmp/basic-1.yaml
+# correct indentation
+for line_number in $(sed -n '/kubeletExtraArgs/=' /tmp/basic-1.yaml);do
+	num_spaces=$(( $(sed -n "${line_number}p" /tmp/basic-1.yaml | tr -dC '[:blank:]'| wc -c) + 2))
+        spaces=$(head -c $num_spaces /dev/zero | tr '\0' ' ')
+	sed -i "$(( $line_number + 1 ))s/^provider-id:/${spaces}provider-id:/g" /tmp/basic-1.yaml
+done

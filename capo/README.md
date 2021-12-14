@@ -20,7 +20,7 @@ sudo mv yq_linux_amd64 /usr/local/bin/yq
   deployment to /tmp/openstackrc
 
 Note:
-Changes on the CAPI side could break the CAPO setup. In order to avoid that, we are fixing the CAPI version to a known working one, `v0.4.0`. If more recent version is know, please update this document and `configure.sh` script.
+Changes on the CAPI side could break the CAPO setup. In order to avoid that, we are fixing the CAPI version to a known working one, `v1.0.1`. If more recent version is know, please update this document and `configure.sh` script.
 
 Now you need to set up a keypair for SSH access to the machines.
 
@@ -29,7 +29,7 @@ Now you need to set up a keypair for SSH access to the machines.
 . /tmp/openstackrc
 # Create the keypair in OpenStack and save the private key locally
 openstack keypair create capo-key > ~/.ssh/capo-key
-# Generate the pubkey from the private key
+# Get the corresponding pubic key
 ssh-keygen -f ~/.ssh/capo-key -y > ~/.ssh/capo-key.pub
 # Export the environment variables used in the dev environment to specify the use of your key
 export OPENSTACK_SSH_AUTHORIZED_KEY=~/.ssh/capo-key.pub
@@ -110,6 +110,13 @@ openstack extension list -f json -c Description -f value | grep trunk
   Expose trunk port details
 ```
 
-## TODO
+In order to provision controlpland and worker nodes, node image is required. Both Centos and Ubuntu image can be downloaded from citycloud or be taken from a successfull metal3-dev-env deployment. Then, upload the image to the devstack instance as follows:
 
-[ ] Add kustomize config for editing the cluster templates
+```bash
+openstack image create Ubuntu_20.04_node --disk-format qcow2 --file /tmp/UBUNTU_20.04_NODE_IMAGE_K8S_v1.22.3.qcow2 
+```
+
+## Known issues
+- if the devstack vm is rebooted, the capo vms to be created will have wrong entries in their resolv.conf. In this case, you need to redeploy devstack.
+
+- After provisioning CP and worker nodes, if the vm is left idle, kubectl access towards the target cluster may not freeze. If that happens, just run ```make deprovision``` and```make capo-apply```. However, it is still possible to use the CAPO controllers to manage the lifecyle of the CP and worker nodes.
