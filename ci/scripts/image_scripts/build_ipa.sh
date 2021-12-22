@@ -112,7 +112,7 @@ if $ENABLE_BOOTSTRAP_TEST; then
     pushd "${DEV_ENV_REPO_LOCATION}"
     git checkout "${METAL3_DEV_ENV_COMMIT}"
     METAL3_DEV_ENV_COMMIT="$(git rev-parse HEAD)"
-    make
+    make || sleep infinity
     make test
     # shellcheck source=/dev/null
     source "./lib/common.sh"
