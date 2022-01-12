@@ -47,7 +47,7 @@ git `sha` hash of the commit referenced by the `HEAD` pointer on the current bra
 
 3. The script checks whether there is a ironic image in [nordix harbor](https://registry.nordix.org/harbor) with the same name and image tag and if not then the build process will continue.
 
-4. In case the build process continues the script will rely on upstream [patch-image.sh](https://github.com/metal3-io/ironic-image/blob/master/patch-image.sh) to patch the [ironic image](https://github.com/metal3-io/ironic-image/blob/master/Dockerfile). First the patch file is constructed then the docker image will be built
+4. In case the build process continues the script will rely on upstream [patch-image.sh](https://github.com/metal3-io/ironic-image/blob/main/patch-image.sh) to patch the [ironic image](https://github.com/metal3-io/ironic-image/blob/main/Dockerfile). First the patch file is constructed then the docker image will be built
 and the path to the patch file will be supplied with the `docker build` command's `--build-arg` option.
 
 5. When the build process succeeds the newly created OCI image will be uploaded to nordix harbor.

@@ -7,18 +7,18 @@ The workflow is based on the understanding that:
 * A project is forked from Open Source project to nordix
 * A local copy is cloned from nordix
 
-We refer to the Open Source project repo as `upstream`, `upstream/master` and
-to the forked repo in the Nordix organization as `origin`, `origin/master`
+We refer to the Open Source project repo as `upstream`, `upstream/main` and
+to the forked repo in the Nordix organization as `origin`, `origin/main`
 
-Main branch is called `master`, containing the latest stable release.
+Main branch is called `main`, containing the latest stable release.
 
-Feature development and bug fixing are done in topic branches, branched of `master` branch. Upon completion and code review, topic branch is merged into `upstream` branch.
+Feature development and bug fixing are done in topic branches, branched of `main` branch. Upon completion and code review, topic branch is merged into `upstream` branch.
 
 ## Branches
 
 ### Topic branches (features and bug fixes)
 
-Topic branches need to be branched off `master` and named `type/name-username`,
+Topic branches need to be branched off `main` and named `type/name-username`,
 where  type is `feature` or `fix` and `username` the Github username or the name
 of the person creating the branch, to mark ownership of the branch.
 
@@ -51,13 +51,13 @@ use the address provided by Github.
 
 Create and checkout local branch where you will do your work.
 
-`git checkout -b <topic-branch> origin/master`
+`git checkout -b <topic-branch> origin/main`
 
 Make sure to have the latest code from the upstream repository
 
 ```sh
 git fetch upstream
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 When pushing the branch for the first time, ensure correct tracking is set up:
@@ -66,12 +66,12 @@ When pushing the branch for the first time, ensure correct tracking is set up:
 
 ### 2. Keep topic branch up-to-date
 
-When changes have been pushed to `master` branch, ensure your topic branch is up-to-date.
+When changes have been pushed to `main` branch, ensure your topic branch is up-to-date.
 
 ```sh
 git fetch upstream
 git checkout <topic-branch>
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 <!-- markdownlint-disable MD026 -->
@@ -92,12 +92,12 @@ git commit -S
 
 ### 5. Push the changes
 
-Rebase your changes on the upstream master to make sure
+Rebase your changes on the upstream main to make sure
 to have the latest commits in
 
 ```sh
 git fetch upstream
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 Changes should be pushed to a correct origin branch:
@@ -114,12 +114,12 @@ avoided as much as possible in this stage
 When the changes in your branch are completed, a pull request could be opened on Github.
 If you need more input and review from the team, you should probably open the pull request on Nordix.
 
-Before opening it, **please ensure your branch is up-to-date with `master`** branch and your commits are properly formatted.
+Before opening it, **please ensure your branch is up-to-date with `main`** branch and your commits are properly formatted.
 
 ```sh
 git fetch upstream
 git checkout <topic-branch>
-git rebase upstream/master
+git rebase upstream/main
 git push -fu origin <topic-branch>
 ```
 
@@ -135,19 +135,19 @@ the small fixes coming from the code review.
 
 ```sh
 git fetch upstream
-git rebase -i upstream/master
+git rebase -i upstream/main
 ```
 
 ### 9. Open an `Upstream` Pull Request
 
 When the local code review is done and commit gets 2 thumbs up(+2), an upstream pull request is made from same topic-branch to the open source project for code review.
 
-Before opening it, **please ensure your branch is up-to-date with `master`** branch and your commits are properly formatted.
+Before opening it, **please ensure your branch is up-to-date with `main`** branch and your commits are properly formatted.
 
 ```sh
 git fetch upstream
 git checkout <topic-branch>
-git rebase upstream/master
+git rebase upstream/main
 git push -u origin <topic-branch>
 ```
 
@@ -193,10 +193,10 @@ Instead the code is merged with the internal pull request.
 
 ## How to backport
 
-Sometimes you may need to backport a commit (e.g. bug fix) from a master branch
+Sometimes you may need to backport a commit (e.g. bug fix) from a main branch
 into a stable release branch. This involves a couple of steps as described below.
 In this example, we will use `release-0.3` as the stable branch in to which we will backport a
-specific commit from the `master` branch.
+specific commit from the `main` branch.
 
 Create and checkout to a new branch (e.g. `backport_commit_x`) based on the stable branch (e.g. `release-0.3`)
 
@@ -207,10 +207,10 @@ git checkout -b backport_commit_x origin/release-0.3
 In order to cherry-pick a specific commit(s) you want, you will need to identify the commit hash(es).
 
 ```bash
-git log --oneline --no-merges ..master
+git log --oneline --no-merges ..main
 ```
 
-prints out all the commits in the `master` branch which aren't in the `release-0.3` branch in a below provided format:
+prints out all the commits in the `main` branch which aren't in the `release-0.3` branch in a below provided format:
 
 ```
 34a036b73 random1

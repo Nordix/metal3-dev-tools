@@ -8,7 +8,7 @@ Set of internal tools for Airship and metal3 development
 make setup-local-repos
 ```
 
-## Update the nordix master branches
+## Update the nordix main branches
 
 ```sh
 make update-remote-repos
