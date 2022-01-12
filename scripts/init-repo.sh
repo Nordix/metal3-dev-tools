@@ -14,9 +14,9 @@ setup_repo () {
     git remote add upstream git@github.com:"${2}"/"${1}".git
     git remote set-url --push upstream no_push
     git remote -v
-    # Update "master" on Nordix
+    # Update "main" on Nordix
     git fetch upstream
-    git rebase upstream/master
+    git rebase upstream/main
     popd
   fi
 }

@@ -7,7 +7,7 @@ workers_count="${3:-3}"
 kindest_node_ver="${4:-kindest/node:v1.18.0}"
 
 if [ -z "${1}" ]; then
-    echo -e "Error: Missing cluster name\nUsage:./setup_test_environment.sh <cluster name> [<number of masters> <number of workers> <kindest_node_ver>]"
+    echo -e "Error: Missing cluster name\nUsage:./setup_test_environment.sh <cluster name> [<number of controlplanes> <number of workers> <kindest_node_ver>]"
     exit 1
 fi
 

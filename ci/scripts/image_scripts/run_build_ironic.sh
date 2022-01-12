@@ -3,7 +3,7 @@
 set -eu
 
 sudo apt update -y
-# This script relies on upstream https://github.com/metal3-io/ironic-image/blob/master/patch-image.sh
+# This script relies on upstream https://github.com/metal3-io/ironic-image/blob/main/patch-image.sh
 # to build Ironic container image based on a gerrit refspec of a patch.
 # Required parameter is REFSPEC, which is gerrit refspec of the patch
 # Example: refs/changes/74/804074/1
@@ -15,7 +15,7 @@ IRONIC_INSPECTOR_REPO="https://opendev.org/openstack/ironic-inspector.git"
 IRONIC_REPO="https://opendev.org/openstack/ironic.git"
 IRONIC_IMAGE_REPO="https://github.com/metal3-io/ironic-image.git"
 IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-"HEAD"}"
-IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-"master"}"
+IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-"main"}"
 PATCH_LIST_FILE=patchList.txt
 
 # Login to the Nordix container registry
