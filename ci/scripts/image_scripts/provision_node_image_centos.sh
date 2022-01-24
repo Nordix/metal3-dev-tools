@@ -29,14 +29,7 @@ sudo dnf install device-mapper-persistent-data lvm2 -y
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
 echo  \"Installing kubernetes binaries\"
-if [[ $KUBERNETES_BINARIES_VERSION != "v1.21.1" && $KUBERNETES_BINARIES_VERSION != "v1.21.0" && $KUBERNETES_BINARIES_VERSION != "v1.20.4" ]]; then
-    curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
-else
-    echo "Installing patched kubeadm to workaround etcd startup issue in Kubernetes ${KUBERNETES_BINARIES_VERSION}"
-    echo "https://github.com/kubernetes/kubernetes/issues/99305"
-    curl -L --remote-name -w "-w %{url_effective}" "https://artifactory.nordix.org/artifactory/airship/kubeadm_etcd_patched/k8s_${KUBERNETES_BINARIES_VERSION}/kubeadm"
-    curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubelet,kubectl}"
-fi
+curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
 chmod a+x kubeadm kubelet kubectl
 sudo mv kubeadm kubelet kubectl /usr/local/bin/
 sudo mkdir -p /etc/systemd/system/kubelet.service.d
