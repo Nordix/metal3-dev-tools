@@ -2,7 +2,7 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.23.0"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.22.0"}
 OS=${OS:-"CentOS_8"}
 # CRI-O version goes 1:1 with Kubernetes version. Thus,
 # please make sure that k8s version given in
