@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
-ci_git_branch = "main"
-ci_git_url = "https://github.com/metal3-io/project-infra.git"
+ci_git_branch = "export-upgrade-selection-var/mohammed"
+ci_git_url = "https://github.com/Nordix/project-infra.git"
 ci_git_credential_id = "metal3-jenkins-github-token"
 
 // 10 minutes
@@ -101,36 +101,6 @@ pipeline {
               source <(curl -s https://raw.githubusercontent.com/Nordix/airship-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
               delete_image "${FINAL_IMAGE_NAME}"
             """  
-            }
-          }
-        }
-      }
-    }
-    stage('Building node CentOS image'){
-      when { expression {IMAGE_OS == 'Centos'}}
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
-            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-
-            /* Generate node CentOS dev-env image */
-            sh "docker run --rm \
-              ${DOCKER_CMD_ENV}\
-              -v ${CURRENT_DIR}:/data \
-              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-              registry.nordix.org/airship/image-builder \
-              /data/ci/images/gen_metal3_centos_image.sh \
-              /data/id_rsa_airshipci 1 \
-              provision_node_image_centos.sh"
-
-            /* Delete image */
-            sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/airship-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
-              delete_image "${FINAL_IMAGE_NAME}"
-            """              
             }
           }
         }
