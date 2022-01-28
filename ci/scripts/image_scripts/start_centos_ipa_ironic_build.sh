@@ -44,6 +44,14 @@ scp \
   "${CI_DIR}/run_build_ironic.sh" \
   "${AIRSHIP_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
 
+# Send IPA builder custom element to remote executer
+scp \
+  -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null \
+  -i "${AIRSHIP_CI_USER_KEY}" \
+  -r "${CI_DIR}/ipa_builder_elements" \
+  "${AIRSHIP_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
+
 echo "Running Ironic image building script"
 # Execute remote script
 # shellcheck disable=SC2029

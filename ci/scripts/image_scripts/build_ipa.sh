@@ -3,6 +3,8 @@
 # Fail whenever any command fails
 set -eu
 
+# The path to the directory that holds this script
+CURRENT_SCRIPT_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")"
 # Repository configuration options
 METAL3_DEV_ENV_REPO="https://github.com/metal3-io/metal3-dev-env"
 METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH:-master}"
@@ -19,8 +21,11 @@ BMO_BRANCH="${BMO_BRANCH:-main}"
 BMO_COMMIT="${BMO_COMMIT:-HEAD}"
 
 # General environment variables
+# The following 3 vars could be usefull to be changed during testing
 DISABLE_UPLOAD="${DISABLE_UPLOAD:-false}"
 RT_UTILS="${RT_UTILS:-/tmp/utils.sh}"
+ENABLE_BOOTSTRAP_TEST="${ENABLE_BOOTSTRAP_TEST:-true}"
+
 RT_URL="${RT_URL:-https://artifactory.nordix.org/artifactory}"
 IPA_BUILDER_PATH="ironic-python-agent-builder"
 IPA_IMAGE_NAME="${IPA_IMAGE_NAME:-ironic-python-agent}"
@@ -28,12 +33,12 @@ IPA_IMAGE_TAR="${IPA_IMAGE_NAME}.tar"
 IPA_BASE_OS="${IPA_BASE_OS:-centos}"
 IPA_BASE_OS_RELEASE="${IPA_BASE_OS_RELEASE:-8-stream}"
 IRONIC_SIZE_LIMIT_MB=500
-ENABLE_BOOTSTRAP_TEST="${ENABLE_BOOTSTRAP_TEST:-true}"
 DEV_ENV_REPO_LOCATION="${DEV_ENV_REPO_LOCATION:-/tmp/dib/metal3-dev-env}"
 IMAGE_REGISTRY="registry.nordix.org"
 CONTAINER_IMAGE_REPO="airship"
 STAGING="${STAGING:-false}"
 METADATA_PATH="/tmp/metadata.txt"
+
 
 # Install required packages
 sudo apt install --yes python3-pip python3-virtualenv qemu-utils
@@ -74,12 +79,20 @@ export DIB_REPOLOCATION_ironic_python_agent="${IPA_REPO}"
 export DIB_REPOREF_requirements="${OPENSTACK_REQUIREMENTS_REF}"
 export DIB_REPOREF_ironic_python_agent="${IPA_COMMIT}"
 
+# IPA builder customisation variables
+# Path to custom IPA builder kernel module element
+CUSTOM_ELEMENTS="${CURRENT_SCRIPT_DIR}/ipa_builder_elements"
+# List of additional kernel modules that should be loaded during boot separated by ':'
+# This list is used by the custom element named ipa-modprobe
+export ADDITIONAL_IPA_KERNEL_MODULES="megaraid_sas"
+
 # Build the IPA initramfs and kernel images
 ironic-python-agent-builder --output "${IPA_IMAGE_NAME}" \
     --release "${IPA_BASE_OS_RELEASE}" "${IPA_BASE_OS}" \
+    --elements-path="${CUSTOM_ELEMENTS}" \
     --element='dynamic-login' --element='journal-to-console' \
     --element='devuser' --element='openssh-server' \
-    --element='extra-hardware' --verbose
+    --element='extra-hardware' --element='ipa-module-autoload' --verbose
 
 # Deactivate the python virtual environment
 deactivate
