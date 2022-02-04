@@ -48,8 +48,8 @@ pipeline {
     DEFAULT_HOSTS_MEMORY = "${TARGET_NODE_MEMORY}"
     NUM_NODES="${NUM_NODES}"
     TESTS_FOR="${TESTS_FOR}"
-    IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/airship/images/temp/"
-    DST_FOLDER="airship/images/temp"
+    IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
+    DST_FOLDER="metal3/images/temp"
     FINAL_IMAGE_NAME="${DISTRIBUTION}_TEMP_IMG_${RAND_NAME}"
     KUBERNETES_VERSION="${KUBERNETES_VERSION}"
     
@@ -92,7 +92,7 @@ pipeline {
               ${DOCKER_CMD_ENV}\
               -v ${CURRENT_DIR}:/data \
               -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-              registry.nordix.org/airship/image-builder \
+              registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_node_ubuntu_image.sh \
               /data/id_rsa_airshipci 1"
             
@@ -121,7 +121,7 @@ pipeline {
               ${DOCKER_CMD_ENV}\
               -v ${CURRENT_DIR}:/data \
               -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-              registry.nordix.org/airship/image-builder \
+              registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_metal3_centos_image.sh \
               /data/id_rsa_airshipci 1 \
               provision_node_image_centos.sh"

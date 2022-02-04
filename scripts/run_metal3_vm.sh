@@ -18,7 +18,7 @@ sed -i '/    ssh-authorized-keys:/!b;n;c\      - '"$(cat ~/.ssh/metal3.pub)" "$W
 
 echo "Downloading Metal3 if needed"
 if [[ ! -f "$WORK_DIR/ubuntu_metal3.qcow2" ]]; then
-  openstack image save --file "$WORK_DIR/ubuntu_metal3.qcow2" airship-ci-ubuntu-metal3-img
+  openstack image save --file "$WORK_DIR/ubuntu_metal3.qcow2" metal3-ci-ubuntu-metal3-img
 fi
 
 vm_defined=$(virsh list --all | grep ubuntu-metal3 || true )
@@ -66,5 +66,5 @@ else
 fi
 
 echo "Machine IP : $(sudo virsh net-dhcp-leases default | \
-  grep "airship-ci-ubuntu-metal3-img" | awk '{print $5}' \
+  grep "metal3-ci-ubuntu-metal3-img" | awk '{print $5}' \
   | cut -d '/' -f1)"

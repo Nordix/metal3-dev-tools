@@ -62,7 +62,7 @@ pipeline {
                   ${DOCKER_CMD_ENV}\
                   -v ${CURRENT_DIR}:/data \
                   -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-                  registry.nordix.org/airship/image-builder \
+                  registry.nordix.org/metal3/image-builder \
                   /data/ci/images/gen_node_ubuntu_image.sh \
                   /data/id_rsa_airshipci 1"
                 
@@ -87,7 +87,7 @@ pipeline {
                   ${DOCKER_CMD_ENV}\
                   -v ${CURRENT_DIR}:/data \
                   -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
-                  registry.nordix.org/airship/image-builder \
+                  registry.nordix.org/metal3/image-builder \
                   /data/ci/images/gen_metal3_centos_image.sh \
                   /data/id_rsa_airshipci 1 \
                   provision_node_image_centos.sh"

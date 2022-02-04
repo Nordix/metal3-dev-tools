@@ -179,11 +179,11 @@ rt_delete_multiple_artifacts() {
 
 # ================ Users Artifactory Helper Functions ===============
 
-RT_AIRSHIP_DIR="airship"
+RT_AIRSHIP_DIR="metal3"
 RT_USERS_DIR="${RT_AIRSHIP_DIR}/users"
 
 # Description:
-# Gets all the keys for a user from airship/users/<username>
+# Gets all the keys for a user from metal3/users/<username>
 # directory.
 #
 # Usage:
@@ -206,7 +206,7 @@ rt_get_user_public_keys() {
 }
 
 # Description:
-# Adds a user public key in airship/users/<username>/<key_name>
+# Adds a user public key in metal3/users/<username>/<key_name>
 #
 # Credentials should be set in the following environment variables.
 #   RT_USER: artifactory user name.
@@ -228,7 +228,7 @@ rt_add_user_public_key() {
 }
 
 # Description:
-# Deletes a user public key in airship/users/<username>/<key_name>
+# Deletes a user public key in metal3/users/<username>/<key_name>
 #
 # Credentials should be set in the following environment variables.
 #   RT_USER: artifactory user name.

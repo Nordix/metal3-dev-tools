@@ -35,7 +35,7 @@ IPA_BASE_OS_RELEASE="${IPA_BASE_OS_RELEASE:-8-stream}"
 IRONIC_SIZE_LIMIT_MB=500
 DEV_ENV_REPO_LOCATION="${DEV_ENV_REPO_LOCATION:-/tmp/dib/metal3-dev-env}"
 IMAGE_REGISTRY="registry.nordix.org"
-CONTAINER_IMAGE_REPO="airship"
+CONTAINER_IMAGE_REPO="metal3"
 STAGING="${STAGING:-false}"
 METADATA_PATH="/tmp/metadata.txt"
 
@@ -175,8 +175,8 @@ fi
 mv "${METADATA_PATH}" "metadata.txt"
 tar -r -f "${IPA_IMAGE_TAR}" "metadata.txt"
 
-REVIEW_ARTIFACTORY_PATH="airship/images/ipa/review/${IPA_BASE_OS}/${IPA_BASE_OS_RELEASE}/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
-STAGING_ARTIFACTORY_PATH="airship/images/ipa/staging/${IPA_BASE_OS}/${IPA_BASE_OS_RELEASE}/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
+REVIEW_ARTIFACTORY_PATH="metal3/images/ipa/review/${IPA_BASE_OS}/${IPA_BASE_OS_RELEASE}/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
+STAGING_ARTIFACTORY_PATH="metal3/images/ipa/staging/${IPA_BASE_OS}/${IPA_BASE_OS_RELEASE}/${IPA_IDENTIFIER}/${IPA_IMAGE_TAR}"
 # Upload the newly built image
 if ! $DISABLE_UPLOAD ; then
     # shellcheck source=/dev/null

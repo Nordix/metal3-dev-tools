@@ -41,12 +41,12 @@ You need to have the Airship CI user private key.
 A container image is available and contains all the tools to build the images
 
    ```bash
-      docker pull registry.nordix.org/airship/image-builder
+      docker pull registry.nordix.org/metal3/image-builder
    ```
 
    ```bash
       docker run --rm -it -v "<path to metal3-dev-tool repo>:/data"
-   -v "<path to ci keys folder>:/data/keys" registry.nordix.org/airship/image-builder /bin/bash
+   -v "<path to ci keys folder>:/data/keys" registry.nordix.org/metal3/image-builder /bin/bash
    ```
 
 ### Calling the scripts

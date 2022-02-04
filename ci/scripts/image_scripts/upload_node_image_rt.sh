@@ -29,7 +29,7 @@ IMAGE_NAME="$IMAGE_NAME".qcow2
 # shellcheck disable=SC1090
 source "${RT_SCRIPTS_DIR}/utils.sh"
 SOURCE_PATH="${WORK_DIR}/${IMAGE_NAME}"
-DST_FOLDER=${DST_FOLDER:-airship/images/k8s_${KUBERNETES_VERSION}}
+DST_FOLDER=${DST_FOLDER:-metal3/images/k8s_${KUBERNETES_VERSION}}
 DST_PATH="${DST_FOLDER}/${IMAGE_NAME}"
 
 # Following environment variables should be set 

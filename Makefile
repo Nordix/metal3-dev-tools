@@ -37,11 +37,11 @@ build-workspace: ## Build Docker Image for workspace
 	docker build \
 		-t ${NAME}-workspace \
 		-f resources/docker/workspace/Dockerfile resources/docker/workspace/
-	docker tag ${NAME}-workspace:latest ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
+	docker tag ${NAME}-workspace:latest ${image_registry}/metal3/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: push-workspace
 push-workspace: ## Push Docker Image for Workspace to nordix registry
-	docker push ${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
+	docker push ${image_registry}/metal3/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: workspace
 workspace: ## Create and execute dev workspace for nordix repos
@@ -53,14 +53,14 @@ workspace: ## Create and execute dev workspace for nordix repos
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v "${HOME}"/.kube/:/root/.kube \
 		-v "${HOME}"/.minikube:"${HOME}"/.minikube \
-		${image_registry}/airship/${NAME}-workspace:${workspace_img_ver}
+		${image_registry}/metal3/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: lint-md
 lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
 	docker run --rm \
 		-v "${CURDIR}:/data" \
 		-v "${lint_folder}:/lintdata" \
-		${image_registry}/airship/${NAME}-md-lint:${lint_md_img_ver} \
+		${image_registry}/metal3/${NAME}-md-lint:${lint_md_img_ver} \
 		mdl -s configs/linter/.mdstylerc.rb "/lintdata"
 
 .PHONY: build-lint-md
@@ -71,8 +71,8 @@ build-lint-md: ## Build Docker Image for markdown lint
 
 .PHONY: push-lint-md
 push-lint-md: ## Push Docker Image for Lint markdown to nordix registry
-	docker tag ${NAME}-md-lint:latest ${image_registry}/airship/${NAME}-md-lint:${lint_md_img_ver}
-	docker push ${image_registry}/airship/${NAME}-md-lint:${lint_md_img_ver}
+	docker tag ${NAME}-md-lint:latest ${image_registry}/metal3/${NAME}-md-lint:${lint_md_img_ver}
+	docker push ${image_registry}/metal3/${NAME}-md-lint:${lint_md_img_ver}
 
 .PHONY: build-image-builder
 build-image-builder: ## Build Docker Image for qcow2 image building
@@ -82,19 +82,19 @@ build-image-builder: ## Build Docker Image for qcow2 image building
 
 .PHONY: push-image-builder
 push-image-builder: ## Push Docker Image for qcow2 image building to nordix registry
-	docker tag image-builder:latest ${image_registry}/airship/image-builder:${image_builder_img_ver}
-	docker push ${image_registry}/airship/image-builder:${image_builder_img_ver}
+	docker tag image-builder:latest ${image_registry}/metal3/image-builder:${image_builder_img_ver}
+	docker push ${image_registry}/metal3/image-builder:${image_builder_img_ver}
 
 .PHONY: build-go-unittest
 build-go-unittest: ## Build Docker Image for go unit test
 	docker build \
 		-t gotest-unit \
 		-f resources/docker/gotest/Dockerfile resources/docker/gotest/
-	docker tag gotest-unit:latest ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
+	docker tag gotest-unit:latest ${image_registry}/metal3/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
 .PHONY: push-go-unittest
 push-go-unittest: ## Push Docker Image for go unit test to nordix registry
-	docker push ${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
+	docker push ${image_registry}/metal3/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
 SHELLCHECK_VERSION := "v0.7.0"
 SHELLCHECK_IMAGE := "koalaman/shellcheck-alpine:${SHELLCHECK_VERSION}"
@@ -114,15 +114,15 @@ build-lint-go: ## Build Docker Image for go lint
 
 .PHONY: push-lint-go
 push-lint-go: ## Push Docker Image for Lint go to nordix registry
-	docker tag ${NAME}-go-lint:latest ${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver}
-	docker push ${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver}
+	docker tag ${NAME}-go-lint:latest ${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver}
+	docker push ${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver}
 
 .PHONY: lint-go
 lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_folder=abspath)
 	docker run --rm \
 		-v "${CURDIR}:/mnt" \
 		-v "${lint_folder}:/data" \
-		${image_registry}/airship/${NAME}-go-lint:${lint_go_img_ver} \
+		${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver} \
 		sh /mnt/scripts/go-linter.sh
 
 .PHONY: run-dev-env
@@ -134,7 +134,7 @@ test: ## Run unit test for the code in repository
 	docker run --rm \
                 -v "${CURRENT_DIR}/${REPO_NAME}:/go/src/${REPO_PATH}" \
 		-w "/go/src/${REPO_PATH}" -e MAKE_CMD=${MAKE_CMD} -e REPO_NAME=${REPO_NAME} \
-		${image_registry}/airship/${NAME}-gotest-unit:${gotest_unit_img_ver}
+		${image_registry}/metal3/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
 .PHONY: integration_test
 integration_test: ## Run integration test

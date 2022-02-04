@@ -95,7 +95,7 @@ bootstrap cluster.
 
 As part of 5. step of the Ironic build process the versioned ironic OCI images are uploaded to [this repository](https://registry.nordix.org/harbor/projects/10/repositories/ironic-image).
 
-All of the IPA images are stored in Nordix Artifactory at this [location](https://artifactory.nordix.org/artifactory/airship/images/ipa) and under these location
+All of the IPA images are stored in Nordix Artifactory at this [location](https://artifactory.nordix.org/artifactory/metal3/images/ipa) and under these location
 the IPA artifacts are grouped into different groups based on their characteristics.
 The versioned IPA images are sorted to different groups, the artifacts are grouped based on what Linux distribution is used as a base image, the grouping also
 takes into consideration the version of the distribution and whether the artifact was created as part of a review process or is it already in a finalized format
@@ -103,8 +103,8 @@ called staging.
 
 Example of the location of a `Centos 8 Stream` based staging and review artifacts:
 
-  - review: https://artifactory.nordix.org/artifactory/airship/images/ipa/review/centos/8-stream/20210908T1017Z-2acdf3c
-  - staging:  https://artifactory.nordix.org/artifactory/airship/images/ipa/staging/centos/8-stream/20210918T0020Z-47a7fb5
+  - review: https://artifactory.nordix.org/artifactory/metal3/images/ipa/review/centos/8-stream/20210908T1017Z-2acdf3c
+  - staging:  https://artifactory.nordix.org/artifactory/metal3/images/ipa/staging/centos/8-stream/20210918T0020Z-47a7fb5
 
 As an example shows the directory structure is the following: `ipa/<staging or review>/<linux distribution>/<distribution version>/<artifact version>`
 
