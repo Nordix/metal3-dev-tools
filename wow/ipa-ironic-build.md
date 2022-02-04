@@ -15,14 +15,14 @@ compatible. In case of a successful build both a versioned archive of IPA and a 
 stored according the current artifact retention policy.
 
 There are two pipelines related to the combined Ironic and IPA build process, one of them is called
-`airship_master_openstack_ipa_and_ironic_image_building` that can be found [here](https://jenkins.nordix.org/view/Airship/job/airship_master_openstack_ipa_and_ironic_image_building/).
-The other one is the `airship_openstack_ipa_and_ironic_image_building` and that is [here](https://jenkins.nordix.org/view/Airship/job/airship_openstack_node_image_building/).
-The difference between the two jobs is related to their trigger mechanism. `airship_master_openstack_ipa_and_ironic_image_building` is triggered periodically, manually and whenever there is
-a change in `airship-dev-tools` repository. `airship_openstack_ipa_and_ironic_image_building` is used to test `GitHub` pull requests and the job is triggered by
+`metal3_master_openstack_ipa_and_ironic_image_building` that can be found [here](https://jenkins.nordix.org/view/Metal3/job/metal3_master_openstack_ipa_and_ironic_image_building/).
+The other one is the `metal3_openstack_ipa_and_ironic_image_building` and that is [here](https://jenkins.nordix.org/view/Metal3/job/metal3_openstack_node_image_building/).
+The difference between the two jobs is related to their trigger mechanism. `metal3_master_openstack_ipa_and_ironic_image_building` is triggered periodically, manually and whenever there is
+a change in `metal3-dev-tools` repository. `metal3_openstack_ipa_and_ironic_image_building` is used to test `GitHub` pull requests and the job is triggered by
 commenting `/test-ipa` on a pull request.
 
 The JJB configurations for the jobs are located in [Nordix gerrit](https://gerrit.nordix.org/infra/cicd) and inside the repository
-the files are located at `jjb/airship/job_ipa_image_building.yml` for `airship_master_openstack_ipa_and_ironic_image_building` and at `jjb/airship/job_ipa_image_building_test.yml` for `airship_openstack_ipa_and_ironic_image_building`.
+the files are located at `jjb/metal3/job_ipa_image_building.yml` for `metal3_master_openstack_ipa_and_ironic_image_building` and at `jjb/metal3/job_ipa_image_building_test.yml` for `metal3_openstack_ipa_and_ironic_image_building`.
 
 The pipeline script has only a single stage that starts a wrapper script that runs on a `static worker VM` and the wrapper script will
 bootstrap the VM that will actually build and test both IPA and Ironic. The wrapper script is located at

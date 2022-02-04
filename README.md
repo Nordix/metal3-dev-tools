@@ -1,6 +1,6 @@
-# airship-dev-tools
+# metal3-dev-tools
 
-Set of internal tools for Airship and metal3 development
+Set of internal tools for metal3 development
 
 ## Setup
 
@@ -93,7 +93,6 @@ make test
 * [Jenkins Nordix](https://jenkins.nordix.org)
 * [Wiki Nordix](https://wiki.nordix.org/)
 * [Jira Nordix](https://jira.nordix.org/secure/Dashboard.jspa)
-* [Jira Airship](https://airship.atlassian.net/projects/AIR/issues)
 * [Gerrit Nordix](https://gerrit.nordix.org)
 * [Harbour nordix](https://registry.nordix.org)
 * [Slack EST](estech-group.slack.com)

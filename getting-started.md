@@ -80,7 +80,5 @@ We suggest you join the following mailing lists :
 
 * [Discuss Nordix](https://lists.nordix.org/mailman/listinfo/discuss) for all
   questions related to Nordix
-* [Discuss Airship](http://lists.airshipit.org/cgi-bin/mailman/listinfo/airship-discuss)
-* [Announce Airship](http://lists.airshipit.org/cgi-bin/mailman/listinfo/airship-announce)
 * [cluster API (Cluster-lifecycle SIG)](https://groups.google.com/forum/#!forum/kubernetes-sig-cluster-lifecycle)
   Joining this group will also allow you to edit the cluster-api google docs.

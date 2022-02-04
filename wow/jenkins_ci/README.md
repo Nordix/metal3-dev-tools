@@ -12,26 +12,24 @@ with your Google account.
 * running from cli by remotely accessing github, no need for local repo
 
 ```
-wget -q https://raw.githubusercontent.com/Nordix/airship-dev-tools/master/wow/jenkins_ci/jenkins-jobs-to-scan.txt | sleep 1 | bash <(curl -Ls https://raw.githubusercontent.com/Nordix/airship-dev-tools/master/wow/jenkins_ci/jenkins-check-ci.sh) && rm jenkins-jobs-to-scan.txt*
+wget -q https://raw.githubusercontent.com/Nordix/metal3-dev-tools/master/wow/jenkins_ci/jenkins-jobs-to-scan.txt | sleep 1 | bash <(curl -Ls https://raw.githubusercontent.com/Nordix/metal3-dev-tools/master/wow/jenkins_ci/jenkins-check-ci.sh) && rm jenkins-jobs-to-scan.txt*
 ```
 
 * a customized jenkins-jobs-to-scan.txt can be used by running (wget run once to fetch jenkins-jobs-to-scan.txt)
 
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/Nordix/airship-dev-tools/master/wow/jenkins_ci/jenkins-check-ci.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/Nordix/metal3-dev-tools/master/wow/jenkins_ci/jenkins-check-ci.sh)
 ```
 
 Check global status of jobs which are built on a daily basis:
-* [airship_master_v1a3_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_centos/) *(v1alpha3 integration test)*
-* [airship_master_v1a3_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a3_integration_test_ubuntu/) *(v1alpha3 integration test)*
-* [airship_master_v1a4_integration_test_centos](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a4_integration_test_centos/) *(v1alpha4 integration test)*
-* [airship_master_v1a4_integration_test_ubuntu](https://jenkins.nordix.org/view/Airship/job/airship_master_v1a4_integration_test_ubuntu/) *(v1alpha4 integration test)*
-* [airship_master_integration_tests_cleanup](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_tests_cleanup/) *(capi baremetal integration tests cleanup)*
-* [airship_openstack_image_building](https://jenkins.nordix.org/view/Airship/job/airship_openstack_image_building/)
-* [airship_docker_image_building](https://jenkins.nordix.org/view/Airship/job/airship_docker_image_building/)
-* [airship_nordix_dev_tools_repos](https://jenkins.nordix.org/view/Airship/job/airship_nordix_dev_tools_repos/)
+* [metal3_master_v1a4_integration_test_centos](https://jenkins.nordix.org/view/Metal3/job/metal3_master_v1a4_integration_test_centos/) *(v1alpha4 integration test)*
+* [metal3_master_v1a4_integration_test_ubuntu](https://jenkins.nordix.org/view/Metal3/job/metal3_master_v1a4_integration_test_ubuntu/) *(v1alpha4 integration test)*
+* [metal3_master_integration_tests_cleanup](https://jenkins.nordix.org/view/Metal3/job/metal3_master_integration_tests_cleanup/) *(capi baremetal integration tests cleanup)*
+* [metal3_openstack_image_building](https://jenkins.nordix.org/view/Metal3/job/metal3_openstack_image_building/)
+* [metal3_docker_image_building](https://jenkins.nordix.org/view/Metal3/job/metal3_docker_image_building/)
+* [metal3_nordix_dev_tools_repos](https://jenkins.nordix.org/view/Metal3/job/metal3_nordix_dev_tools_repos/)
 
-Jobs with prefix 'airship_master_' run metal3-dev-env v1alpha3 and v1alpha4 integration tests. You
+Jobs with prefix 'metal3_master_' run metal3-dev-env v1alpha3 and v1alpha4 integration tests. You
 should see **blue** colour that indicates that run was successfull.
 
 In case of job **FAILURE**,
@@ -52,7 +50,7 @@ Just trigger the CI manually because these causes aren't results of any pull
 request but rather system instability.
 
 ### Possible sources of notifications on CI failures
-* First place to notice the CI failure is [Nordix Jenkins UI](https://jenkins.nordix.org/view/Airship/)
+* First place to notice the CI failure is [Nordix Jenkins UI](https://jenkins.nordix.org/view/Metal3/)
 * Metal3 [Slack channel](https://kubernetes.slack.com/messages/CHD49TLE7)
 #cluster-api-baremetal
 * Metal3 [Mailing list](https://groups.google.com/forum/#!forum/metal3-dev)
@@ -61,17 +59,17 @@ request but rather system instability.
 ### Workflow of Nordix Jenkins CI
 First based on a trigger-phrase from an open PR or on a daily basis, Jenkins Job
 Builder (JJB) builds a Jenkins CI job, which will execute the steps given in
-the corresponding pipeline (example: [capi_bm_integration_tests.pipeline](https://github.com/Nordix/airship-dev-tools/blob/master/ci/jobs/capi_bm_integration_tests.pipeline))
+the corresponding pipeline (example: [capi_bm_integration_tests.pipeline](https://github.com/Nordix/metal3-dev-tools/blob/master/ci/jobs/capi_bm_integration_tests.pipeline))
 
 **Note:** You will find JJB files in [Nordix Gerrit](https://gerrit.nordix.org/admin/repos/infra/cicd)
-and Jenkins pipelines in [airship-dev-tools](https://github.com/Nordix/airship-dev-tools/tree/master/ci/jobs).
+and Jenkins pipelines in [metal3-dev-tools](https://github.com/Nordix/metal3-dev-tools/tree/master/ci/jobs).
 
 When a job is triggered either by trigger-phrase or on a daily basis, it is executed in
 one of the Jenkins slave VM (example:```airship-static0-workers-*```), which is
  running on **Default_Project_37137** of [City Cloud](https://citycontrolpanel.com/landing?m=login_required).
 
 In order to access the VM where the job is running:
-1. Find the name of the Jenkins slave (from [Jenkins](https://jenkins.nordix.org/view/Airship/))
+1. Find the name of the Jenkins slave (from [Jenkins](https://jenkins.nordix.org/view/Metal3/))
 that is executing the job.
 2. Go the [City Cloud](https://citycontrolpanel.com/landing?m=login_required)
 console and get the floating IP of the corresponding Jenkins slave VM.
@@ -84,14 +82,14 @@ created for running actual integration test. See example screenshot:
 and from there SSH into the actual tester VM with its own IP that you found
 in step3.
 
-  **Note:** to SSH the Jenkins slave VM you need an airshipci SSH key
+  **Note:** to SSH the Jenkins slave VM you need an metal3ci SSH key
   * if needed run 'ssh-add -l' to check that the key is loaded to ssh-agent
-  * ssh airshipci@'Jenkins-slave-VM-IP' -A
+  * ssh metal3ci@'Jenkins-slave-VM-IP' -A
   * ssh 'tester-VM-IP'
 
 5. Once you are inside the tester VM you can debug it and get more info.  
 
 ### How to clean up leftover VMs from CityCloud
-There is a Jenkins [master job](https://jenkins.nordix.org/view/Airship/job/airship_master_integration_tests_cleanup/) that every 6 hours cleans up all the leftover VMs, which failed to be deleted at the end of v1alphaX integration test.
+There is a Jenkins [master job](https://jenkins.nordix.org/view/Metal3/job/metal3_master_integration_tests_cleanup/) that every 6 hours cleans up all the leftover VMs, which failed to be deleted at the end of v1alphaX integration test.
 
 **Note:** If you want to trigger cleaning job manually, you can use the `/test-clean` phrase within an open pull request under [metal3-io/project-infra](https://github.com/metal3-io/project-infra) repo.

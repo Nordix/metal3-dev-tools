@@ -98,7 +98,7 @@ pipeline {
             
             /* Delete image */
             sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/airship-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
+              source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
               delete_image "${FINAL_IMAGE_NAME}"
             """  
             }
@@ -128,7 +128,7 @@ pipeline {
 
             /* Delete image */
             sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/airship-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
+              source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
               delete_image "${FINAL_IMAGE_NAME}"
             """              
             }
@@ -202,7 +202,7 @@ EOF
           
           /* Delete temporary image from artifactory */          
           sh """#!/bin/bash
-          source <(curl -s https://raw.githubusercontent.com/Nordix/airship-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
+          source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
           rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
           """
       }
