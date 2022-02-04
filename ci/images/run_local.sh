@@ -48,6 +48,6 @@ CURRENT_DIR="$(dirname "$(readlink -f "${0}")")/../../"
   ${CR_CMD_ENV}\
   -v ${CURRENT_DIR}:/data \
   -v ${KEY_PATH}:/data/id_rsa_airshipci \
-  registry.nordix.org/airship/image-builder \
+  registry.nordix.org/metal3/image-builder \
   /data/ci/images/${SCRIPT} \
   /data/id_rsa_airshipci 1

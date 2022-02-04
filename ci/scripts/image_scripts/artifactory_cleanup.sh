@@ -6,7 +6,7 @@ set -eu
 # General artifactory variables
 RT_UTILS="${RT_UTILS:-/tmp/utils.sh}"
 RT_URL="https://artifactory.nordix.org/artifactory"
-IPA_ROOT_ARTIFACTORY="airship/images/ipa"
+IPA_ROOT_ARTIFACTORY="metal3/images/ipa"
 DRY_RUN="${DRY_RUN:-false}"
 ANONYM="${ANONYM:-0}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"

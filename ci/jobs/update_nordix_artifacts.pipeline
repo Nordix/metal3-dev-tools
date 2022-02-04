@@ -1,4 +1,4 @@
-ci_git_url = "https://github.com/metal3/airship-dev-tools.git"
+ci_git_url = "https://github.com/metal3/metal3-dev-tools.git"
 ci_git_branch = "master"
 ci_git_credential_id = "nordix-airship-github-ssh"
 

@@ -28,7 +28,7 @@ WORKSPACE=${WORKSPACE:=/tmp}
 
 IPA_UPSTREAM="https://images.rdoproject.org/centos8/master/rdo_trunk/current-tripleo/ironic-python-agent.tar"
 IPA_MD5_UPSTREAM="${IPA_UPSTREAM}.md5"
-IPA_ARTIFACTORY_PATH="airship/ironic-python-agent/"
+IPA_ARTIFACTORY_PATH="metal3/ironic-python-agent/"
 
 # Update an artifact in Artifactory given:
 # $1 - the source of the artifact as a URI
