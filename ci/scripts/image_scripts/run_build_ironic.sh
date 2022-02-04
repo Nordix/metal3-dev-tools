@@ -8,7 +8,7 @@ sudo apt update -y
 # Required parameter is REFSPEC, which is gerrit refspec of the patch
 # Example: refs/changes/74/804074/1
 IMAGE_REGISTRY="registry.nordix.org"
-CONTAINER_IMAGE_REPO="airship"
+CONTAINER_IMAGE_REPO="metal3"
 IRONIC_REFSPEC="${IRONIC_REFSPEC:-+refs/heads/master:refs/remotes/origin/master}"
 IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC:-+refs/heads/master:refs/remotes/origin/master}"
 IRONIC_INSPECTOR_REPO="https://opendev.org/openstack/ironic-inspector.git"

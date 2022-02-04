@@ -45,7 +45,7 @@ A container image is available and contains all the tools to build the images
    ```
 
    ```bash
-      docker run --rm -it -v "<path to airship-dev-tool repo>:/data"
+      docker run --rm -it -v "<path to metal3-dev-tool repo>:/data"
    -v "<path to ci keys folder>:/data/keys" registry.nordix.org/airship/image-builder /bin/bash
    ```
 

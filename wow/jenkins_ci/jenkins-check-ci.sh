@@ -2,7 +2,7 @@
 
 set -u
 # List of jobs in 'jenkins-jobs-to-scan.txt' based on
-# https://github.com/Nordix/airship-dev-tools/blob/master/wow/jenkins_ci/README.md
+# https://github.com/Nordix/metal3-dev-tools/blob/master/wow/jenkins_ci/README.md
 
 # remove empty lines
 sed -i '/^\s*$/d' jenkins-jobs-to-scan.txt
@@ -16,7 +16,7 @@ tput bold
 
 while IFS= read -r line; do
   ((count++))
-  out=$(curl -s https://jenkins.nordix.org/view/Airship/api/json?pretty=true | grep -B 3 red | egrep name | egrep "$line")
+  out=$(curl -s https://jenkins.nordix.org/view/Metal3/api/json?pretty=true | grep -B 3 red | egrep name | egrep "$line")
   if [[ ! -z "$out" ]]; then
     if [[ "$all_pass" == true ]]; then
       tput setaf 1
