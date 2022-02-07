@@ -83,6 +83,28 @@ Then for all repositories :
 make test
 ```
 
+## metal3-dev-tools integration tests
+
+This repository is mainly used for keeping scripts related to building node and
+host images (OS). Once, new changes are pushed related to node images, there is
+no way to test if those newly build images are going to work or not when running
+integration tests in metal3-dev-env repository.
+For that reason, and also to detect any possible issues early enough, we can run
+metal3-dev-tools integration tests on a PR in this repository which:
+
+1. Creates and pushes temporary node images to the artifactory from the changes
+   on the PR;
+1. Pulls and uses those images while running integration tests on PR;
+1. Deletes those images from the artifactory at the the end of the integration tests.
+
+To trigger metal3-dev-tools integration tests on a PR, please use the following
+phrases:
+
+* **/test-integration-metal3-dev-tools-ubuntu** runs metal3-dev-tools integration
+  tests on Ubuntu
+* **/test-integration-metal3-dev-tools-centos** runs metal3-dev-tools integration
+  tests on CentOS
+
 ## Ways of working
 
 * [Github Workflow](wow/github-workflow.md)
