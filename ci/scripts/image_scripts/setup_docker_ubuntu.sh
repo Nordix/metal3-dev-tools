@@ -18,5 +18,7 @@ sudo apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-focal docker-ce-cli=5:19
 sudo groupadd docker
 sudo usermod -aG docker "${USER}"
 sudo usermod -aG docker ubuntu
+# FIXME: remove this line once USER is always metal3ci
+sudo usermod -aG docker metal3ci
 sudo systemctl enable docker
 sudo systemctl restart docker
