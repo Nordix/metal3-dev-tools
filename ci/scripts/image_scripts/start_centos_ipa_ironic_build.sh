@@ -8,7 +8,7 @@ BUILDER_PORT_NAME="${BUILDER_PORT_NAME:-${BUILDER_VM_NAME}-int-port}"
 BUILDER_FLAVOR="${BUILDER_FLAVOR:-8C-16GB-200GB}"
 CI_DIR="$(dirname "$(readlink -f "${0}")")"
 IPA_BUILDER_SCRIPT_NAME="${IPA_BUILDER_SCRIPT_NAME:-build_ipa.sh}"
-CI_EXT_NET="airship-ci-ext-net"
+CI_EXT_NET="metal3-ci-ext-net"
 IMAGE_NAME="airship-ci-ubuntu-metal3-img"
 
 # shellcheck disable=SC1090
