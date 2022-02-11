@@ -30,8 +30,8 @@ DEV Infrastructure like CI infra contains basic components like routers, externa
 
 Resources which developers can use directly are
 
-- ***External Network***: airship-dev-ext-net
-- ***External Network Subnet***: airship-dev-ext-net-subnet
+- ***External Network***: metal3-dev-ext-net
+- ***External Network Subnet***: metal3-dev-ext-net-subnet
 
 #### Create Dev Infrastructure
 
