@@ -14,7 +14,7 @@ script {
 
 
 pipeline {
-  agent { label 'airship-static-workers' }
+  agent { label 'metal3-static-workers' }
   environment {
     build_ok = true
     CURRENT_DIR = sh (

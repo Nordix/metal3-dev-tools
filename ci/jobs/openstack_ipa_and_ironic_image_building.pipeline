@@ -16,9 +16,9 @@ script {
 }
 
 pipeline {
-  agent { label 'airship-static-workers' }
+  agent { label 'metal3-static-workers' }
   environment {
-    AIRSHIP_CI_USER="airshipci"
+    AIRSHIP_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
     VM_NAME = "${VM_NAME}"
     RT_URL="https://artifactory.nordix.org/artifactory"
