@@ -18,6 +18,9 @@ IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-"HEAD"}"
 IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-"main"}"
 PATCH_LIST_FILE=patchList.txt
 
+# shellcheck disable=SC1091
+source "/tmp/harbor_utils.sh"
+
 # Login to the Nordix container registry
 docker login "${IMAGE_REGISTRY}" -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
 
@@ -77,6 +80,15 @@ EOF
   popd
 fi
 
+# Get the digest(s) belonging to the image(s) with the specified tag.
+# Only a single digest is expected.
+HARBOR_ARTIFACT_DIGEST="$(harbor_get_digests_from_tag "ironic-image" "${IRONIC_TAG}" "false" )"
+
+if (( $(echo "$HARBOR_ARTIFACT_DIGEST" | wc -l) > 1 )); then
+    echo "ERROR: There are multiple ironic-image OCI artifacts in Harbor with the ${IRONIC_TAG} tag."
+    exit 1
+fi
+
 # Logout from the Nordix container registry
 docker logout "${IMAGE_REGISTRY}"
 
@@ -92,4 +104,5 @@ IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH}"
 IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC}"
 IRONIC_INSPECTOR_REPO="${IRONIC_INSPECTOR_REPO}"
 IRONIC_INSPECTOR_COMMIT="${IRONIC_INSPECTOR_COMMIT}"
+IRONIC_IMAGE_HARBOR_DIGEST="${HARBOR_ARTIFACT_DIGEST}"
 EOF

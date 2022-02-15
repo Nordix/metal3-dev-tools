@@ -40,7 +40,9 @@ scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
   -i "${METAL3_CI_USER_KEY}" \
-  "${CI_DIR}/${IPA_BUILDER_SCRIPT_NAME}" "${CI_DIR}/../artifactory/utils.sh" \
+  "${CI_DIR}/${IPA_BUILDER_SCRIPT_NAME}" \
+  "${CI_DIR}/../artifactory/utils.sh" \
+  "${CI_DIR}/../harbor/harbor_utils.sh" \
   "${CI_DIR}/run_build_ironic.sh" \
   "${METAL3_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
 
