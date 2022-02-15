@@ -5,6 +5,7 @@ set -eu
 
 # General artifactory variables
 RT_UTILS="${RT_UTILS:-/tmp/utils.sh}"
+HARBOR_UTILS="${HARBOR_UTILS:-/tmp/harbor_utils.sh}"
 RT_URL="https://artifactory.nordix.org/artifactory"
 IPA_ROOT_ARTIFACTORY="metal3/images/ipa"
 DRY_RUN="${DRY_RUN:-false}"
@@ -33,4 +34,13 @@ CENTOS_STREAM_STAGING_RETENTION_NUM="${CENTOS_STREAM_STAGING_RETENTION_NUM:-10}"
 
 rt_delete_multiple_artifacts "${CENTOS_STREAM_STAGING}" "${ANONYM}" "${DRY_RUN}" \
     "${CENTOS_STREAM_STAGING_PINNED}" "${CENTOS_STREAM_STAGING_RETENTION_NUM}"
+
+# Harbor metal3 project cleanup
+# shellcheck disable=SC1090
+source "${HARBOR_UTILS}"
+PINNED_HARBOR_ARTIFACTS="${PINNED_HARBOR_ARTIFACTS:-${SCRIPT_DIR}/harbor_pinned.txt}"
+
+# Clean (delete) ironic-image container images
+harbor_clean_OCI_repository "ironic-image" "${PINNED_HARBOR_ARTIFACTS}" "5" "${DRY_RUN}"
+
 
