@@ -8,7 +8,7 @@ git_branch = "${ghprbActualCommit}"
 git_credential_id = "nordix-airship-ci-github-prod-token"
 
 pipeline {
-  agent { label 'airship-static-workers' }
+  agent { label 'metal3-static-workers' }
   environment {
     build_ok = true
     CURRENT_DIR = sh (

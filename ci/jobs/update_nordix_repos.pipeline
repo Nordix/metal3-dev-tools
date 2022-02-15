@@ -3,7 +3,7 @@ ci_git_branch = "master"
 ci_git_credential_id = "nordix-airship-github-ssh"
 
 pipeline {
-  agent { label 'airship-static-workers' }
+  agent { label 'metal3-static-workers' }
   environment {
     CURRENT_DIR = sh (
                       script: 'pwd',
