@@ -33,7 +33,7 @@ access goes through the jumphosts.
 
 In order to access the dev VMs ( 10.101.10.* or 10.201.10.* ), the SSH traffic
 needs to go through the jumphost. If you want to SSH to the jumphost itself,
-please use the airshipci account with the correct SSH key.
+please use the metal3ci account with the correct SSH key.
 
 Replace user by your username in the following script
 
@@ -74,7 +74,7 @@ follows those rules:
   traffic from the jumphost or other machines in the default security group).
   You can create your own security group if needed.
 - sensible specs (we are sharing resources)
-- network connectivity : airship-ext-dev only , no direct connection to the
+- network connectivity : metal3-ext-dev only , no direct connection to the
   external network
 - don't use passwords but SSH keys
 - delete your machine when you don't need it anymore

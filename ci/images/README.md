@@ -34,7 +34,7 @@ example with :
       source openstack.rc
    ```
 
-You need to have the Airship CI user private key.
+You need to have the Metal3 CI user private key.
 
 ### Building environment
 
@@ -60,27 +60,27 @@ First, you will need to source the OpenStack credentials file.
 Then set the correct environment variables:
 
    ```bash
-      export AIRSHIP_CI_USER=airshipci
-      export AIRSHIP_CI_USER_KEY=/data/keys/id_rsa_airshipci
+      export METAL3_CI_USER=metal3ci
+      export METAL3_CI_USER_KEY=/data/keys/id_rsa_metal3ci
       export RT_URL="https://artifactory.nordix.org/artifactory"
    ```
 
 The ubuntu building scripts take two arguments :
 
-* path: to airship CI private key relative in the container
+* path: to metal3 CI private key relative in the container
 * boolean: Use a floating ip publicly accessible ( 0 or 1 )
 
    ```bash
-   ./gen_<xxx>_<ubuntu>_image.sh /data/keys/id_rsa_airshipci 1
+   ./gen_<xxx>_<ubuntu>_image.sh /data/keys/id_rsa_metal3ci 1
    ```
 
 The centos building scripts take three arguments :
 
-* path: to airship CI private key relative in the container
+* path: to metal3 CI private key relative in the container
 * boolean: Use a floating ip publicly accessible ( 0 or 1 )
 * provisioner script: script file name, give random string to list available scripts
 
    ```bash
-   ./gen_<xxx>_<centos>_image.sh /data/keys/id_rsa_airshipci 1 <provisioner script>
+   ./gen_<xxx>_<centos>_image.sh /data/keys/id_rsa_metal3ci 1 <provisioner script>
    ```
 

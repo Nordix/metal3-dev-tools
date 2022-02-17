@@ -9,7 +9,7 @@ BUILDER_FLAVOR="${BUILDER_FLAVOR:-8C-16GB-200GB}"
 CI_DIR="$(dirname "$(readlink -f "${0}")")"
 IPA_BUILDER_SCRIPT_NAME="${IPA_BUILDER_SCRIPT_NAME:-build_ipa.sh}"
 CI_EXT_NET="metal3-ci-ext-net"
-IMAGE_NAME="airship-ci-ubuntu-metal3-img"
+IMAGE_NAME="metal3-ci-ubuntu-metal3-img"
 
 # shellcheck disable=SC1090
 source "${CI_DIR}/../openstack/utils.sh"
@@ -33,24 +33,24 @@ BUILDER_IP="$(openstack port show -f json "${BUILDER_PORT_NAME}" \
 
 echo "Waiting for the host ${BUILDER_VM_NAME} to come up"
 # Wait for the host to come up
-wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${BUILDER_IP}"
+wait_for_ssh "${METAL3_CI_USER}" "${METAL3_CI_USER_KEY}" "${BUILDER_IP}"
 
 # Send IPA & Ironic script to remote executer
 scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
+  -i "${METAL3_CI_USER_KEY}" \
   "${CI_DIR}/${IPA_BUILDER_SCRIPT_NAME}" "${CI_DIR}/../artifactory/utils.sh" \
   "${CI_DIR}/run_build_ironic.sh" \
-  "${AIRSHIP_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
+  "${METAL3_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
 
 # Send IPA builder custom element to remote executer
 scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
+  -i "${METAL3_CI_USER_KEY}" \
   -r "${CI_DIR}/ipa_builder_elements" \
-  "${AIRSHIP_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
+  "${METAL3_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
 
 echo "Running Ironic image building script"
 # Execute remote script
@@ -60,8 +60,8 @@ ssh \
   -o UserKnownHostsFile=/dev/null \
   -o ServerAliveInterval=15 \
   -o ServerAliveCountMax=10 \
-  -i "${AIRSHIP_CI_USER_KEY}" \
-  "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
+  -i "${METAL3_CI_USER_KEY}" \
+  "${METAL3_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
   IRONIC_REFSPEC="${IRONIC_REFSPEC:-}" \
   IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-}" \
@@ -78,8 +78,8 @@ ssh \
   -o UserKnownHostsFile=/dev/null \
   -o ServerAliveInterval=15 \
   -o ServerAliveCountMax=10 \
-  -i "${AIRSHIP_CI_USER_KEY}" \
-  "${AIRSHIP_CI_USER}"@"${BUILDER_IP}" \
+  -i "${METAL3_CI_USER_KEY}" \
+  "${METAL3_CI_USER}"@"${BUILDER_IP}" \
   PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin \
   RT_USER="${RT_USER}" RT_TOKEN="${RT_TOKEN}" GITHUB_TOKEN="${GITHUB_TOKEN}" STAGING="${STAGING}" \
   IPA_BRANCH="${IPA_BRANCH:-master}" IPA_COMMIT="${IPA_REPO_REF:-HEAD}" \

@@ -46,7 +46,7 @@ done
 }
 
 # Fetch k8s logs
-fetch_k8s_logs "management_cluster" "/home/airshipci/.kube/config"
+fetch_k8s_logs "management_cluster" "/home/metal3ci/.kube/config"
 
 
 # Fetch Ironic containers logs before pivoting to the target cluster
@@ -70,7 +70,7 @@ sudo sh -c "cp -r /var/log/libvirt/qemu/* ${LOGS_DIR}/qemu/"
 sudo chown -R ${USER}:${USER} "${LOGS_DIR}/qemu"
 
 mkdir -p "${LOGS_DIR}/cluster-api-config"
-cp -r "/home/airshipci/.cluster-api/." "${LOGS_DIR}/cluster-api-config/"
+cp -r "/home/metal3ci/.cluster-api/." "${LOGS_DIR}/cluster-api-config/"
 
 if [[ "${TESTS_FOR}" == "feature_tests_upgrade"* ]]
 then

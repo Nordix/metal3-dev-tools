@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
-ci_git_credential_id = "nordix-airship-ci-github-prod-token"
+ci_git_credential_id = "nordix-metal3-ci-github-prod-token"
 ci_git_branch = "master"
 
 script {
@@ -15,7 +15,7 @@ script {
 pipeline {
   agent { label 'metal3-static-workers' }
   environment {
-    AIRSHIP_CI_USER="metal3ci"
+    METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
     VM_NAME = "${VM_NAME}"
     RT_URL="https://artifactory.nordix.org/artifactory"
@@ -39,8 +39,8 @@ pipeline {
         timeout(time: 60, unit: 'MINUTES')
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
                 /* Artifactory cleanup script */
                 sh "\${CURRENT_DIR}/ci/scripts/image_scripts/artifactory_cleanup.sh"

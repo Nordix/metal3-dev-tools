@@ -10,8 +10,8 @@ set -eu
 #     - source stackrc file
 #     - openstack dev infra and jumphost should already be deployed.
 #     - environment variables set:
-#       - AIRSHIP_CI_USER: Ci user for jumphost.
-#       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
+#       - METAL3_CI_USER: Ci user for jumphost.
+#       - METAL3_CI_USER_KEY: Path of the CI user private key for jumphost.
 #       - RT_URL: artifactory URL.
 #
 # Usage:

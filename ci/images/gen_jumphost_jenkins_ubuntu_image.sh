@@ -28,7 +28,7 @@ REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}
 SSH_USER_GROUP="sudo"
 
 SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
-SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub")"
+SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_metal3ci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \
   "${SSH_USER_NAME}" \
@@ -41,7 +41,7 @@ STARTER_SCRIPT_PATH="/tmp/build_starter.sh"
 echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
 
 # Create CI Keypair
-CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_airshipci.pub"
+CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_metal3ci.pub"
 delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 

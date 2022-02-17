@@ -95,8 +95,8 @@ render_user_data() {
 # Generates subnet name from Network name.
 #
 # Example:
-#   Input: "airship-network"
-#   Output: "airship-network-subnet"
+#   Input: "metal3-network"
+#   Output: "metal3-network-subnet"
 #
 get_subnet_name() {
   echo "${1:?}-subnet"
@@ -106,8 +106,8 @@ get_subnet_name() {
 # Generates External Port name from Network name.
 #
 # Example:
-#   Input: "airship-network"
-#   Output: "airship-network-ext-port"
+#   Input: "metal3-network"
+#   Output: "metal3-network-ext-port"
 #
 get_external_port_name() {
   echo "${1:?}-ext-port"

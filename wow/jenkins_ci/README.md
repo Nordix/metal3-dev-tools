@@ -1,6 +1,6 @@
 
 ### Access to Nordix Jenkins
-You can access to Nordix [Jenkins](https://jenkins.nordix.org/view/Airship/)
+You can access to Nordix [Jenkins](https://jenkins.nordix.org/view/Metal3/)
 with your Google account.
 
 ###  Daily steps to ensure successfullness of Jenkins CI
@@ -65,7 +65,7 @@ the corresponding pipeline (example: [capi_bm_integration_tests.pipeline](https:
 and Jenkins pipelines in [metal3-dev-tools](https://github.com/Nordix/metal3-dev-tools/tree/master/ci/jobs).
 
 When a job is triggered either by trigger-phrase or on a daily basis, it is executed in
-one of the Jenkins slave VM (example:```airship-static0-workers-*```), which is
+one of the Jenkins slave VM (example:```metal3-static0-workers-*```), which is
  running on **Default_Project_37137** of [City Cloud](https://citycontrolpanel.com/landing?m=login_required).
 
 In order to access the VM where the job is running:

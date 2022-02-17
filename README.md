@@ -35,10 +35,10 @@ If the IP address of the newly created virtual machine is not shown, then run th
 virsh net-dhcp-leases default
 ```
 
-ssh into the machine with the airshipci user
+ssh into the machine with the metal3ci user
 
 ```
-ssh airshipci@VM_IP
+ssh metal3ci@VM_IP
 ```
 
 When running ```make``` as described below, if you hit an issue about the default network, saying that it is already in use

@@ -31,8 +31,8 @@ The public key should be given as content, not as a file.
 Some environment variables need to be set
 
 - RT_URL: Artifactory URL
-- AIRSHIP_CI_USER: CI username for the jumphost
-- AIRSHIP_CI_USER_KEY: CI user private key path
+- METAL3_CI_USER: CI username for the jumphost
+- METAL3_CI_USER_KEY: CI user private key path
 
 ### Creation Usage
 
@@ -45,8 +45,8 @@ Some environment variables need to be set
 Some environment variables need to be set
 
 - RT_URL: Artifactory URL
-- AIRSHIP_CI_USER: CI username for the jumphost
-- AIRSHIP_CI_USER_KEY: CI user private key path
+- METAL3_CI_USER: CI username for the jumphost
+- METAL3_CI_USER_KEY: CI user private key path
 
 ### Update usage
 
@@ -63,8 +63,8 @@ Some environment variables need to be set
 Some environment variables need to be set
 
 - RT_URL: Artifactory URL
-- AIRSHIP_CI_USER: CI username for the jumphost
-- AIRSHIP_CI_USER_KEY: CI user private key path
+- METAL3_CI_USER: CI username for the jumphost
+- METAL3_CI_USER_KEY: CI user private key path
 
 ### Delete usage
 
