@@ -98,5 +98,11 @@ pipeline {
         }
       }
     }
+  }
+  post{
+    success {
+            echo 'Run metal3_openstack_image_building job'
+            build job: 'metal3_openstack_image_building'
+        }
   }      
 }
