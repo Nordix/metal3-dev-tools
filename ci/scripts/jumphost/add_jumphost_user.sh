@@ -10,8 +10,8 @@ set -eu
 #     - source stackrc file
 #     - openstack dev infra and jumphost should already be deployed.
 #     - environment variables set:
-#       - AIRSHIP_CI_USER: Ci user for jumphost.
-#       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
+#       - METAL3_CI_USER: Ci user for jumphost.
+#       - METAL3_CI_USER_KEY: Path of the CI user private key for jumphost.
 #
 # Usage:
 #   add_jumphost_user.sh <user_name> <file_path_containing_all_user_keys>
@@ -37,31 +37,31 @@ source "${JUMPHOST_SCRIPTS_DIR}/utils.sh"
 JUMPHOST_PUBLIC_IP="$(get_dev_jumphost_public_ip)"
 
 echo "DEV Jumphost Public IP = ${JUMPHOST_PUBLIC_IP}"
-wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${JUMPHOST_PUBLIC_IP}"
+wait_for_ssh "${METAL3_CI_USER}" "${METAL3_CI_USER_KEY}" "${JUMPHOST_PUBLIC_IP}"
 
 # Send Authorized KEYS file to Jumphost
 scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
+  -i "${METAL3_CI_USER_KEY}" \
   "${USER_AUTHORIZED_KEYS_FILE}" \
-  "${AIRSHIP_CI_USER}@${JUMPHOST_PUBLIC_IP}:/tmp/${NEW_USER}_auth_keys" > /dev/null
+  "${METAL3_CI_USER}@${JUMPHOST_PUBLIC_IP}:/tmp/${NEW_USER}_auth_keys" > /dev/null
 
 # Send Remote script to Jumphost
 scp \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
+  -i "${METAL3_CI_USER_KEY}" \
   "${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh" \
-  "${AIRSHIP_CI_USER}@${JUMPHOST_PUBLIC_IP}:/tmp/" > /dev/null
+  "${METAL3_CI_USER}@${JUMPHOST_PUBLIC_IP}:/tmp/" > /dev/null
 
 # Execute remote script
 # shellcheck disable=SC2029
 ssh \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
-  "${AIRSHIP_CI_USER}"@"${JUMPHOST_PUBLIC_IP}" \
+  -i "${METAL3_CI_USER_KEY}" \
+  "${METAL3_CI_USER}"@"${JUMPHOST_PUBLIC_IP}" \
   /tmp/add_proxy_user.sh "${NEW_USER}" "/tmp/${NEW_USER}_auth_keys" > /dev/null
 
 echo "User[${NEW_USER}] added successfully"

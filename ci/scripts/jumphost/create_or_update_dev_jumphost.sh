@@ -10,8 +10,8 @@ set -eu
 #     - source stackrc file
 #     - openstack dev infra should already be deployed.
 #     - environment variables set:
-#       - AIRSHIP_CI_USER: Ci user for jumphost.
-#       - AIRSHIP_CI_USER_KEY: Path of the CI user private key for jumphost.
+#       - METAL3_CI_USER: Ci user for jumphost.
+#       - METAL3_CI_USER_KEY: Path of the CI user private key for jumphost.
 #       - RT_URL: artifactory URL.
 # Usage:
 #  create_or_update_dev_jumphost.sh
@@ -103,7 +103,7 @@ FLOATING_IP_ADDRESS="$(openstack floating ip list --tags "${DEV_JUMPHOST_FLOATIN
 
 echo "DEV Jumphost Public IP = ${FLOATING_IP_ADDRESS}"
 
-wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${FLOATING_IP_ADDRESS}"
+wait_for_ssh "${METAL3_CI_USER}" "${METAL3_CI_USER_KEY}" "${FLOATING_IP_ADDRESS}"
 
 
 # Update Authorized users in Jumphost

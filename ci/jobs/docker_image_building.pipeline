@@ -1,6 +1,6 @@
 
 ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
-ci_git_credential_id = "nordix-airship-ci-github-prod-token"
+ci_git_credential_id = "nordix-metal3-ci-github-prod-token"
 ci_git_branch = "master"
 image_registry = "registry.nordix.org"
 workspace_img_ver = "v1.0"
@@ -43,7 +43,7 @@ pipeline {
               timeout(time: 10, unit: 'MINUTES')
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
+                withCredentials([usernamePassword(credentialsId: 'metal3ci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
                 }
                 sh "make push-lint-md"

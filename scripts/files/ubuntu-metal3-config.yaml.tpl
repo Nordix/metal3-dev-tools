@@ -2,7 +2,7 @@
 package_update: true
 package_upgrade: true
 users:
-  - name: airshipci
+  - name: metal3ci
     groups: sudo
     lock_passwd: false
     shell: /bin/bash

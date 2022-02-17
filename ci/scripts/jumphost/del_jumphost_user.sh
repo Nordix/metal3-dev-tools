@@ -31,13 +31,13 @@ source "${JUMPHOST_SCRIPTS_DIR}/utils.sh"
 JUMPHOST_PUBLIC_IP="$(get_dev_jumphost_public_ip)"
 
 echo "DEV Jumphost Public IP = ${JUMPHOST_PUBLIC_IP}"
-wait_for_ssh "${AIRSHIP_CI_USER}" "${AIRSHIP_CI_USER_KEY}" "${JUMPHOST_PUBLIC_IP}"
+wait_for_ssh "${METAL3_CI_USER}" "${METAL3_CI_USER_KEY}" "${JUMPHOST_PUBLIC_IP}"
 
 # Execute remote script to delete user
 # shellcheck disable=SC2029
 ssh \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
-  -i "${AIRSHIP_CI_USER_KEY}" \
-  "${AIRSHIP_CI_USER}"@"${JUMPHOST_PUBLIC_IP}" \
+  -i "${METAL3_CI_USER_KEY}" \
+  "${METAL3_CI_USER}"@"${JUMPHOST_PUBLIC_IP}" \
   "sudo deluser --remove-all-files ${_USER}"

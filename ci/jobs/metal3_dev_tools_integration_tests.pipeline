@@ -21,7 +21,7 @@ script {
 pipeline {
   agent { label 'metal3-static-workers' }
   environment {
-    AIRSHIP_CI_USER="metal3ci"
+    METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
     RT_URL="https://artifactory.nordix.org/artifactory"
     OS_AUTH_URL="https://kna1.citycloud.com:5000"
@@ -53,8 +53,8 @@ pipeline {
     FINAL_IMAGE_NAME="${DISTRIBUTION}_TEMP_IMG_${RAND_NAME}"
     KUBERNETES_VERSION="${KUBERNETES_VERSION}"
     
-    DOCKER_CMD_ENV="--env AIRSHIP_CI_USER \
-      --env AIRSHIP_CI_USER_KEY=/data/id_rsa_airshipci \
+    DOCKER_CMD_ENV="--env METAL3_CI_USER \
+      --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \
       --env VM_KEY \
       --env RT_URL \
       --env RT_TOKEN \
@@ -83,18 +83,18 @@ pipeline {
         timeout(time: 60, unit: 'MINUTES')
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
 
             /* Generate node ubuntu image */
             sh "docker run --rm \
               ${DOCKER_CMD_ENV}\
               -v ${CURRENT_DIR}:/data \
-              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
               registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_node_ubuntu_image.sh \
-              /data/id_rsa_airshipci 1"
+              /data/id_rsa_metal3ci 1"
             
             /* Delete image */
             sh """#!/bin/bash
@@ -112,18 +112,18 @@ pipeline {
         timeout(time: 60, unit: 'MINUTES')
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
 
             /* Generate node CentOS dev-env image */
             sh "docker run --rm \
               ${DOCKER_CMD_ENV}\
               -v ${CURRENT_DIR}:/data \
-              -v ${AIRSHIP_CI_USER_KEY}:/data/id_rsa_airshipci \
+              -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
               registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_metal3_centos_image.sh \
-              /data/id_rsa_airshipci 1 \
+              /data/id_rsa_metal3ci 1 \
               provision_node_image_centos.sh"
 
             /* Delete image */
@@ -161,8 +161,8 @@ pipeline {
         timeout(time: TIMEOUT, unit: 'SECONDS')
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]) {
+        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
               ansiColor('xterm') {
               sh """  cat <<-EOF > "./jenkins/scripts/files/vars.sh"
@@ -186,8 +186,8 @@ EOF
               currentBuild.result = 'FAILURE'
             }
           }
-          withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-            withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+          withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+            withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
               sh "./jenkins/scripts/fetch_logs.sh"
             }
           }
@@ -208,15 +208,15 @@ EOF
       }
     }
     success {
-      withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-        withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+        withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
           sh "./jenkins/scripts/integration_test_clean.sh"
         }
       }
     }
     cleanup {
-      withCredentials([usernamePassword(credentialsId: 'airshipci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-        withCredentials([sshUserPrivateKey(credentialsId: 'airshipci_city_cloud_ssh_keypair', keyFileVariable: 'AIRSHIP_CI_USER_KEY')]){
+      withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+        withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
           sh "./jenkins/scripts/integration_delete.sh"
         }
       }

@@ -179,8 +179,8 @@ rt_delete_multiple_artifacts() {
 
 # ================ Users Artifactory Helper Functions ===============
 
-RT_AIRSHIP_DIR="metal3"
-RT_USERS_DIR="${RT_AIRSHIP_DIR}/users"
+RT_METAL3_DIR="metal3"
+RT_USERS_DIR="${RT_METAL3_DIR}/users"
 
 # Description:
 # Gets all the keys for a user from metal3/users/<username>
