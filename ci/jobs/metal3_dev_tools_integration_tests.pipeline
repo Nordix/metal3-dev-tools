@@ -78,7 +78,7 @@ pipeline {
   }
   stages {
     stage('Building node Ubuntu image'){
-      when { expression {IMAGE_OS == 'Ubuntu'}}
+      when { expression {IMAGE_OS == 'ubuntu'}}
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
@@ -107,7 +107,7 @@ pipeline {
       }
     }
     stage('Building node CentOS image'){
-      when { expression {IMAGE_OS == 'Centos'}}
+      when { expression {IMAGE_OS == 'centos'}}
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
