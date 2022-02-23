@@ -162,7 +162,7 @@ EOF
     cat << EOF >> "${METADATA_PATH}"
 IPAM_REPO="${IPAMREPO:-}"
 IPAM_BRANCH="${IPAMBRANCH:-}"
-IPAM_PATH="$(git rev-parse HEAD)"
+IPAM_COMMIT="$(git rev-parse HEAD)"
 EOF
     popd
     cat << EOF >> "${METADATA_PATH}"
