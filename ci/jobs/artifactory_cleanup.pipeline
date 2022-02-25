@@ -32,6 +32,7 @@ pipeline {
                       returnStdout: true
                      ).trim()
     RT_UTILS="${CURRENT_DIR}/ci/scripts/artifactory/utils.sh"
+    HARBOR_UTILS="${CURRENT_DIR}/ci/scripts/harbor/harbor_utils.sh"
   }
   stages {
     stage('Cleaning Artifactory'){
