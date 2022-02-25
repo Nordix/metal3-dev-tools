@@ -43,7 +43,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-                withCredentials([usernamePassword(credentialsId: 'airshipci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
+                withCredentials([usernamePassword(credentialsId: 'metal3ci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                   /* Artifactory cleanup script */
                   sh "\${CURRENT_DIR}/ci/scripts/image_scripts/artifact_cleanup.sh"
                 }
