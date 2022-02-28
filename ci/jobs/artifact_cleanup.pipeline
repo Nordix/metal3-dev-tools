@@ -9,7 +9,7 @@ script {
   def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
   def rand = new Random()
   VM_KEY = (1..4).collect { ('a'..'z').join("")[ rand.nextInt( 26 ) ] }.join("")
-  VM_NAME = "ci-artifactory-cleanup-vm-" + dateFormat.format(date) + "-" + VM_KEY
+  VM_NAME = "ci-artifact-cleanup-vm-" + dateFormat.format(date) + "-" + VM_KEY
 }
 
 pipeline {
@@ -35,7 +35,7 @@ pipeline {
     HARBOR_UTILS="${CURRENT_DIR}/ci/scripts/harbor/harbor_utils.sh"
   }
   stages {
-    stage('Cleaning Artifactory'){
+    stage('Cleaning Artifacts from Artifactory and Harbor'){
       options {
         timeout(time: 60, unit: 'MINUTES')
       }
@@ -44,7 +44,7 @@ pipeline {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
                 withCredentials([usernamePassword(credentialsId: 'metal3ci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
-                  /* Artifactory cleanup script */
+                  /* Artifact cleanup script */
                   sh "\${CURRENT_DIR}/ci/scripts/image_scripts/artifact_cleanup.sh"
                 }
             }
