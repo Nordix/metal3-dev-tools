@@ -95,6 +95,7 @@ docker logout "${IMAGE_REGISTRY}"
 # Create Ironic metadata and save it to file
 touch /tmp/metadata.txt
 cat << EOF > /tmp/metadata.txt
+IRONIC_TAG="${IRONIC_TAG}"
 IRONIC_REPO="${IRONIC_REPO}"
 IRONIC_REFSPEC="${IRONIC_REFSPEC}"
 IRONIC_COMMIT="${IRONIC_COMMIT}"
