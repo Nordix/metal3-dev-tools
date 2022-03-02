@@ -136,4 +136,7 @@ update_custom_branch "$CAPM3_RELEASE_BRANCHES" "$LOCAL_CAPM3_REPO" "$NORDIX_CAPM
 IPAM_RELEASE_BRANCHES="release-0.0 release-0.1"
 update_custom_branch "$IPAM_RELEASE_BRANCHES" "$LOCAL_IPAM_REPO" "$NORDIX_IPAM_REPO"
 
+CAPI_RELEASE_BRANCHES="release-0.4 release-1.0 release-1.1"
+update_custom_branch "$CAPI_RELEASE_BRANCHES" "$LOCAL_CAPI_REPO" "$NORDIX_CAPI_REPO"
+
 popd || exit
