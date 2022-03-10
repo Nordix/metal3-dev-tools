@@ -7,7 +7,7 @@ set -eu
 CURRENT_SCRIPT_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")"
 # Repository configuration options
 METAL3_DEV_ENV_REPO="https://github.com/metal3-io/metal3-dev-env"
-METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH:-master}"
+METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH:-main}"
 METAL3_DEV_ENV_COMMIT="${METAL3_DEV_ENV_COMMIT:-HEAD}"
 IPA_REPO="${IPA_REPO:-https://github.com/Nordix/ironic-python-agent}"
 IPA_BRANCH="${IPA_BRANCH:-master}"
