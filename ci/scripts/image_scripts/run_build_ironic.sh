@@ -13,9 +13,9 @@ IRONIC_REFSPEC="${IRONIC_REFSPEC:-+refs/heads/master:refs/remotes/origin/master}
 IRONIC_INSPECTOR_REFSPEC="${IRONIC_INSPECTOR_REFSPEC:-+refs/heads/master:refs/remotes/origin/master}"
 IRONIC_INSPECTOR_REPO="https://opendev.org/openstack/ironic-inspector.git"
 IRONIC_REPO="https://opendev.org/openstack/ironic.git"
-IRONIC_IMAGE_REPO="https://github.com/metal3-io/ironic-image.git"
-IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-"HEAD"}"
-IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-"main"}"
+IRONIC_IMAGE_REPO="https://github.com/elfosardo/ironic-image.git"
+IRONIC_IMAGE_REPO_COMMIT="29c03c65ee41ef4a328709bb16d2bd99768f9375"
+IRONIC_IMAGE_BRANCH="move-pip-patch"
 PATCH_LIST_FILE=patchList.txt
 
 # shellcheck disable=SC1091
@@ -57,6 +57,7 @@ else
     git clone ${IRONIC_IMAGE_REPO}
     pushd ironic-image
     git checkout "${IRONIC_IMAGE_BRANCH}"
+    echo "Checked out to branch ${IRONIC_IMAGE_BRANCH}"
     git checkout "${IRONIC_IMAGE_REPO_COMMIT}"
     IRONIC_IMAGE_REPO_COMMIT="$(git rev-parse HEAD)"
 
