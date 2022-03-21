@@ -51,7 +51,7 @@ pipeline {
     IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
     DST_FOLDER="metal3/images/temp"
     FINAL_IMAGE_NAME="${DISTRIBUTION}_TEMP_IMG_${RAND_NAME}"
-    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.3' }"
+    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.5' }"
     
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \
@@ -87,21 +87,23 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-
-            /* Generate node ubuntu image */
-            sh "docker run --rm \
-              ${DOCKER_CMD_ENV}\
-              -v ${CURRENT_DIR}:/data \
-              -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
-              registry.nordix.org/metal3/image-builder \
-              /data/ci/images/gen_node_ubuntu_image.sh \
-              /data/id_rsa_metal3ci 1"
             
-            /* Delete image */
-            sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
-              delete_image "${FINAL_IMAGE_NAME}"
-            """  
+            catchError([stageResult: 'FAILURE', message: 'Failed to build the node Ubuntu image']){
+              /* Generate node ubuntu image */
+              sh "docker run --rm \
+                ${DOCKER_CMD_ENV}\
+                -v ${CURRENT_DIR}:/data \
+                -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
+                registry.nordix.org/metal3/image-builder \
+                /data/ci/images/gen_node_ubuntu_image.sh \
+                /data/id_rsa_metal3ci 1"
+              
+              /* Delete image */
+              sh """#!/bin/bash
+                source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
+                delete_image "${FINAL_IMAGE_NAME}"
+              """
+              }  
             }
           }
         }
@@ -116,22 +118,24 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
+            
+            catchError([stageResult: 'FAILURE', message: 'Failed to build the node Centos image']){
+              /* Generate node CentOS dev-env image */
+              sh "docker run --rm \
+                ${DOCKER_CMD_ENV}\
+                -v ${CURRENT_DIR}:/data \
+                -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
+                registry.nordix.org/metal3/image-builder \
+                /data/ci/images/gen_metal3_centos_image.sh \
+                /data/id_rsa_metal3ci 1 \
+                provision_node_image_centos.sh"
 
-            /* Generate node CentOS dev-env image */
-            sh "docker run --rm \
-              ${DOCKER_CMD_ENV}\
-              -v ${CURRENT_DIR}:/data \
-              -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
-              registry.nordix.org/metal3/image-builder \
-              /data/ci/images/gen_metal3_centos_image.sh \
-              /data/id_rsa_metal3ci 1 \
-              provision_node_image_centos.sh"
-
-            /* Delete image */
-            sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
-              delete_image "${FINAL_IMAGE_NAME}"
-            """              
+              /* Delete image */
+              sh """#!/bin/bash
+                source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
+                delete_image "${FINAL_IMAGE_NAME}"
+              """              
+              }
             }
           }
         }
@@ -166,12 +170,14 @@ pipeline {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
               ansiColor('xterm') {
+              echo "Pass k8s version, image location name"
               sh """  cat <<-EOF > "./jenkins/scripts/files/vars.sh"
                 IMAGE_LOCATION="${IMAGE_LOCATION}"
                 IMAGE_NAME="${FINAL_IMAGE_NAME}.qcow2"
                 KUBERNETES_VERSION="${KUBERNETES_VERSION}"
 EOF
                 """
+              echo "About to start integration test"
               sh "./jenkins/scripts/integration_test.sh"               
               }
             }
