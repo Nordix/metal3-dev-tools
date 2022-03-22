@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Must be a keypair in the OpenStack project visible with `openstack keypair list`
 export OPENSTACK_DNS_NAMESERVERS=8.8.8.8
 export OPENSTACK_FAILURE_DOMAIN=nova
 export OPENSTACK_EXTERNAL_NETWORK_ID=""
-export OPENSTACK_IMAGE_NAME="Ubuntu_20.04_node"
+export OPENSTACK_IMAGE_NAME="UBUNTU_20.04_NODE_IMAGE_K8S_v1.23.2"
 export OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR=2C-4GB-100GB
 export OPENSTACK_NODE_MACHINE_FLAVOR=2C-4GB-100GB
 
@@ -25,16 +24,18 @@ function setAuthKey {
 
 function setKeyName {
 
-    read -e -p 'Enter the corresponding private key in openstack cluster:' PROVIDED_OPENSTACK_SSH_KEY_NAME
+    read -e -p 'Enter the corresponding keypair in openstack cluster:' PROVIDED_OPENSTACK_SSH_KEY_NAME
     EXISTING_KEY=$(./run-openstack-command.sh openstack keypair show $PROVIDED_OPENSTACK_SSH_KEY_NAME -c name -f value | tr -d '\r')
 
     if [ "${EXISTING_KEY}" = "${PROVIDED_OPENSTACK_SSH_KEY_NAME}" ] ;then
         export OPENSTACK_SSH_KEY_NAME="${PROVIDED_OPENSTACK_SSH_KEY_NAME}"
     else
-        echo "Unable to find they key ${PROVIDED_OPENSTACK_SSH_KEY_NAME} in openstack"
+        echo "Unable to find they keypair ${PROVIDED_OPENSTACK_SSH_KEY_NAME} in openstack"
+        echo "It must be a keypair in the OpenStack project visible with 'openstack keypair list'"
         return 1
     fi
+    echo "End of setKeyName"
 }
 
-[ -z "${OPENSTACK_SSH_AUTHORIZED_KEY-}" ] && setAuthKey
-[ -z "${OPENSTACK_SSH_KEY_NAME-}" ] && setKeyName
+[ -n "${OPENSTACK_SSH_AUTHORIZED_KEY-}" ] || setAuthKey
+[ -n "${OPENSTACK_SSH_KEY_NAME-}" ] || setKeyName

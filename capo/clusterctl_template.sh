@@ -5,6 +5,8 @@ set -euxo pipefail
 CLUSTER_NAME="$1"
 OS_CLOUD_NAME="$2"
 
+KUBERNETES_VERSION="v1.23.2"
+
 GIT_ROOT=$(git rev-parse --show-toplevel)
 CAPI_REPO=$(realpath "${GIT_ROOT}/../cluster-api")
 CAPO_REPO=$(realpath "${GIT_ROOT}/../cluster-api-provider-openstack")
@@ -20,8 +22,8 @@ env | grep OPENSTACK_CLOUD | sed 's/^/export /' > /tmp/capo_vars_openstack.sh
 source ./capo_os_vars.rc
 source /tmp/capo_vars_openstack.sh
 
-"$CLUSTERCTL" config cluster "$CLUSTER_NAME" \
-    --kubernetes-version v1.19.1 \
+"$CLUSTERCTL" generate cluster "$CLUSTER_NAME" \
+    --kubernetes-version="${KUBERNETES_VERSION}" \
     --from "${CAPO_REPO}/templates/cluster-template-without-lb.yaml" \
     --control-plane-machine-count=1 \
     --worker-machine-count=1 > /tmp/$CLUSTER_NAME.yaml
