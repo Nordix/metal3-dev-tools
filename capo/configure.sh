@@ -10,6 +10,8 @@ CACERT_PATH="/tmp/cacert.pem"
 OPENSTACK_RC_PATH="/tmp/openstackrc"
 OS_CLOUD_NAME="$1"
 
+CAPI_VERSION="v1.0.5"
+
 if ! [[ -d "$CAPI_REPO" ]]; then
   echo "Expected to find directory $CAPI_REPO, but couldn't find it."
   echo "Clone this repo from https://github.com/kubernetes-sigs/cluster-api"
@@ -18,7 +20,7 @@ fi
 # use a known working CAPI version
 pushd  "$CAPI_REPO"
 git fetch --all --tags --prune
-git checkout  v0.4.0
+git checkout  "${CAPI_VERSION}"
 popd
 
 if ! [[ -d "$CAPO_REPO" ]]; then
