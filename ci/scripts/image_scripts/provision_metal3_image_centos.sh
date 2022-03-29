@@ -17,15 +17,15 @@ export IMAGE_OS="${IMAGE_OS:-Centos}"
 export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-minikube}"
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
-sudo yum update -y
-sudo yum update -y curl nss
-sudo yum install -y git make
+sudo dnf distro-sync -y
+sudo dnf update -y curl nss
+sudo dnf install -y git make
 
 # Install EPEL repo (later required by atop, python3-bcrypt and python3-passlib)
-sudo yum update -y && sudo yum install -y epel-release
+sudo dnf update -y && sudo dnf install -y epel-release
 
 # Without this minikube cannot start properly kvm and fails.
-# As a simple workaround, this will create an empty file which can 
+# As a simple workaround, this will create an empty file which can
 # disable the new firmware, more details here [1], look for firmware description.
 # [1] <https://libvirt.org/formatdomain.html#operating-system-booting>
 # upstream commit fixing the behavior to not print error messages for unknown features
@@ -52,8 +52,7 @@ popd
 
 rm -rf "${M3_DENV_PATH}"
 
-# We need podman in order to
-#pull container images for Centos Jenkins image
+# We need podman in order to pull container images for Centos Jenkins image
 sudo dnf -y install podman
 
 # Download container images
