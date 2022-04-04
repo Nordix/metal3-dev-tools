@@ -14,7 +14,7 @@ sudo sed -i 's|^SADC_OPTIONS=.*|SADC_OPTIONS=" -S XALL"|' /etc/sysconfig/sysstat
 
 ## Reduce metrics retention to 3 days
 sudo sed -i 's/^LOGGENERATIONS=.*/LOGGENERATIONS=3/' /etc/sysconfig/atop
-sudo sed -i 's|^HISTORY=.*|HISTORY=3"|' /etc/sysconfig/sysstat
+sudo sed -i 's|^HISTORY=.*|HISTORY=3|' /etc/sysconfig/sysstat
 
 ## Standardize sysstat log directory
 sudo mkdir -p /var/log/sysstat
