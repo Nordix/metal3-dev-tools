@@ -10,6 +10,7 @@ script {
 
 pipeline {
   agent { label 'metal3-static-workers' }
+  options { ansiColor('xterm') }
   environment {
     METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
