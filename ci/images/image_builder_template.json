@@ -1,7 +1,7 @@
 {
   "variables": {
     "image_name": "",
-    "source_image": "4654e14c-f667-4e24-a538-c792b57c5bc8",
+    "source_image_name": "",
     "user_data_file": "userdata",
     "exec_script_path": "",
     "ssh_username": "metal3ci",
@@ -9,6 +9,7 @@
     "ssh_private_key_file": "",
     "network": "282a8c18-614c-4fbc-9928-b66d56ae3cbe",
     "floating_ip_net": "",
+    "reuse_ips": "false",
     "local_scripts_dir": "../scripts",
     "ssh_pty": "false",
     "flavor":"2C-16GB-20GB"
@@ -16,11 +17,11 @@
   "builders": [{
     "type": "openstack",
     "image_name": "{{user `image_name`}}",
-    "source_image": "{{user `source_image`}}",
+    "source_image_name": "{{user `source_image_name`}}",
     "user_data_file": "{{user `user_data_file`}}",
     "flavor":  "{{user `flavor`}}",
-    "reuse_ips": false,
-    "ssh_keypair_name": "metal3ci-key",
+    "reuse_ips": "{{user `reuse_ips`}}",
+    "ssh_keypair_name": "{{user `ssh_keypair_name`}}",
     "ssh_private_key_file": "{{user `ssh_private_key_file`}}",
     "networks": "{{user `network`}}",
     "floating_ip_network": "{{user `floating_ip_net`}}",
