@@ -20,6 +20,7 @@ script {
 
 pipeline {
   agent { label 'metal3-static-workers' }
+  options { ansiColor('xterm') }
   environment {
     METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
@@ -41,7 +42,6 @@ pipeline {
     TEST_EXECUTER_VM_NAME = "${VM_NAME}"
     BUILD_TAG = "${env.BUILD_TAG}"
     PR_ID = "${ghprbPullId}"
-    DISTRIBUTION = "${DISTRIBUTION}"
     CAPI_VERSION = "${CAPI_VERSION}"
     CAPM3_VERSION = "${CAPM3_VERSION}"
     IMAGE_OS = "${IMAGE_OS}"
@@ -50,9 +50,9 @@ pipeline {
     TESTS_FOR="${TESTS_FOR}"
     IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
     DST_FOLDER="metal3/images/temp"
-    FINAL_IMAGE_NAME="${DISTRIBUTION}_TEMP_IMG_${RAND_NAME}"
+    FINAL_IMAGE_NAME="${IMAGE_OS}_TEMP_IMG_${RAND_NAME}"
     KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.5' }"
-    
+
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \
       --env VM_KEY \
@@ -96,12 +96,12 @@ pipeline {
               registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_node_ubuntu_image.sh \
               /data/id_rsa_metal3ci 1"
-            
+
             /* Delete image */
             sh """#!/bin/bash
               source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
               delete_image "${FINAL_IMAGE_NAME}"
-            """  
+            """
             }
           }
         }
@@ -131,7 +131,7 @@ pipeline {
             sh """#!/bin/bash
               source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
               delete_image "${FINAL_IMAGE_NAME}"
-            """              
+            """
             }
           }
         }
@@ -165,15 +165,13 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
             withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
-              ansiColor('xterm') {
               sh """  cat <<-EOF > "./jenkins/scripts/files/vars.sh"
                 IMAGE_LOCATION="${IMAGE_LOCATION}"
                 IMAGE_NAME="${FINAL_IMAGE_NAME}.qcow2"
                 KUBERNETES_VERSION="${KUBERNETES_VERSION}"
 EOF
                 """
-              sh "./jenkins/scripts/integration_test.sh"               
-              }
+              sh "./jenkins/scripts/integration_test.sh"
             }
           }
         }
@@ -200,8 +198,8 @@ EOF
   post {
     always {
       withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-          
-          /* Delete temporary image from artifactory */          
+
+          /* Delete temporary image from artifactory */
           sh """#!/bin/bash
           source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
           rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
