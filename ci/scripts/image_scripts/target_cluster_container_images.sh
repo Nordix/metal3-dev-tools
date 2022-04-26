@@ -14,3 +14,6 @@ sudo systemctl enable --now crio
 for container in $(env | grep "CALICO_*" | cut -f2 -d'='); do
   sudo crictl pull "${container}"
 done
+
+# Pre-pull control-plane, kube-proxy and coredns images
+sudo /usr/local/bin/kubeadm config images pull --kubernetes-version=${KUBERNETES_VERSION}
