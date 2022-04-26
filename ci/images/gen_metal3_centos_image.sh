@@ -46,7 +46,7 @@ NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
 SSH_USER_GROUP="wheel"
-
+SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_metal3ci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \
@@ -67,7 +67,7 @@ create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
-  -var "source_image_name=${SOURCE_IMAGE_NAME}" \
+  -var "source_image=${SOURCE_IMAGE}" \
   -var "user_data_file=${USER_DATA_FILE}" \
   -var "exec_script_path=${STARTER_SCRIPT_PATH}" \
   -var "ssh_username=${SSH_USER_NAME}" \
