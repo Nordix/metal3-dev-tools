@@ -84,7 +84,7 @@ export DIB_REPOREF_ironic_python_agent="${IPA_COMMIT}"
 CUSTOM_ELEMENTS="${CURRENT_SCRIPT_DIR}/ipa_builder_elements"
 # List of additional kernel modules that should be loaded during boot separated by ':'
 # This list is used by the custom element named ipa-modprobe
-export ADDITIONAL_IPA_KERNEL_MODULES="megaraid_sas"
+export ADDITIONAL_IPA_KERNEL_MODULES="megaraid_sas hpsa"
 
 # Build the IPA initramfs and kernel images
 ironic-python-agent-builder --output "${IPA_IMAGE_NAME}" \
