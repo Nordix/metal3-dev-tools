@@ -39,6 +39,7 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
 SOURCE_IMAGE_NAME="CentOS-Stream-GenericCloud-8"
+SOURCE_IMAGE="$(get_resource_id_from_name image "${SOURCE_IMAGE_NAME}")"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
@@ -67,7 +68,7 @@ create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
-  -var "source_image_name=${SOURCE_IMAGE_NAME}" \
+  -var "source_image=${SOURCE_IMAGE}" \
   -var "user_data_file=${USER_DATA_FILE}" \
   -var "exec_script_path=${STARTER_SCRIPT_PATH}" \
   -var "ssh_username=${SSH_USER_NAME}" \
