@@ -22,7 +22,7 @@ export UBUNTU_VERSION=${UBUNTU_VERSION:-"20.04"}
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"
 FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"UBUNTU_""${UBUNTU_VERSION}""_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
 IMAGE_FLAVOR="1C-4GB-20GB"
-SOURCE_IMAGE="dba1e718-a102-46be-b8e9-ae1b1f2fd2fb"
+SOURCE_IMAGE_NAME="Ubuntu-20.04"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
@@ -51,7 +51,7 @@ create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
-  -var "source_image=${SOURCE_IMAGE}" \
+  -var "source_image_name=${SOURCE_IMAGE_NAME}" \
   -var "user_data_file=${USER_DATA_FILE}" \
   -var "exec_script_path=${STARTER_SCRIPT_PATH}" \
   -var "ssh_username=${SSH_USER_NAME}" \
