@@ -23,7 +23,6 @@ sudo ls -la /usr/local/bin/retrieve.configuration.files.sh
 sudo dnf update -y
 sudo dnf install -y ebtables socat conntrack-tools
 sudo dnf install python3 -y
-sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo dnf install gcc kernel-headers kernel-devel keepalived -y
 sudo dnf install device-mapper-persistent-data lvm2 -y
 
