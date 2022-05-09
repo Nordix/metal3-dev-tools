@@ -5,11 +5,11 @@ NAME    := ${PROJECT}-${APP}
 lint_folder ?= $(CURDIR)
 
 image_registry        := registry.nordix.org
-workspace_img_ver     := v1.0
-lint_md_img_ver       := v1.0
-lint_go_img_ver       := v1.0
-gotest_unit_img_ver   := v1.0
-image_builder_img_ver := v1.0
+workspace_img_ver     := latest
+lint_md_img_ver       := latest
+lint_go_img_ver       := latest
+gotest_unit_img_ver   := latest
+image_builder_img_ver := latest
 
 
 .DEFAULT_HELP := help
