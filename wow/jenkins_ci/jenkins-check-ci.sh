@@ -14,28 +14,25 @@ all_pass=true
 tput clear
 tput bold
 
-while IFS= read -r line; do
-  ((count++))
-  out=$(curl -s https://jenkins.nordix.org/view/Metal3/api/json?pretty=true | grep -B 3 red | egrep name | egrep "$line")
-  if [[ ! -z "$out" ]]; then
+out=$(curl -s https://jenkins.nordix.org/view/Metal3%20Main/api/json?pretty=true | jq '.jobs[]|.color+" "+.name+" "+.url' | sort -u | egrep "red|aborted"| column -t )
+if [[ ! -z "$out" ]]; then
     if [[ "$all_pass" == true ]]; then
-      tput setaf 1
-      echo "--------------------------------------"
-      echo "---------- FAILED CI JOBS ------------"
-      echo "--------------------------------------"
-      all_pass=false
+        tput setaf 1
+        echo "--------------------------------------"
+        echo "---------- FAILED CI JOBS ------------"
+        echo "--------------------------------------"
+        all_pass=false
     fi
     echo "$out"
-  fi
-  if [[ "$all_pass" == true ]]; then
+fi
+if [[ "$all_pass" == true ]]; then
     if [[ -z "$out" ]]; then
-      if [[ "$nbr_of_lines" -eq "$count" ]]; then
-        tput setaf 2
-        echo "--------------------------------------"
-        echo "----- ALL REQUIRED CI JOBS PASS ------"
-        echo "--------------------------------------"
-      fi
+        if [[ "$nbr_of_lines" -eq "$count" ]]; then
+            tput setaf 2
+            echo "--------------------------------------"
+            echo "----- ALL REQUIRED CI JOBS PASS ------"
+            echo "--------------------------------------"
+        fi
     fi
-  fi
-done < jenkins-jobs-to-scan.txt
+fi
 
