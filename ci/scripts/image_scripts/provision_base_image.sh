@@ -2,7 +2,7 @@
 
 set -eux
 
-# This script sets up fresh ubuntu 18.04+ installation
+# This script sets up fresh ubuntu 20.04+ installation
 # to create a base image for our applications.
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
