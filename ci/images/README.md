@@ -90,7 +90,7 @@ The scripts mentioned above (gen_*_image.sh) are made for use in our CI pipeline
 As such, they make certain assumptions that may not be ideal when developing and testing things locally (e.g. keypair name and ssh-key path).
 
 For these situations there is another script: `run_local.sh`.
-It allows overriding many variables and skips things like uploading the images to Artifactory.
+It allows overriding many variables so it should be easy to customize to your needs.
 
 This is how you use it:
 
@@ -102,7 +102,7 @@ This is how you use it:
 
 Here is an example of custom variables:
 
-```shell
+```bash
 # My custom variables
 export SSH_USER_NAME="foo"
 export SSH_USER_GROUP="wheel"
@@ -112,12 +112,62 @@ export SSH_PRIVATE_KEY_FILE="/home/foo/.ssh/id_rsa"
 export IMAGE_NAME="foo-test-image"
 export SOURCE_IMAGE_NAME="Upstream-centos-or-ubuntu"
 export NETWORK="abcdefg"
+# Artifactory variables
+# These are needed if you want to build Node images and upload them to Artifactory
+export RT_URL="https://artifactory.nordix.org/artifactory"
+export RT_USER=<your-username>
+export RT_TOKEN=<your-token>
 ```
+
+**NOTE:** The script uploads the node images (i.e. those produced by `provision_node_image.sh` and `provision_node_image_centos.sh`) to Artifactory.
+Make sure you use an image name that does not conflict with existing images!
+This is also a good idea for other images since they will end up in Openstack.
 
 And here is how to use it:
 
-```console
-$ source vars.sh
-$ source openstack.rc
-$ ./run_local.sh provision_metal3_image.sh
+```bash
+source vars.sh
+source openstack.rc
+./run_local.sh provision_metal3_image.sh
+```
+
+**Remember to clean up the images when you no longer need them!**
+
+#### Manual upload to Artifactory
+
+You can use the `upload_node_image_rt.sh` script to upload the images to Artifactory.
+For this you will need to set some environment variables:
+
+```bash
+export RT_URL="https://artifactory.nordix.org/artifactory"
+export RT_USER=<your-username>
+export RT_TOKEN=<your-token>
+../scripts/image_scripts/upload_node_image_rt.sh "${IMAGE_NAME}"
+```
+
+The script will automatically download the image from Openstack and upload it to the `metal3/images/k8s_${KUBERNETES_VERSION}` folder.
+
+#### Clean up images
+
+List and delete images in Artifactory:
+
+```bash
+export RT_URL="https://artifactory.nordix.org/artifactory"
+source ../scripts/artifactory/utils.sh
+rt_list_directory "metal3/images"
+rt_list_directory "metal3/images/k8s_v1.24.0"
+
+# Please check carefully the path and name before deleting.
+# Note that you need to add the suffix ".qcow2" here.
+export RT_USER=<your-username>
+export RT_TOKEN=<your-token>
+rt_delete_artifact "metal3/images/k8s_v1.24.0/${IMAGE_NAME}.qcow2" "0"
+```
+
+List and delete images in Openstack:
+
+```bash
+source openstack.rc
+openstack image list
+openstack image delete ${IMAGE_NAME}
 ```

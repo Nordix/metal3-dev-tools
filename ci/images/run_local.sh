@@ -39,6 +39,10 @@ SOURCE_IMAGE_NAME="${SOURCE_IMAGE_NAME:-CentOS-Stream-GenericCloud-8}"
 # Group to add user to. To get sudo access on CentOS: wheel, on Ubuntu: sudo
 SSH_USER_GROUP="${SSH_USER_GROUP:-wheel}"
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.23.5"}
+# The network name is by defualt set to $DEV_EXT_NET. You can override it here.
+NETWORK_NAME=""
+# Or if you want to use ID, set this instead:
+# NETWORK=<ID-of-network>
 
 # The variables below should not need to be touched by the user
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
@@ -47,13 +51,23 @@ if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   BUILDER_CONFIG_FILE="image_builder_template.json"
   IMAGE_FLAVOR="4C-16GB-50GB"
+elif [[ "$PROVISIONING_SCRIPT" == *"base"* ]]; then
+  BUILDER_CONFIG_FILE="image_builder_template.json"
+  IMAGE_FLAVOR="1C-4GB-20GB"
 else
   echo "Available provisioning scripts are:"
   echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
   exit 1
 fi
 
+if [[ "$PROVISIONING_SCRIPT" == *"centos"* ]]; then
+  USER_DATA_TEMPLATE="centos_userdata.tpl"
+else
+  USER_DATA_TEMPLATE="ubuntu_userdata.tpl"
+fi
+
 DEV_TOOLS="$(dirname "$(readlink -f "${0}")")/../../"
+SCRIPTS_DIR="${DEV_TOOLS}/ci/scripts/image_scripts"
 OS_SCRIPTS_DIR="${DEV_TOOLS}/ci/scripts/openstack"
 IMAGES_DIR="${DEV_TOOLS}/ci/images"
 
@@ -62,7 +76,7 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-NETWORK_NAME="${DEV_EXT_NET}"
+NETWORK_NAME="${NETWORK_NAME:-${DEV_EXT_NET}}"
 FLOATING_IP_NETWORK="${EXT_NET}"
 REUSE_IPS="true"
 # get_resource_id_from_name assumes that the openstack CLI is installed locally.
@@ -82,7 +96,7 @@ render_user_data \
   "${SSH_USER_NAME}" \
   "${SSH_USER_GROUP}" \
   "${IMAGE_NAME}" \
-  "${IMAGES_DIR}/centos_userdata.tpl" \
+  "${IMAGES_DIR}/${USER_DATA_TEMPLATE}" \
   "${USER_DATA_FILE}"
 
 CR_CMD_ENV="--env METAL3_CI_USER \
@@ -124,3 +138,9 @@ CONTAINER_IMAGES_DIR="/data/metal3-dev-tools/ci/images"
     -var "ssh_pty=true" \
     -var "flavor=${IMAGE_FLAVOR}" \
     "${CONTAINER_IMAGES_DIR}/${BUILDER_CONFIG_FILE}"
+
+
+# upload node image to artifactory
+if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
+  bash "${SCRIPTS_DIR}/upload_node_image_rt.sh" "${IMAGE_NAME}"
+fi
