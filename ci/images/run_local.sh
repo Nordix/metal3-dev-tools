@@ -38,7 +38,7 @@ IMAGE_NAME="${IMAGE_NAME:-${USER}-test}"
 SOURCE_IMAGE_NAME="${SOURCE_IMAGE_NAME:-CentOS-Stream-GenericCloud-8}"
 # Group to add user to. To get sudo access on CentOS: wheel, on Ubuntu: sudo
 SSH_USER_GROUP="${SSH_USER_GROUP:-wheel}"
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.24.0"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.23.5"}
 
 # The variables below should not need to be touched by the user
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
