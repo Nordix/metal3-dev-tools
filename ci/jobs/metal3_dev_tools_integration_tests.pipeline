@@ -39,6 +39,7 @@ pipeline {
     REPO_BRANCH = "${ghprbTargetBranch}"
     UPDATED_BRANCH = "${ghprbActualCommit}"
     OS_USERNAME="metal3ci"
+    CENTOS_VERSION="9"
     TEST_EXECUTER_VM_NAME = "${VM_NAME}"
     BUILD_TAG = "${env.BUILD_TAG}"
     PR_ID = "${ghprbPullId}"
@@ -50,8 +51,8 @@ pipeline {
     TESTS_FOR="${TESTS_FOR}"
     IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
     DST_FOLDER="metal3/images/temp"
-    FINAL_IMAGE_NAME="${IMAGE_OS}_TEMP_IMG_WITH_FIRMWARE2_${RAND_NAME}"
     KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.5' }"
+    FINAL_IMAGE_NAME="${IMAGE_OS}_${CENTOS_VERSION}_NODE_IMG_K8S_${KUBERNETES_VERSION}_${RAND_NAME}_TEST_CLOUDINIT_REVERTED"
 
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \

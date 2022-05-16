@@ -17,7 +17,7 @@ export IMAGE_OS="${IMAGE_OS:-Centos}"
 export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-minikube}"
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
-"${SCRIPTS_DIR}"/configure_nameservers_centos.sh
+# "${SCRIPTS_DIR}"/configure_nameservers_centos.sh
 
 sudo dnf distro-sync -y
 sudo dnf update -y curl nss

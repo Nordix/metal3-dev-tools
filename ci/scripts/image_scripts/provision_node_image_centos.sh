@@ -8,7 +8,7 @@ export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.13.0"}
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
-"${SCRIPTS_DIR}"/configure_nameservers_centos.sh
+# "${SCRIPTS_DIR}"/configure_nameservers_centos.sh
 
 # Install CRI-O
 "${SCRIPTS_DIR}"/install_crio_on_centos.sh
@@ -25,18 +25,6 @@ sudo dnf install -y ebtables socat conntrack-tools
 sudo dnf install python3 -y
 sudo dnf install gcc kernel-headers kernel-devel keepalived -y
 sudo dnf install device-mapper-persistent-data lvm2 -y
-
-# Driver to load firmware files (from /lib/firmware/bnx2x/) in the kernel
-# version of 5.14.0-80.el9.x86_64 are missing (probably they are present 
-# on the file system but missing from new kernel initrd image) which causes driver to fail.  
-# This workaround should help in making FW files as a part of initrd.
-sudo dnf -y install dracut
-sudo dnf install wget -y
-sudo wget https://anduin.linuxfromscratch.org/sources/linux-firmware/bnx2x/bnx2x-e2-7.13.21.0.fw
-sudo wget https://anduin.linuxfromscratch.org/sources/linux-firmware/bnx2x/bnx2x-e2-7.13.15.0.fw
-sudo dracut --install-optional bnx2x-e2-7.13.21.0.fw --force
-sudo dracut --install-optional bnx2x-e2-7.13.15.0.fw --force
-sudo lsinitrd | grep bnx2x
 
 # Disable SELINUX enforcing
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
