@@ -9,9 +9,15 @@ export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.13.0"}
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 
+# Needrestart and packer does not seem to work well together. Needrestart is
+# propmpting for what services to restart and packer cannot answer, so it get stuck.
+# This makes needrestart (l)ist the packages instead of prompting with a dialog.
+# The alternative would be sudo apt-get remove -y needrestart.
+echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/needrestart.conf || true
+
 # Upgrade all packages
 sudo apt-get update
-sudo apt-get upgrade -f -y
+sudo apt-get dist-upgrade -f -y
 
 # Install required packages.
 sudo apt install -y \

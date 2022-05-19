@@ -6,9 +6,15 @@ set -eux
 # to create a base image for our applications.
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
+# Needrestart and packer does not seem to work well together. Needrestart is
+# propmpting for what services to restart and packer cannot answer, so it get stuck.
+# This makes needrestart (l)ist the packages instead of prompting with a dialog.
+# The alternative would be sudo apt-get remove -y needrestart.
+echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/needrestart.conf || true
+
 # Upgrade all packages
 sudo apt-get update
-sudo apt-get upgrade -f -y
+sudo apt-get dist-upgrade -f -y                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
 # Install required packages.
 sudo apt install -y \
