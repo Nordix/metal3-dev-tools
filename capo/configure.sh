@@ -10,7 +10,7 @@ CACERT_PATH="/tmp/cacert.pem"
 OPENSTACK_RC_PATH="/tmp/openstackrc"
 OS_CLOUD_NAME="$1"
 
-CAPI_VERSION="v1.0.5"
+CAPI_VERSION="main"
 
 if ! [[ -d "$CAPI_REPO" ]]; then
   echo "Expected to find directory $CAPI_REPO, but couldn't find it."
