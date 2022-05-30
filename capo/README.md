@@ -46,65 +46,6 @@ Then:
   Note that you can specify the name of the cluster like this: `make CLUSTER_NAME=${USER}-capo-test provision`.
   This avoids name collisions and makes it easier to tell who created the resources in Openstack.
 
-## Devstack setup
-
-In order to add more features, such as trunking, we need to create an Openstack instance using devstack.
-
-1. Create Centos-8 VM with 32GB of RAM and 8 CPU cores.
-2. From within the VM, clone the devstack repo
-   ```bash
-   git clone https://opendev.org/openstack/devstack.git
-   ```
-3. Create stack user/group with the proper privilege
-   ```bash
-   cd devstack
-   sudo ./tools/create-stack-user.sh
-   ```
-4. Install devstack as stack user
-   ```bash
-   sudo su - stack
-   sudo mkdir -p /opt/stack/logs
-   sudo chown stack:stack /opt/stack/
-   sudo chmod -R 755 /opt/stack/
-   ```
-
-The following error could be seen
-
-```
-OpenStack Wallaby Repository
-Error: Failed to download metadata for repo 'openstack-wallaby': Cannot prepare internal mirrorlist: No URLs in mirrorlist
-```
-
-If you see the above error, run the following to fix it.
-
-```bash
-sudo sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/rdo-release.repo
-yum update -y
-```
-
-Configure trunk support, more information can be found [here](https://docs.openstack.org/ocata/networking-guide/config-trunking.html)
-
-To add trunk supoort edit `lib/neutron_plugins/ovn_agent`
-
-```
-ML2_L3_PLUGIN=${ML2_L3_PLUGIN-"ovn-router,trunk"}
-```
-
-Now, start the installation.
-
-```bash
-./stack.sh
-```
-
-Verify installation
-
-```bash
-openstack extension list -f json -c Description -f value | grep trunk
-  Extensions list not supported by Identity API
-  Provides support for trunk ports
-  Expose trunk port details
-```
-
 ## Cleanup
 
 The "normal" way to clean up openstack resources created by CAPO is to delete all Cluster objects you created.
@@ -123,8 +64,84 @@ Clean up the local resources with
 make clean
 ```
 
-Finally, there could be still some resources left in openstack due to bugs in CAPO (especially if you are working on it actively).
+Finally, there could be still some resources left in openstack due to bugs in CAPO (especially if you are working on itactively).
 Clean these up by using the `clean-os-resources.sh` script.
+
+## Devstack setup
+
+In order to add more features, such as trunking, we need to create an Openstack instance using devstack.
+Luckily there is a script in the CAPO repository under `hack/ci/create_devstack.sh` that can be used to set this up.
+
+Prerequisites: You will need the openstack python client installed for this.
+As of writing, the version used in Ubuntu 20.04 is too old (5.5).
+To fix this you can use a python virtual environment where you install a newer version, like this:
+
+```bash
+# Ensure you have the venv package
+sudo apt install python3.8-venv
+# Create a venv and activate it
+python3 -m venv .venv
+source .venv/bin/activate
+# Install the openstack client inside the venv
+pip install python-openstackclient
+```
+
+1. Create a `clouds.yaml` if you don't have one already.
+   It is an alternative to the `OS_*` environment variables and looks like this:
+   ```yaml
+   clouds:
+     "capo-kna1":
+       auth:
+         auth_url: "https://kna1.citycloud.com:5000"
+         username: "user"
+         password: "secret"
+         domain_name: "CCP_Domain_37137"
+         user_domain_name: "CCP_Domain_37137"
+         project_name: "CAPO"
+         tenant_name: "CAPO"
+       region_name: "Kna1"
+       verify: false
+   ```
+   Save it for example at `~/.config/openstack`.
+   **Note:** `clouds.yaml` at the root of the CAPO repo is overwritten by `create_devstack.sh` so don't save it there!
+2. Export some variables (save these in a file so you can easily source them when needed).
+   ```bash
+   # This tells create_devstack.sh to use openstack to create the resources
+   export RESOURCE_TYPE="openstack"
+   # This is the cloud to use in the clouds.yaml file created above
+   export OS_CLOUD="capo-kna1"
+   # The openstack flavor to use for the devstack servers
+   export OPENSTACK_FLAVOR_controller="16C-32GB-200GB"
+   export OPENSTACK_FLAVOR_worker="4C-16GB-150GB"
+   export OPENSTACK_SSH_KEY_NAME=<openstack-keypair-name>
+   export SSH_PUBLIC_KEY_FILE="/home/${USER}/.ssh/id_ed25519.pub"
+   export SSH_PRIVATE_KEY_FILE="/home/${USER}/.ssh/id_ed25519"
+   export OPENSTACK_PUBLIC_NETWORK="ext-net"
+   ```
+3. Ensure that there is no old `clouds.yaml` in the root of the CAPO repo that would override the one you created.
+   ```bash
+   rm ./clouds.yaml
+   ```
+4. Run the script!
+   ```bash
+   ./hack/ci/create_devstack.sh
+   ```
+
+You should now have a working devstack!
+The script also runs `sshuttle` in the background so that it is possible to reach the networks inside the devstack that are used for e2e tests.
+Run the e2e tests like this:
+```
+export OPENSTACK_CLOUD_YAML_FILE=$(pwd)/clouds.yaml
+make test-e2e
+```
+
+### Cleanup devstack
+
+Note that the devstack is "self contained" in the way that any resources created inside the devstack will be removed with the devstack, so the only thing to clean up is the devstack itself.
+
+1. Remove the devstack `clouds.yaml` so that the scripts don't try to use it instead of the one you created.
+2. Export `OS_CLOUD` and check that it points to the correct environment (where the devstack is running).
+2. Run `./hack/ci/create_devstack.sh cleanup`.
 
 ## TODO
 

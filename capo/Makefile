@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 CLUSTER_NAME := basic-1
 OS_CLOUD_NAME := "openstack-1"
-all: configure kind-create tilt-up 
+all: configure kind-create tilt-up
 provision: capo-template capo-apply
 configure:
 	./configure.sh $(OS_CLOUD_NAME)
@@ -26,5 +26,3 @@ deprovision:
 clean: deprovision
 	kind get clusters | grep -q kind-capo && kind delete cluster --name kind-capo
 	@echo Remove resources left over in OpenStack by running the os_cleanup script
-capo-e2e: configure
-	OS_CLOUD_NAME="capo-e2e" ./run-e2e-test.sh
