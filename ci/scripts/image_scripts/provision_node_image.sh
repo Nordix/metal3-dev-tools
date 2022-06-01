@@ -12,15 +12,17 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 # Needrestart and packer does not seem to work well together. Needrestart is
 # propmpting for what services to restart and packer cannot answer, so it get stuck.
 # This makes needrestart (l)ist the packages instead of prompting with a dialog.
+# It also makes it only print kernel hints instead of prompting users to aknowledge.
 # The alternative would be sudo apt-get remove -y needrestart.
-echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/needrestart.conf || true
+echo -e '$nrconf{restart} = "l";\n$nrconf{kernelhints} = -1;' | sudo tee /etc/needrestart/needrestart.conf || true
 
 # Upgrade all packages
 sudo apt-get update
 sudo apt-get dist-upgrade -f -y
 
 # Install required packages.
-sudo apt install -y \
+sudo apt-get update
+sudo apt-get install -y \
   vim \
   jq \
   git \
@@ -38,14 +40,14 @@ sudo apt install -y \
 sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo apt-get install -y conntrack socat
-sudo apt install net-tools gcc linux-headers-$(uname -r) bridge-utils -y
-sudo apt install -y keepalived && sudo systemctl stop keepalived
+sudo apt-get install net-tools gcc linux-headers-$(uname -r) bridge-utils -y
+sudo apt-get install -y keepalived && sudo systemctl stop keepalived
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
-sudo apt update -y
+sudo apt-get update -y
 
 # Install CRI-O
-"${SCRIPTS_DIR}"/install_crio_on_ubuntu.sh 
+"${SCRIPTS_DIR}"/install_crio_on_ubuntu.sh
 
 echo  "Installing kubernetes binaries"
 curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
