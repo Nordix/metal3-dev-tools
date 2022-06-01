@@ -9,15 +9,17 @@ SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 # Needrestart and packer does not seem to work well together. Needrestart is
 # propmpting for what services to restart and packer cannot answer, so it get stuck.
 # This makes needrestart (l)ist the packages instead of prompting with a dialog.
+# It also makes it only print kernel hints instead of prompting users to acknowledge.
 # The alternative would be sudo apt-get remove -y needrestart.
-echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/needrestart.conf || true
+echo -e '$nrconf{restart} = "l";\n$nrconf{kernelhints} = -1;' | sudo tee /etc/needrestart/needrestart.conf || true
 
 # Upgrade all packages
 sudo apt-get update
-sudo apt-get dist-upgrade -f -y                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+sudo apt-get dist-upgrade -f -y
 
 # Install required packages.
-sudo apt install -y \
+sudo apt-get update
+sudo apt-get install -y \
   vim \
   jq \
   git \
