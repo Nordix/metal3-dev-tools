@@ -11,6 +11,7 @@ IPA_ROOT_ARTIFACTORY="metal3/images/ipa"
 DRY_RUN="${DRY_RUN:-false}"
 ANONYM="${ANONYM:-0}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+declare -a IPA_BASE_DISTROS=('centos-8-stream' 'centos-9-stream')
 
 # shellcheck disable=SC1090
 source "${RT_UTILS}"
@@ -19,26 +20,30 @@ export "RT_URL=${RT_URL}"
 # Centos Stream configuration
 CENTOS_STREAM_ROOT="${IPA_ROOT_ARTIFACTORY}"
 
-# Centos Stream Review
-CENTOS_STREAM_REVIEW="${CENTOS_STREAM_ROOT}/review/centos/8-stream"
-CENTOS_STREAM_REVIEW_PINNED="${CENTOS_STREAM_REVIEW_PINNED:-${SCRIPT_DIR}/centos_stream_review_pinned.txt}"
-CENTOS_STREAM_REVIEW_RETENTION_NUM="${CENTOS_STREAM_REVIEW_RETENTION_NUM:-5}"
+for DISTRO in "${IPA_BASE_DISTROS[@]}"; do
+    # clean review artifacts
+    echo "IPA BASE IMAGE: $DISTRO"
+    CENTOS_STREAM_REVIEW="${CENTOS_STREAM_ROOT}/review/centos/${DISTRO#*-}"
+    CENTOS_STREAM_REVIEW_PINNED="${SCRIPT_DIR}/${DISTRO}-review-pinned.txt"
+    CENTOS_STREAM_REVIEW_RETENTION_NUM="${CENTOS_STREAM_REVIEW_RETENTION_NUM:-5}"
 
-rt_delete_multiple_artifacts "${CENTOS_STREAM_REVIEW}" "${ANONYM}" "${DRY_RUN}" \
-    "${CENTOS_STREAM_REVIEW_PINNED}" "${CENTOS_STREAM_REVIEW_RETENTION_NUM}"
+    rt_delete_multiple_artifacts "${CENTOS_STREAM_REVIEW}" "${ANONYM}" "${DRY_RUN}" \
+        "${CENTOS_STREAM_REVIEW_PINNED}" "${CENTOS_STREAM_REVIEW_RETENTION_NUM}"
 
-# Centos Stream Staging
-CENTOS_STREAM_STAGING="${CENTOS_STREAM_ROOT}/staging/centos/8-stream"
-CENTOS_STREAM_STAGING_PINNED="${CENTOS_STREAM_STAGING_PINNED:-${SCRIPT_DIR}/centos_stream_staging_pinned.txt}"
-CENTOS_STREAM_STAGING_RETENTION_NUM="${CENTOS_STREAM_STAGING_RETENTION_NUM:-10}"
+    # clean staging artifacts
+    CENTOS_STREAM_STAGING="${CENTOS_STREAM_ROOT}/staging/centos/${DISTRO#*-}"
+    CENTOS_STREAM_STAGING_PINNED="${SCRIPT_DIR}/${DISTRO}-staging-pinned.txt"
+    CENTOS_STREAM_STAGING_RETENTION_NUM="${CENTOS_STREAM_STAGING_RETENTION_NUM:-10}"
 
-rt_delete_multiple_artifacts "${CENTOS_STREAM_STAGING}" "${ANONYM}" "${DRY_RUN}" \
-    "${CENTOS_STREAM_STAGING_PINNED}" "${CENTOS_STREAM_STAGING_RETENTION_NUM}"
+    rt_delete_multiple_artifacts "${CENTOS_STREAM_STAGING}" "${ANONYM}" "${DRY_RUN}" \
+        "${CENTOS_STREAM_STAGING_PINNED}" "${CENTOS_STREAM_STAGING_RETENTION_NUM}"
+done
 
 # Harbor metal3 project cleanup
 # shellcheck disable=SC1090
 source "${HARBOR_UTILS}"
-PINNED_IRONIC_IMAGE_ARTIFACTS="${PINNED_IRONIC_IMAGE_ARTIFACTS:-${SCRIPT_DIR}/ironic_image_pinned.txt}"
+echo "Harbor images:"
+PINNED_IRONIC_IMAGE_ARTIFACTS="${PINNED_IRONIC_IMAGE_ARTIFACTS:-${SCRIPT_DIR}/ironic-image-pinned.txt}"
 
 # Clean (delete) ironic-image container images
 harbor_clean_OCI_repository "ironic-image" "${PINNED_IRONIC_IMAGE_ARTIFACTS}" "5" "${DRY_RUN}"
