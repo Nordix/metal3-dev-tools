@@ -31,7 +31,7 @@ IPA_BUILDER_PATH="ironic-python-agent-builder"
 IPA_IMAGE_NAME="${IPA_IMAGE_NAME:-ironic-python-agent}"
 IPA_IMAGE_TAR="${IPA_IMAGE_NAME}.tar"
 IPA_BASE_OS="${IPA_BASE_OS:-centos}"
-IPA_BASE_OS_RELEASE="${IPA_BASE_OS_RELEASE:-8-stream}"
+IPA_BASE_OS_RELEASE="${IPA_BASE_OS_RELEASE:-9-stream}"
 IRONIC_SIZE_LIMIT_MB=500
 DEV_ENV_REPO_LOCATION="${DEV_ENV_REPO_LOCATION:-/tmp/dib/metal3-dev-env}"
 IMAGE_REGISTRY="registry.nordix.org"
@@ -97,7 +97,8 @@ ironic-python-agent-builder --output "${IPA_IMAGE_NAME}" \
     --elements-path="${CUSTOM_ELEMENTS}" \
     --element='dynamic-login' --element='journal-to-console' \
     --element='devuser' --element='openssh-server' \
-    --element='extra-hardware' --element='ipa-module-autoload' --verbose
+    --element='extra-hardware' --element='ipa-module-autoload' \
+    --element='ipa-add-buildinfo' --verbose
 
 # Deactivate the python virtual environment
 deactivate
