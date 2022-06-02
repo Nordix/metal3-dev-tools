@@ -22,7 +22,7 @@
       "flavor":  "{{user `flavor`}}",
       "image_disk_format": "qcow2",
       "use_blockstorage_volume": "true",
-      "volume_size": "20",
+      "volume_size": "50",
       "reuse_ips": "{{user `reuse_ips`}}",
       "ssh_keypair_name": "{{user `ssh_keypair_name`}}",
       "ssh_private_key_file": "{{user `ssh_private_key_file`}}",

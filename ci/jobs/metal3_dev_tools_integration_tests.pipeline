@@ -25,10 +25,10 @@ pipeline {
     METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
     RT_URL="https://artifactory.nordix.org/artifactory"
-    OS_AUTH_URL="https://kna1.citycloud.com:5000"
+    OS_AUTH_URL="https://fra1.citycloud.com:5000"
     OS_USER_DOMAIN_NAME="CCP_Domain_37137"
     OS_PROJECT_DOMAIN_NAME="CCP_Domain_37137"
-    OS_REGION_NAME="Kna1"
+    OS_REGION_NAME="Fra1"
     OS_PROJECT_NAME="Default Project 37137"
     OS_TENANT_NAME="Default Project 37137"
     OS_AUTH_VERSION=3

@@ -49,7 +49,7 @@ delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 
 # Build Image
-packer build \
+packer build -debug \
   -var "image_name=${IMAGE_NAME}" \
   -var "source_image_name=${SOURCE_IMAGE_NAME}" \
   -var "user_data_file=${USER_DATA_FILE}" \
