@@ -20,5 +20,5 @@ create_router "${EXT_NET}" "${CI_ROUTER_NAME}"
 create_external_net "${CI_EXT_SUBNET_CIDR}" "${CI_ROUTER_NAME}" "${CI_EXT_NET}"
 
 # Create CI Keypair
-CI_PUBLIC_KEY_FILE="${SCRIPTPATH}/id_rsa_metal3ci.pub"
+CI_PUBLIC_KEY_FILE="${SCRIPTPATH}/id_ed25519_metal3ci.pub"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${CI_KEYPAIR_NAME}"
