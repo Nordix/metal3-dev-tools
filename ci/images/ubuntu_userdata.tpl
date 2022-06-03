@@ -11,8 +11,4 @@ users:
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
   - echo "PubkeyAcceptedKeyTypes=+ssh-rsa" >> /etc/ssh/sshd_config
-  - sed -i '/ClientAliveInterval\|ClientAliveCountMax\|TCPKeepAlive/d' /etc/ssh/sshd_config
-  - echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
-  - echo "ClientAliveCountMax 60" >> /etc/ssh/sshd_config
-  - echo "TCPKeepAlive no" >> /etc/ssh/sshd_config
   - systemctl restart ssh.service
