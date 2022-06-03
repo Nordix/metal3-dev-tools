@@ -28,7 +28,7 @@ FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/provision_base_image.sh"
 SSH_USER_GROUP="sudo"
 
-SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_rsa_metal3ci.pub")"
+SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_ed25519_metal3ci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \
   "${SSH_USER_NAME}" \
@@ -42,7 +42,7 @@ echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
 
 # Create CI Keypair
 
-CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_rsa_metal3ci.pub"
+CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_ed25519_metal3ci.pub"
 delete_keypair "${SSH_KEYPAIR_NAME}"
 create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
 

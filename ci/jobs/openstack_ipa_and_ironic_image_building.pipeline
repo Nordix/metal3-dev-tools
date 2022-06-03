@@ -31,7 +31,7 @@ pipeline {
     OS_AUTH_VERSION=3
     OS_IDENTITY_API_VERSION=3
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
-      --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \
+      --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
       --env VM_KEY \
       --env RT_URL \
       --env RT_TOKEN \

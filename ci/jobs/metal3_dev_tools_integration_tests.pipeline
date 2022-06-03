@@ -54,7 +54,7 @@ pipeline {
     KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.5' }"
 
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
-      --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \
+      --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
       --env VM_KEY \
       --env RT_URL \
       --env RT_TOKEN \
@@ -92,10 +92,10 @@ pipeline {
             sh "docker run --rm \
               ${DOCKER_CMD_ENV}\
               -v ${CURRENT_DIR}:/data \
-              -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
+              -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
               registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_node_ubuntu_image.sh \
-              /data/id_rsa_metal3ci 1"
+              /data/id_ed25519_metal3ci 1"
 
             /* Delete image */
             sh """#!/bin/bash
@@ -121,10 +121,10 @@ pipeline {
             sh "docker run --rm \
               ${DOCKER_CMD_ENV}\
               -v ${CURRENT_DIR}:/data \
-              -v ${METAL3_CI_USER_KEY}:/data/id_rsa_metal3ci \
+              -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
               registry.nordix.org/metal3/image-builder \
               /data/ci/images/gen_metal3_centos_image.sh \
-              /data/id_rsa_metal3ci 1 \
+              /data/id_ed25519_metal3ci 1 \
               provision_node_image_centos.sh"
 
             /* Delete image */

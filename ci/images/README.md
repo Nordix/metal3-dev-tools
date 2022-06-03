@@ -61,7 +61,7 @@ Then set the correct environment variables:
 
    ```bash
       export METAL3_CI_USER=metal3ci
-      export METAL3_CI_USER_KEY=/data/keys/id_rsa_metal3ci
+      export METAL3_CI_USER_KEY=/data/keys/id_ed25519_metal3ci
       export RT_URL="https://artifactory.nordix.org/artifactory"
    ```
 
@@ -71,7 +71,7 @@ The ubuntu building scripts take two arguments :
 * boolean: Use a floating ip publicly accessible ( 0 or 1 )
 
    ```bash
-   ./gen_<xxx>_<ubuntu>_image.sh /data/keys/id_rsa_metal3ci 1
+   ./gen_<xxx>_<ubuntu>_image.sh /data/keys/id_ed25519_metal3ci 1
    ```
 
 The centos building scripts take three arguments :
@@ -81,7 +81,7 @@ The centos building scripts take three arguments :
 * provisioner script: script file name, give random string to list available scripts
 
    ```bash
-   ./gen_<xxx>_<centos>_image.sh /data/keys/id_rsa_metal3ci 1 <provisioner script>
+   ./gen_<xxx>_<centos>_image.sh /data/keys/id_ed25519_metal3ci 1 <provisioner script>
    ```
 
 ### Building and testing locally

@@ -100,7 +100,7 @@ render_user_data \
   "${USER_DATA_FILE}"
 
 CR_CMD_ENV="--env METAL3_CI_USER \
-  --env METAL3_CI_USER_KEY=/data/id_rsa_metal3ci \
+  --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
   --env OS_AUTH_URL \
   --env OS_USER_DOMAIN_NAME \
   --env OS_PROJECT_DOMAIN_NAME \
