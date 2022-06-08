@@ -10,5 +10,4 @@ users:
 
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
-  - update-crypto-policies --set LEGACY
   - systemctl restart sshd.service

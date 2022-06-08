@@ -14,7 +14,7 @@ sudo add-apt-repository -y \
    $(lsb_release -cs) \
    stable"
 sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io jq
+sudo apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-focal docker-ce-cli=5:19.03.14~3-0~ubuntu-focal containerd.io jq
 sudo groupadd docker
 sudo usermod -aG docker "${USER}"
 sudo usermod -aG docker ubuntu

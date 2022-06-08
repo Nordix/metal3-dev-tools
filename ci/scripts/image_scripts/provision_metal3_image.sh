@@ -16,10 +16,10 @@ sudo systemctl stop apt-daily.timer
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
 # Metal3 Dev Env variables
-M3_DENV_ORG="${M3_DENV_ORG:-metal3-io}"
+M3_DENV_ORG="${M3_DENV_ORG:-Nordix}"
 M3_DENV_REPO="${M3_DENV_REPO:-metal3-dev-env}"
 M3_DENV_URL="${M3_DENV_URL:-https://github.com/${M3_DENV_ORG}/${M3_DENV_REPO}.git}"
-M3_DENV_BRANCH="${M3_DENV_BRANCH:-main}"
+M3_DENV_BRANCH="${M3_DENV_BRANCH:-downgrade/ubuntu-centos}"
 M3_DENV_ROOT="${M3_DENV_ROOT:-/tmp}"
 M3_DENV_PATH="${M3_DENV_PATH:-${M3_DENV_ROOT}/${M3_DENV_REPO}}"
 FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE:-true}"
