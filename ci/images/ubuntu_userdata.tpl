@@ -12,3 +12,6 @@ runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
   - echo "PubkeyAcceptedKeyTypes=+ssh-rsa" >> /etc/ssh/sshd_config
   - systemctl restart ssh.service
+  - modprobe -r -a kvm_intel kvm
+  - modprobe kvm tdp_mmu=0
+  - modprobe -a kvm kvm_intel
