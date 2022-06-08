@@ -12,6 +12,5 @@ runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
   - update-crypto-policies --set LEGACY
   - systemctl restart sshd.service
-  - modprobe -r -a kvm_intel kvm
-  - modprobe kvm tdp_mmu=0
-  - modprobe -a kvm kvm_intel
+  - echo "options kvm tdp_mmu=0" >> /etc/modprobe.d/kvm.conf
+
