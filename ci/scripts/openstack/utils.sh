@@ -477,12 +477,12 @@ replace_image() {
   for IMAGE_ID in ${IMAGE_ARRAY}
   do
     echo "Deleting image ${IMAGE_ID}"
-    openstack image set "${IMAGE_ID}" --deactivate > /dev/null
-    openstack image delete "${IMAGE_ID}" > /dev/null
+    openstack image set "${IMAGE_ID}" --deactivate
+    openstack image delete "${IMAGE_ID}" 
   done
 
   echo "Setting image name from ${SRC_IMAGE} to ${DST_IMAGE}"
-  openstack image set --name "${DST_IMAGE}" "${SRC_IMAGE}" > /dev/null
+  openstack image set --name "${DST_IMAGE}" "${SRC_IMAGE}"
 }
 
 # Description:
