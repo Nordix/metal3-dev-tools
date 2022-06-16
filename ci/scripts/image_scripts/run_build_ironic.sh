@@ -3,6 +3,10 @@
 set -eu
 
 sudo apt update -y
+sudo apt install -y policycoreutils
+echo "SELINUX DEBUG"
+sestatus
+echo "SELINUX DEBUG"
 # This script relies on upstream https://github.com/metal3-io/ironic-image/blob/main/patch-image.sh
 # to build Ironic container image based on a gerrit refspec of a patch.
 # Required parameter is REFSPEC, which is gerrit refspec of the patch
