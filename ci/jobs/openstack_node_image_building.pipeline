@@ -22,6 +22,7 @@ pipeline {
     OS_TENANT_NAME="Default Project 37137"
     OS_AUTH_VERSION=3
     OS_IDENTITY_API_VERSION=3
+    TEST_EXECUTER_VM_NAME = "${VM_NAME}"
     KUBERNETES_VERSION = "${KUBERNETES_VERSION}"
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
@@ -44,54 +45,59 @@ pipeline {
                       script: 'readlink -f "."',
                       returnStdout: true
                      ).trim()
-
   }
   stages {
-    stage('Building node Ubuntu image'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
-            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-
-              catchError([stageResult: 'FAILURE', message: 'Failed to build the node Ubuntu image']) {
-                /* Generate node ubuntu image */
-                sh "docker run --rm \
-                  ${DOCKER_CMD_ENV}\
-                  -v ${CURRENT_DIR}:/data \
-                  -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
-                  registry.nordix.org/metal3/image-builder \
-                  /data/ci/images/gen_node_ubuntu_image.sh \
-                  /data/id_ed25519_metal3ci 1"
-                
+    stage('Building node image'){
+      parallel {
+        stage('Building node Ubuntu image'){
+          options {
+            timeout(time: 60, unit: 'MINUTES')
+          }
+          environment {
+            TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-Ubuntu-based"
+          }
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
+                  catchError([stageResult: 'FAILURE', message: 'Failed to build the node Ubuntu image']) {
+                    /* Generate node ubuntu image */
+                    sh "docker run --rm \
+                      ${DOCKER_CMD_ENV}\
+                      -v ${CURRENT_DIR}:/data \
+                      -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
+                      registry.nordix.org/metal3/image-builder \
+                      /data/ci/images/gen_node_ubuntu_image.sh \
+                      /data/id_ed25519_metal3ci 1"
+                  }
+                }
               }
             }
           }
         }
-      }
-    }
-    stage('Building node CentOS image'){
-      options {
-        timeout(time: 60, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
-            withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-
-              catchError([stageResult: 'FAILURE', message: 'Failed to build the node CentOS image']) {
-                /* Generate node CentOS dev-env image */
-                sh "docker run --rm \
-                  ${DOCKER_CMD_ENV}\
-                  -v ${CURRENT_DIR}:/data \
-                  -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
-                  registry.nordix.org/metal3/image-builder \
-                  /data/ci/images/gen_metal3_centos_image.sh \
-                  /data/id_ed25519_metal3ci 1 \
-                  provision_node_image_centos.sh"
-
+        stage('Building node CentOS image'){
+          options {
+            timeout(time: 60, unit: 'MINUTES')
+          }
+          environment {
+            TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-CentOS-based"
+          }
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
+                  catchError([stageResult: 'FAILURE', message: 'Failed to build the node CentOS image']) {
+                    /* Generate node CentOS image */
+                    sh "docker run --rm \
+                      ${DOCKER_CMD_ENV}\
+                      -v ${CURRENT_DIR}:/data \
+                      -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
+                      registry.nordix.org/metal3/image-builder \
+                      /data/ci/images/gen_metal3_centos_image.sh \
+                      /data/id_ed25519_metal3ci 1 \
+                      provision_node_image_centos.sh"
+                  }
+                }
               }
             }
           }
@@ -101,8 +107,8 @@ pipeline {
   }
   post{
     success {
-            echo 'Run metal3_openstack_image_building job'
-            build job: 'metal3_openstack_image_building'
-        }
+      echo 'Run metal3_openstack_image_building job'
+      build job: 'metal3_openstack_image_building'
+    }
   }      
 }
