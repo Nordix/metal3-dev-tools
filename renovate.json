@@ -13,6 +13,22 @@
      "packageNames": ["kindest/node"],
      "automerge": false,
      "commitMessageTopic": "kindest/node"
+    },
+    {
+      "matchPackageNames": ["golang"],
+      "allowedVersions": "<=1.17"
+    },
+    {
+      "matchPackageNames": ["kubernetes/kubernetes"],
+      "allowedVersions": "<=1.23"
+    },
+    {
+      "matchPackageNames": ["kindest/node"],
+      "allowedVersions": "<=1.23"
+    },
+    {
+      "matchPackageNames": ["kubernetes-sigs/cri-tools"],
+      "allowedVersions": "<=1.23"
     }
   ],
   "prHourlyLimit": 5,
