@@ -23,6 +23,7 @@ pipeline {
     OS_TENANT_NAME="Default Project 37137"
     OS_AUTH_VERSION=3
     OS_IDENTITY_API_VERSION=3
+    TEST_EXECUTER_VM_NAME = "${VM_NAME}"
     KUBERNETES_VERSION = "${KUBERNETES_VERSION}"
     KIND_NODE_IMAGE_VERSION = "${KIND_NODE_IMAGE_VERSION}"
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
@@ -45,7 +46,6 @@ pipeline {
                       script: 'readlink -f "."',
                       returnStdout: true
                      ).trim()
-
   }
   stages {
     stage('SCM') {
@@ -63,17 +63,15 @@ pipeline {
                 submoduleCfg: [],
                 userRemoteConfigs: [[credentialsId: ci_git_credential_id,
                 url: ci_git_url]]])
-
       }
     }
-    stage('Building base image'){
+    stage('Building base image for Karlskrona region'){
       options {
         timeout(time: 30, unit: 'MINUTES')
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
-
             catchError([stageResult: 'FAILURE', message: 'Failed to build the base image']) {
               /* Generate base ubuntu image */
               sh "docker run --rm \
@@ -83,20 +81,18 @@ pipeline {
                 registry.nordix.org/metal3/image-builder \
                 /data/ci/images/gen_base_ubuntu_image.sh \
                 /data/id_ed25519_metal3ci 1"
-
             }
           }
         }
       }
     }
-    stage('Building Jenkins image'){
+    stage('Building Jenkins image for Karlskrona region'){
       options {
         timeout(time: 30, unit: 'MINUTES')
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
           withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
-
             catchError([stageResult: 'FAILURE', message: 'Failed to build the Jenkins image']) {
               /* Generate Jumphost / Jenkins ubuntu image */
               sh "docker run --rm \
@@ -106,54 +102,59 @@ pipeline {
                 registry.nordix.org/metal3/image-builder \
                 /data/ci/images/gen_jumphost_jenkins_ubuntu_image.sh \
                 /data/id_ed25519_metal3ci 1"
-
             }
           }
         }
       }
     }
-    stage('Building Metal3 Ubuntu image'){
-      options {
-        timeout(time: 90, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
-
-            catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image']) {
-              /* Generate Metal3 ubuntu image */
-              sh "docker run --rm \
-                ${DOCKER_CMD_ENV}\
-                -v ${CURRENT_DIR}:/data \
-                -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
-                registry.nordix.org/metal3/image-builder \
-                /data/ci/images/gen_metal3_ubuntu_image.sh \
-                /data/id_ed25519_metal3ci 1"
-
+    stage('Building Metal3 image for Karlskrona region'){
+      parallel {
+        stage('Building Metal3 Ubuntu image for Karlskrona region'){
+          options {
+            timeout(time: 90, unit: 'MINUTES')
+          }
+          environment {
+            TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-Ubuntu-based"
+          }
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image']) {
+                  /* Generate Metal3 ubuntu image */
+                  sh "docker run --rm \
+                    ${DOCKER_CMD_ENV}\
+                    -v ${CURRENT_DIR}:/data \
+                    -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
+                    registry.nordix.org/metal3/image-builder \
+                    /data/ci/images/gen_metal3_ubuntu_image.sh \
+                    /data/id_ed25519_metal3ci 1"
+                }
+              }
             }
           }
         }
-      }
-    }
-    stage('Building Metal3 CentOS image'){
-      options {
-        timeout(time: 90, unit: 'MINUTES')
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
-
-            catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image']) {
-              /* Generate Metal3 CentOS dev-env image */
-              sh "docker run --rm \
-                ${DOCKER_CMD_ENV}\
-                -v ${CURRENT_DIR}:/data \
-                -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
-                registry.nordix.org/metal3/image-builder \
-                /data/ci/images/gen_metal3_centos_image.sh \
-                /data/id_ed25519_metal3ci 1 \
-                provision_metal3_image_centos.sh"
-
+        stage('Building Metal3 CentOS image for Karlskrona region'){
+          options {
+            timeout(time: 90, unit: 'MINUTES')
+          }
+          environment {
+            TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-CentOS-based"
+          }
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image']) {
+                  /* Generate Metal3 CentOS image */
+                  sh "docker run --rm \
+                    ${DOCKER_CMD_ENV}\
+                    -v ${CURRENT_DIR}:/data \
+                    -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
+                    registry.nordix.org/metal3/image-builder \
+                    /data/ci/images/gen_metal3_centos_image.sh \
+                    /data/id_ed25519_metal3ci 1 \
+                    provision_metal3_image_centos.sh"
+                }
+              }
             }
           }
         }
@@ -180,62 +181,63 @@ pipeline {
                 registry.nordix.org/metal3/image-builder \
                 /data/ci/images/gen_base_ubuntu_image.sh \
                 /data/id_ed25519_metal3ci 1"
-
             }
           }
         }
       }
     }
-    stage('Building Metal3 Ubuntu image for Frankfurt region'){
-      options {
-        timeout(time: 90, unit: 'MINUTES')
-      }
-      environment {
-        OS_AUTH_URL="https://fra1.citycloud.com:5000"
-        OS_REGION_NAME="Fra1"
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
-
-            catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image for Frankfurt region']) {
-            /* Generate Metal3 ubuntu image */
-              sh "docker run --rm \
-                ${DOCKER_CMD_ENV}\
-                -v ${CURRENT_DIR}:/data \
-                -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
-                registry.nordix.org/metal3/image-builder \
-                /data/ci/images/gen_metal3_ubuntu_image.sh \
-                /data/id_ed25519_metal3ci 1"
-
+    stage('Building Metal3 image for Frankfurt region'){
+      parallel {
+        stage('Building Metal3 Ubuntu image for Frankfurt region'){
+          options {
+            timeout(time: 90, unit: 'MINUTES')
+          }
+          environment {
+            OS_AUTH_URL="https://fra1.citycloud.com:5000"
+            OS_REGION_NAME="Fra1"
+            TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-Ubuntu"
+          }
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 Ubuntu image for Frankfurt region']) {
+                  /* Generate Metal3 ubuntu image */
+                  sh "docker run --rm \
+                    ${DOCKER_CMD_ENV}\
+                    -v ${CURRENT_DIR}:/data \
+                    -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
+                    registry.nordix.org/metal3/image-builder \
+                    /data/ci/images/gen_metal3_ubuntu_image.sh \
+                    /data/id_ed25519_metal3ci 1"
+                }
+              }
             }
           }
         }
-      }
-    }
-    stage('Building Metal3 CentOS image for Frankfurt region'){
-      options {
-        timeout(time: 90, unit: 'MINUTES')
-      }
-      environment {
-        OS_AUTH_URL="https://fra1.citycloud.com:5000"
-        OS_REGION_NAME="Fra1"
-      }
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
-          withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
-
-            catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image for Frankfurt region']) {
-            /* Generate Metal3 CentOS dev-env image */
-              sh "docker run --rm \
-                ${DOCKER_CMD_ENV}\
-                -v ${CURRENT_DIR}:/data \
-                -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
-                registry.nordix.org/metal3/image-builder \
-                /data/ci/images/gen_metal3_centos_image.sh \
-                /data/id_ed25519_metal3ci 1 \
-                provision_metal3_image_centos.sh"
-
+        stage('Building Metal3 CentOS image for Frankfurt region'){
+          options {
+            timeout(time: 90, unit: 'MINUTES')
+          }
+          environment {
+            OS_AUTH_URL="https://fra1.citycloud.com:5000"
+            OS_REGION_NAME="Fra1"
+            TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-CentOS"
+          }
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                catchError([stageResult: 'FAILURE', message: 'Failed to build the Metal3 CentOS image for Frankfurt region']) {
+                  /* Generate Metal3 CentOS image */
+                  sh "docker run --rm \
+                    ${DOCKER_CMD_ENV}\
+                    -v ${CURRENT_DIR}:/data \
+                    -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
+                    registry.nordix.org/metal3/image-builder \
+                    /data/ci/images/gen_metal3_centos_image.sh \
+                    /data/id_ed25519_metal3ci 1 \
+                    provision_metal3_image_centos.sh"
+                }
+              }
             }
           }
         }
