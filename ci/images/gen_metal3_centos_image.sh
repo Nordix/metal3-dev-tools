@@ -18,6 +18,7 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   CI_IMAGE_NAME="${CI_NODE_CENTOS_IMAGE}"
+  CI_KEYPAIR_NAME="metal3ci-key-centos"
   BUILDER_CONFIG_FILE="image_builder_template_node.json"
   IMAGE_FLAVOR="1C-4GB-20GB"
   FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
