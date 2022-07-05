@@ -3,13 +3,19 @@
 set -uex
 
 export CRICTL_VERSION=${CRICTL_VERSION:-"v1.22.0"}
-OS=${OS:-"xUbuntu_22.04"}
+source /etc/os-release
+if [[ ${VERSION_ID} == "20.04" ]]
+then
+  OS=${OS:-"xUbuntu_20.04"}
+else
+  OS=${OS:-"xUbuntu_22.04"}
+fi
 # CRI-O version goes 1:1 with Kubernetes version. Thus,
 # please make sure that k8s version given in
 # KUBERNETES_VERSION variable matches CRI-O version
 # give in VERSION variable.
 TEMP_CRIO_VERSION="${CRICTL_VERSION#v}" && TEMP_CRIO_VERSION="${TEMP_CRIO_VERSION%.*}" # e.g. v1.20.2 -> 1.20
-VERSION=${VERSION:-"${TEMP_CRIO_VERSION}"}
+CRIO_VERSION=${CRIO_VERSION:-"${TEMP_CRIO_VERSION}"}
 
 # Prerequisites for CRI-O
 # Create the .conf file to load the modules at bootup
@@ -34,12 +40,12 @@ sudo sysctl --system
 cat <<EOF | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
 deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /
 EOF
-cat <<EOF | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
-deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /
+cat <<EOF | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$CRIO_VERSION.list
+deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIO_VERSION/$OS/ /
 EOF
 
 curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/libcontainers.gpg add -
-curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/$OS/Release.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg add -
+curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRIO_VERSION/$OS/Release.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg add -
 
 sudo apt-get update
 sudo apt-get install cri-o cri-o-runc -y
