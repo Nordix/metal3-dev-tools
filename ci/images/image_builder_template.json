@@ -12,7 +12,7 @@
     "reuse_ips": "false",
     "local_scripts_dir": "../scripts",
     "ssh_pty": "false",
-    "flavor":"2C-16GB-20GB"
+    "flavor":"2C-16GB-50GB"
   },
   "builders": [{
     "type": "openstack",
