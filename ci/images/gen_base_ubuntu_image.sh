@@ -22,12 +22,15 @@ SOURCE_IMAGE_NAME="Ubuntu-20.04"
 IMAGE_FLAVOR="1C-4GB-20GB"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
-SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/provision_base_image.sh"
 SSH_USER_GROUP="sudo"
 
+if [[ "$OS_REGION_NAME" == "Fra1" ]]; then
+  CI_KEYPAIR_NAME="${CI_KEYPAIR_NAME}-Fra1"
+fi  
+SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_ed25519_metal3ci.pub")"
 render_user_data \
   "${SSH_AUTHORIZED_KEY}" \

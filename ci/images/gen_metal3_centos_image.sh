@@ -24,10 +24,14 @@ if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
-  CI_KEYPAIR_NAME="metal3ci-key-centos"
   BUILDER_CONFIG_FILE="image_builder_template.json"
   IMAGE_FLAVOR="4C-16GB-50GB"
   FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
+  if [[ "$OS_REGION_NAME" == "FRA1" ]]; then
+    CI_KEYPAIR_NAME="metal3ci-key-centos-FRA1"
+  else
+    CI_KEYPAIR_NAME="metal3ci-key-centos"
+  fi  
 else
   echo "Available provisioning scripts are:"
   echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
