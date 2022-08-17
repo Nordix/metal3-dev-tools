@@ -27,7 +27,7 @@ IPA_REPO="https://github.com/openstack/ironic-python-agent.git"
 IPA_BUILDER_REPO="https://github.com/openstack/ironic-python-agent-builder.git"
 TOPOLVM_REPO="https://github.com/topolvm/topolvm.git"
 SRIOV_CNI_REPO="https://github.com/k8snetworkplumbingwg/sriov-cni.git"
-SRIOV_SRIOV_NDP_REPO="https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin.git"
+SRIOV_NDP_REPO="https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin.git"
 
 
 NORDIX_CAPM3_REPO="git@github.com:Nordix/cluster-api-provider-metal3.git"
