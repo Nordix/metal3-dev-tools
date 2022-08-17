@@ -9,9 +9,9 @@ CURRENT_SCRIPT_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")"
 METAL3_DEV_ENV_REPO="https://github.com/metal3-io/metal3-dev-env"
 METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH:-main}"
 METAL3_DEV_ENV_COMMIT="${METAL3_DEV_ENV_COMMIT:-HEAD}"
-IPA_REPO="${IPA_REPO:-https://github.com/Nordix/ironic-python-agent}"
-IPA_BRANCH="${IPA_BRANCH:-master}"
-IPA_COMMIT="${IPA_COMMIT:-HEAD}"
+IPA_REPO="https://github.com/Nordix/ironic-python-agent"
+IPA_BRANCH="quick_fix_root_device"
+IPA_COMMIT="refs/heads/quick_fix_root_device"
 IPA_BUILDER_REPO="${IPA_BUILDER_REPO:-https://github.com/Nordix/ironic-python-agent-builder.git}"
 IPA_BUILDER_BRANCH="${IPA_BUILDER_BRANCH:-master}"
 IPA_BUILDER_COMMIT="${IPA_BUILDER_COMMIT:-HEAD}"
@@ -38,7 +38,6 @@ IMAGE_REGISTRY="registry.nordix.org"
 CONTAINER_IMAGE_REPO="metal3"
 STAGING="${STAGING:-false}"
 METADATA_PATH="/tmp/metadata.txt"
-
 
 # Install required packages
 sudo apt install --yes python3-pip python3-virtualenv qemu-utils
@@ -131,12 +130,16 @@ if $ENABLE_BOOTSTRAP_TEST; then
     pushd "${DEV_ENV_REPO_LOCATION}"
     git checkout "${METAL3_DEV_ENV_COMMIT}"
     METAL3_DEV_ENV_COMMIT="$(git rev-parse HEAD)"
-    make
-    make test
     # shellcheck source=/dev/null
     source "./lib/common.sh"
     # shellcheck source=/dev/null
     source "./lib/releases.sh"
+    make
+    kubectl patch bmh node-0 -n metal3 --type merge --patch-file \
+        "/tmp/bmh-patch-long-serial.yaml"
+    kubectl patch bmh node-1 -n metal3 --type merge --patch-file \
+        "/tmp/bmh-patch-short-serial.yaml"
+    make test
     CERT_MANAGER_VERSION="$(grep -r "Installing cert-manager Version" |sed -n 's/.*\(v[0-9]\.[0-9]\.[0-9]\)"/\1/p' | head -n 1)"
     cat << EOF >> "${METADATA_PATH}"
 METAL3_DEV_ENV_REPO="${METAL3_DEV_ENV_REPO}"

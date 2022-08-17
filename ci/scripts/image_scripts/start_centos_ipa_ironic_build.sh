@@ -44,6 +44,8 @@ scp \
   "${CI_DIR}/../artifactory/utils.sh" \
   "${CI_DIR}/../harbor/harbor_utils.sh" \
   "${CI_DIR}/run_build_ironic.sh" \
+  "${CI_DIR}/bmh-patch-short-serial.yaml" \
+  "${CI_DIR}/bmh-patch-long-serial.yaml" \
   "${METAL3_CI_USER}@${BUILDER_IP}:/tmp/" > /dev/null
 
 # Send IPA builder custom element to remote executer
