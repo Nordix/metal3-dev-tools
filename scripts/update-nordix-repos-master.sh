@@ -26,6 +26,9 @@ HWCC_REPO="https://github.com/metal3-io/hardware-classification-controller.git"
 IPA_REPO="https://github.com/openstack/ironic-python-agent.git"
 IPA_BUILDER_REPO="https://github.com/openstack/ironic-python-agent-builder.git"
 TOPOLVM_REPO="https://github.com/topolvm/topolvm.git"
+SRIOV_CNI_REPO="https://github.com/k8snetworkplumbingwg/sriov-cni.git"
+SRIOV_SRIOV_NDP_REPO="https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin.git"
+
 
 NORDIX_CAPM3_REPO="git@github.com:Nordix/cluster-api-provider-metal3.git"
 NORDIX_CAPO_REPO="git@github.com:Nordix/cluster-api-provider-openstack.git"
@@ -41,6 +44,9 @@ NORDIX_HWCC_REPO="git@github.com:Nordix/metal3-hardware-classification-controlle
 NORDIX_IPA_REPO="git@github.com:Nordix/ironic-python-agent.git"
 NORDIX_IPA_BUILDER_REPO="git@github.com:Nordix/ironic-python-agent-builder.git"
 NORDIX_TOPOLVM="git@github.com:Nordix/topolvm.git"
+NORDIX_SRIOV_CNI_REPO="git@github.com:Nordix/sriov-cni.git"
+NORDIX_SRIOV_NDP_REPO="git@github.com:Nordix/sriov-network-device-plugin.git"
+
 
 LOCAL_CAPM3_REPO="${WORKSPACE}/cluster-api-provider-metal3"
 LOCAL_CAPO_REPO="${WORKSPACE}/cluster-api-provider-openstack"
@@ -56,13 +62,15 @@ LOCAL_HWCC_REPO="${WORKSPACE}/hardware-classification-controller"
 LOCAL_IPA_REPO="${WORKSPACE}/ironic-python-agent.git"
 LOCAL_IPA_BUILDER_REPO="${WORKSPACE}/ironic-python-agent-builder.git"
 LOCAL_TOPOLVM="${WORKSPACE}/topolvm.git"
+LOCAL_SRIOV_CNI_REPO="${WORKSPACE}/sriov-cni.git"
+LOCAL_SRIOV_NDP_REPO="${WORKSPACE}/sriov-network-device-plugin.git"
 
 pushd "${SCRIPTPATH}" || exit
 cd ..
 
-UPDATE_REPO="${1:-${LOCAL_CAPM3_REPO} ${LOCAL_CAPO_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO} ${LOCAL_PROJECTINFRA_REPO} ${LOCAL_IRONIC_IMAGE_REPO} ${LOCAL_IPAM_REPO} ${LOCAL_METAL3GITHUBIO_REPO} ${LOCAL_HWCC_REPO} ${LOCAL_IPA_REPO} ${LOCAL_IPA_BUILDER_REPO} ${LOCAL_TOPOLVM}}"
-UPSTREAM_REPO="${3:-${CAPM3_REPO} ${CAPO_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO} ${PROJECTINFRA_REPO} ${IRONIC_IMAGE_REPO} ${IPAM_REPO} ${METAL3GITHUBIO_REPO} ${HWCC_REPO} ${IPA_REPO} ${IPA_BUILDER_REPO} ${TOPOLVM_REPO}}"
-NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO} ${NORDIX_PROJECTINFRA_REPO} ${NORDIX_IRONIC_IMAGE_REPO} ${NORDIX_IPAM_REPO} ${NORDIX_METAL3GITHUBIO_REPO} ${NORDIX_HWCC_REPO} ${NORDIX_IPA_REPO} ${NORDIX_IPA_BUILDER_REPO} ${NORDIX_TOPOLVM}}"
+UPDATE_REPO="${1:-${LOCAL_CAPM3_REPO} ${LOCAL_CAPO_REPO} ${LOCAL_CAPI_REPO} ${LOCAL_BMO_REPO} ${LOCAL_M3DOCS_REPO} ${LOCAL_M3DEVENV_REPO} ${LOCAL_PROJECTINFRA_REPO} ${LOCAL_IRONIC_IMAGE_REPO} ${LOCAL_IPAM_REPO} ${LOCAL_METAL3GITHUBIO_REPO} ${LOCAL_HWCC_REPO} ${LOCAL_IPA_REPO} ${LOCAL_IPA_BUILDER_REPO} ${LOCAL_TOPOLVM} ${LOCAL_SRIOV_CNI_REPO} ${LOCAL_SRIOV_NDP_REPO}}"
+UPSTREAM_REPO="${3:-${CAPM3_REPO} ${CAPO_REPO} ${CAPI_REPO} ${BMO_REPO} ${M3DOCS_REPO} ${M3DEVENV_REPO} ${PROJECTINFRA_REPO} ${IRONIC_IMAGE_REPO} ${IPAM_REPO} ${METAL3GITHUBIO_REPO} ${HWCC_REPO} ${IPA_REPO} ${IPA_BUILDER_REPO} ${TOPOLVM_REPO} ${SRIOV_CNI_REPO} ${SRIOV_NDP_REPO}}"
+NORDIX_REPO="${4:-${NORDIX_CAPM3_REPO} ${NORDIX_CAPO_REPO} ${NORDIX_CAPI_REPO} ${NORDIX_BMO_REPO} ${NORDIX_M3DOCS_REPO} ${NORDIX_M3DEVENV_REPO} ${NORDIX_PROJECTINFRA_REPO} ${NORDIX_IRONIC_IMAGE_REPO} ${NORDIX_IPAM_REPO} ${NORDIX_METAL3GITHUBIO_REPO} ${NORDIX_HWCC_REPO} ${NORDIX_IPA_REPO} ${NORDIX_IPA_BUILDER_REPO} ${NORDIX_TOPOLVM} ${NORDIX_SRIOV_CNI_REPO} ${NORDIX_SRIOV_NDP_REPO}}"
 
 # This function syncs a single branch between Nordix and upstream (usually Metal3) repository
 function update_custom_branch {
