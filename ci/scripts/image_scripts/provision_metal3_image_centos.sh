@@ -22,6 +22,7 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 sudo dnf distro-sync -y
 sudo dnf update -y curl nss
 sudo dnf install -y git make
+sudo dnf install -y podman-catatonit
 
 # Install EPEL repo (later required by atop, python3-bcrypt and python3-passlib)
 sudo dnf update -y && sudo dnf install -y epel-release
