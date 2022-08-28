@@ -15,18 +15,25 @@ sudo rm /etc/NetworkManager/conf.d/99-cloud-init.conf || true
 sudo systemctl restart NetworkManager
 # Configure network (set nameservers, disable peer DNS and remove mac address
 # that was automatically added). The rest of the fields are kept as is.
-cat <<EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth0
-NAME="System eth0"
-BOOTPROTO=dhcp
-DEVICE=eth0
-MTU=1500
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-PEERDNS=no
-DNS1=8.8.8.8
-DNS2=8.8.4.4
+cat <<EOF | sudo tee /etc/NetworkManager/system-connections/System-eth0.nmconnection
+[connection]
+id=System eth0
+type=ethernet
+interface-name=eth0
+autoconnect-priority=0
+
+[ethernet]
+mtu=1500
+
+[ipv4]
+dns=8.8.8.8;8.8.4.4;
+ignore-auto-dns=true
+method=auto
+
+[ipv6]
+method=ignore
 EOF
 # Apply the changes
+sudo chmod 600 /etc/NetworkManager/system-connections/System-eth0.nmconnection
 sudo nmcli connection reload
-sudo nmcli connection up "System eth0"
+sudo nmcli connection up 'System eth0'
