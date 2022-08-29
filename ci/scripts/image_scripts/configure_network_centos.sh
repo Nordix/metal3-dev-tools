@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set NetworkManagers plugin to keyfile
+sudo sed -i 's/^plugins.*/plugins = keyfile/g' /etc/NetworkManager/NetworkManager.conf
+
 # Disable cloud-init network configuration that would overwrite the network config.
 cat <<EOF | sudo tee /etc/cloud/cloud.cfg.d/01-network.cfg
 network:
