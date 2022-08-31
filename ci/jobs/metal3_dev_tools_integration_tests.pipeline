@@ -50,8 +50,8 @@ pipeline {
     TESTS_FOR="${TESTS_FOR}"
     IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
     DST_FOLDER="metal3/images/temp"
-    FINAL_IMAGE_NAME="${IMAGE_OS}_tmp_img_${RAND_NAME}"
-    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.24.1' }"
+    FINAL_IMAGE_NAME="MOHAMMED-2-UBUNTU_NODE_IMAGE_K8S"
+    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.8' }"
 
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
@@ -97,11 +97,7 @@ pipeline {
               /data/ci/images/gen_node_ubuntu_image.sh \
               /data/id_ed25519_metal3ci 1"
 
-            /* Delete image */
-            sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
-              delete_image "${FINAL_IMAGE_NAME}"
-            """
+
             }
           }
         }
@@ -202,7 +198,7 @@ EOF
           /* Delete temporary image from artifactory */
           sh """#!/bin/bash
           source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
-          rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
+          /* rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0" */
           """
       }
     }
