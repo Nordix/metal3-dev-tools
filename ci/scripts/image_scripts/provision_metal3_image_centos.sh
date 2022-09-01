@@ -16,16 +16,16 @@ FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE:-true}"
 export IMAGE_OS="${IMAGE_OS:-Centos}"
 export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-minikube}"
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
+export CONTAINER_REGISTRY="registry.nordix.org/quay-io-proxy"
+export DOCKER_HUB_PROXY="registry.nordix.org/docker-hub-proxy"
 
 "${SCRIPTS_DIR}"/configure_network_centos.sh
 
 sudo dnf distro-sync -y
-sudo dnf update -y curl nss
 sudo dnf install -y git make
-sudo dnf install -y podman-catatonit
 
 # Install EPEL repo (later required by atop, python3-bcrypt and python3-passlib)
-sudo dnf update -y && sudo dnf install -y epel-release
+sudo dnf install -y epel-release
 
 # Without this minikube cannot start properly kvm and fails.
 # As a simple workaround, this will create an empty file which can
@@ -54,9 +54,6 @@ sudo su -l -c "minikube delete" "${USER}"
 popd
 
 rm -rf "${M3_DENV_PATH}"
-
-# We need podman in order to pull container images for Centos Jenkins image
-sudo dnf -y install podman
 
 # Download container images
 "${SCRIPTS_DIR}"/source_cluster_container_images.sh
