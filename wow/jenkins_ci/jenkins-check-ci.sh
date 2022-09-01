@@ -14,7 +14,7 @@ all_pass=true
 tput clear
 tput bold
 
-out=$(curl -s https://jenkins.nordix.org/view/Metal3%20Main/api/json?pretty=true | jq '.jobs[]|.color+" "+.name+" "+.url' | sort -u | egrep "red|aborted"| column -t )
+out=$(curl -s https://jenkins.nordix.org/view/Metal3%20Periodic/api/json?pretty=true | jq '.jobs[]|.color+" "+.name+" "+.url' | sort -u | egrep "red|aborted"| column -t )
 if [[ ! -z "$out" ]]; then
     if [[ "$all_pass" == true ]]; then
         tput setaf 1
