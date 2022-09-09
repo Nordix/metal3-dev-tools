@@ -34,7 +34,7 @@ SSH_USER_NAME="${SSH_USER_NAME:-${USER}}"
 SSH_PUBLIC_KEY_FILE="${SSH_PUBLIC_KEY_FILE:-/home/${USER}/.ssh/id_rsa.pub}"
 SSH_PRIVATE_KEY_FILE="${SSH_PRIVATE_KEY_FILE:-/home/${USER}/.ssh/id_rsa}"
 IMAGE_NAME="${IMAGE_NAME:-${USER}-test}"
-# Image to start build from. For example ubuntu-22.04-server-cloudimg-amd64 or CentOS-Stream-GenericCloud-9
+# Image to start build from. For example ubuntu-22.04-server-cloudimg-amd64 or CentOS-Stream-9-20220829
 SOURCE_IMAGE_NAME="${SOURCE_IMAGE_NAME:-CentOS-Stream-GenericCloud-8}"
 # Group to add user to. To get sudo access on CentOS: wheel, on Ubuntu: sudo
 SSH_USER_GROUP="${SSH_USER_GROUP:-wheel}"

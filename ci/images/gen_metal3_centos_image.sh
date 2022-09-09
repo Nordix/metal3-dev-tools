@@ -40,7 +40,7 @@ fi
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
-SOURCE_IMAGE_NAME="CentOS-Stream-GenericCloud-9"
+SOURCE_IMAGE_NAME="CentOS-Stream-9-20220829"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
