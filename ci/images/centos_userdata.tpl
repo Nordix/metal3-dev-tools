@@ -9,4 +9,3 @@ users:
 
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
-  - echo "options kvm tdp_mmu=0" >> /etc/modprobe.d/kvm.conf
