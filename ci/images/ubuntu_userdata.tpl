@@ -9,4 +9,5 @@ users:
 
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
+  - sed -i "s/persistent/none/g"  /usr/lib/systemd/network/99-default.link
   - echo "options kvm tdp_mmu=0" >> /etc/modprobe.d/kvm.conf
