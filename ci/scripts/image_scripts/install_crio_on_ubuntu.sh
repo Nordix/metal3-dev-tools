@@ -2,7 +2,7 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.24.2"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.25.0"}
 source /etc/os-release
 if [[ ${VERSION_ID} == "20.04" ]]
 then
