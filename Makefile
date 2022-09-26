@@ -140,12 +140,12 @@ test: ## Run unit test for the code in repository
 integration_test: ## Run integration test
 	$(CURDIR)/ci/scripts/tests/integration_test.sh
 
-.PHONY: build_ipa
+.PHONY: build_fullstack
 build_ipa:
-	$(CURDIR)/ci/scripts/image_scripts/start_centos_ipa_ironic_build.sh
+	$(CURDIR)/ci/scripts/image_scripts/start_centos_fullstack_build.sh
 
-.PHONY: clean_ipa_builder_vm
-clean_ipa_builder_vm:
+.PHONY: clean_fullstack_builder_vm
+clean_fullstack_builder_vm:
 	$(CURDIR)/ci/scripts/openstack/delete_openstack_vm.sh
 
 .PHONY: integration_test_cleanup
