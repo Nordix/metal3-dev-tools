@@ -53,7 +53,7 @@ pipeline {
 
   }
   stages {
-    stage('Building ipa image'){
+    stage('Building and testing full Metal3 stack'){
       options {
         timeout(time: TIMEOUT, unit: 'SECONDS')
       }
@@ -63,11 +63,11 @@ pipeline {
             withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
               withCredentials([usernamePassword(credentialsId: 'metal3ci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                 withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
-                  /* IPA Image building script */
+                  /* Fullstack building script */
                   script {
                     CURRENT_START_TIME = System.currentTimeMillis()
                   }
-                  sh "make build_ipa"
+                  sh "make build_fullstack"
                 }
               }
             }
@@ -87,9 +87,9 @@ pipeline {
       }
       withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
-          /* Delete IPA image builder vm */
+          /* Delete fullstack builder vm */
           sh "./ci/scripts/image_scripts/start_log_collection.sh"
-          sh "make clean_ipa_builder_vm"
+          sh "make clean_fullstack_builder_vm"
         }
       }
       archiveArtifacts "logs-${env.BUILD_TAG}.tgz"

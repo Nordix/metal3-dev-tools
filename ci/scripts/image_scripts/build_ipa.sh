@@ -6,19 +6,39 @@ set -eu
 # The path to the directory that holds this script
 CURRENT_SCRIPT_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")"
 # Repository configuration options
-METAL3_DEV_ENV_REPO="https://github.com/metal3-io/metal3-dev-env"
-METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH:-main}"
-METAL3_DEV_ENV_COMMIT="${METAL3_DEV_ENV_COMMIT:-HEAD}"
+# IPA BRANCH IS PINNED ATM
 IPA_REPO="https://github.com/Nordix/ironic-python-agent"
 IPA_BRANCH="quick_fix_root_device"
-IPA_COMMIT="refs/heads/quick_fix_root_device"
-IPA_BUILDER_REPO="${IPA_BUILDER_REPO:-https://github.com/Nordix/ironic-python-agent-builder.git}"
+IPA_REF="refs/heads/quick_fix_root_device"
+IPA_BUILDER_REPO="${IPA_BUILDER_REPO:-https://opendev.org/openstack/ironic-python-agent-builder.git}"
 IPA_BUILDER_BRANCH="${IPA_BUILDER_BRANCH:-master}"
 IPA_BUILDER_COMMIT="${IPA_BUILDER_COMMIT:-HEAD}"
 IPA_BUILD_WORKSPACE="${IPA_BUILD_WORKSPACE:-/tmp/dib}"
 OPENSTACK_REQUIREMENTS_REF="${OPENSTACK_REQUIREMENTS_REF:-master}"
-BMO_BRANCH="${BMO_BRANCH:-main}"
-BMO_COMMIT="${BMO_COMMIT:-HEAD}"
+# Metal3 dev env repo configuration for testing the newly built IPA
+METAL3_DEV_ENV_REPO="${METAL3_DEV_ENV_REPO:-https://github.com/metal3-io/metal3-dev-env}"
+METAL3_DEV_ENV_BRANCH="${METAL3_DEV_ENV_BRANCH:-main}"
+METAL3_DEV_ENV_COMMIT="${METAL3_DEV_ENV_COMMIT:-HEAD}"
+# Components needed for a working Metal3 deployment
+# Changes done to the component's git configuration makes a difference only
+# in case local image building is enabled.
+BMOREPO="${BMOREPO:-https://github.com/metal3-io/baremetal-operator.git}"
+BMOBRANCH="${BMO_BRANCH:-main}"
+BMOCOMMIT="${BMO_COMMIT:-HEAD}"
+CAPM3REPO="${CAPM3_REPO:-https://github.com/metal3-io/cluster-api-provider-metal3.git}"
+CAPM3BRANCH="${CAPM3_BRANCH:-main}"
+CAPM3COMMIT="${CAPM3_COMMIT:-HEAD}"
+IPAMREPO="${IPAM_REPO:-https://github.com/metal3-io/ip-address-manager.git}"
+IPAMBRANCH="${IPAM_BRANCH:-main}"
+IPAMCOMMIT="${IPAM_COMMIT:-HEAD}"
+CAPIREPO="${CAPI_REPO:-https://github.com/kubernetes-sigs/cluster-api.git}"
+CAPIBRANCH="${CAPI_BRANCH:-main}"
+CAPICOMMIT="${CAPI_COMMIT:-HEAD}"
+# Metal3 dev env local build configuration
+BUILD_CAPM3_LOCALLY="${BUILD_CAPM3_LOCALLY:-true}"
+BUILD_BMO_LOCALLY="${BUILD_BMO_LOCALLY:-true}"
+BUILD_IPAM_LOCALLY="${BUILD_IPAM_LOCALLY:-true}"
+BUILD_CAPI_LOCALLY="${BUILD_CAPI_LOCALLY:-false}"
 
 # General environment variables
 # The following 3 vars could be usefull to be changed during testing
@@ -64,7 +84,7 @@ git clone --single-branch --branch "${IPA_BRANCH}" "${IPA_REPO}"
 # Generate the IPA image identifier string
 pushd "./ironic-python-agent"
 # IDENTIFIER is the git commit of the HEAD and the ISO 8061 UTC timestamp
-git checkout "${IPA_COMMIT}"
+git checkout "${IPA_REF}"
 IPA_COMMIT="$(git rev-parse HEAD)"
 IPA_BUILDER_COMMIT_SHORT="$(git rev-parse --short HEAD)"
 IPA_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")-${IPA_BUILDER_COMMIT_SHORT}"
@@ -81,7 +101,7 @@ python3 -m pip install "./${IPA_BUILDER_PATH}"
 # Configure the IPA builder to pull the IPA source from Nordix fork
 export DIB_REPOLOCATION_ironic_python_agent="${IPA_REPO}"
 export DIB_REPOREF_requirements="${OPENSTACK_REQUIREMENTS_REF}"
-export DIB_REPOREF_ironic_python_agent="${IPA_COMMIT}"
+export DIB_REPOREF_ironic_python_agent="${IPA_REF}"
 
 # IPA builder customisation variables
 # Path to custom IPA builder kernel module element
@@ -125,8 +145,23 @@ if $ENABLE_BOOTSTRAP_TEST; then
     export IRONIC_IMAGE="${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"
     export USE_LOCAL_IPA=true
     export IPA_DOWNLOAD_ENABLED=false
-    export BMOCOMMIT="${BMO_COMMIT}"
-    export BMOBRANCH="${BMO_BRANCH}"
+    export BMOREPO
+    export BMOBRANCH
+    export BMOCOMMIT
+    export CAPM3REPO
+    export CAPM3BRANCH
+    export CAPM3COMMIT
+    export IPAMREPO
+    export IPAMBRANCH
+    export IPAMCOMMIT
+    export CAPIREPO
+    export CAPIBRANCH
+    export CAPICOMMIT
+    export BUILD_CAPM3_LOCALLY
+    export BUILD_BMO_LOCALLY
+    export BUILD_IPAM_LOCALLY
+    export BUILD_CAPI_LOCALLY
+    # execute
     pushd "${DEV_ENV_REPO_LOCATION}"
     git checkout "${METAL3_DEV_ENV_COMMIT}"
     METAL3_DEV_ENV_COMMIT="$(git rev-parse HEAD)"
@@ -169,15 +204,23 @@ EOF
     popd
     pushd "${IPAMPATH}"
     cat << EOF >> "${METADATA_PATH}"
-IPAM_REPO="${IPAMREPO:-}"
-IPAM_BRANCH="${IPAMBRANCH:-}"
+IPAM_REPO="${IPAMREPO}"
+IPAM_BRANCH="${IPAMBRANCH}"
 IPAM_COMMIT="$(git rev-parse HEAD)"
 EOF
     popd
-    cat << EOF >> "${METADATA_PATH}"
+    if $BUILD_CAPI_LOCALLY; then
+        cat << EOF >> "${METADATA_PATH}"
+CAPI_REPO="${CAPIREPO}"
+CAPI_BRANCH="${CAPIBRANCH}"
+CAPI_COMMIT="${CAPICOMMIT}"
+EOF
+    else
+        cat << EOF >> "${METADATA_PATH}"
 CAPI_RELEASE="${CAPIRELEASE}"
 CAPI_VERSION="${CAPI_VERSION}"
 EOF
+    fi
     popd
 fi
 
