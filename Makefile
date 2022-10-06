@@ -141,7 +141,7 @@ integration_test: ## Run integration test
 	$(CURDIR)/ci/scripts/tests/integration_test.sh
 
 .PHONY: build_fullstack
-build_ipa:
+build_fullstack:
 	$(CURDIR)/ci/scripts/image_scripts/start_centos_fullstack_build.sh
 
 .PHONY: clean_fullstack_builder_vm
