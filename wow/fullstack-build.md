@@ -10,28 +10,30 @@
 - Jenkins - https://www.jenkins.io/
 
 ## High level overview of the build pipeline
-The goal of the combined Ironic and IPA build pipeline is to build and test the two components together thus verify that given version of IPA and Ironic are
-compatible. In case of a successful build both a versioned archive of IPA and a versioned OCI container image of Ironic will be generated and they will be
-stored according the current artifact retention policy.
+The goal of the combined fullstack build pipeline is to build from source and test the all Metal3 and Openstack-Ironic components together thus verify that given version of
+IPA, Ironic, BMO, CAPI, CAPM3, IPAM are compatible. In case of a successful build both a versioned archive of IPA and a versioned OCI container image of Ironic will be
+generated and they will be stored according the current artifact retention policy.
 
-There are two pipelines related to the combined Ironic and IPA build process, one of them is called
-`metal3_master_openstack_ipa_and_ironic_image_building` that can be found [here](https://jenkins.nordix.org/view/Metal3/job/metal3_master_openstack_ipa_and_ironic_image_building/).
-The other one is the `metal3_openstack_ipa_and_ironic_image_building` and that is [here](https://jenkins.nordix.org/view/Metal3/job/metal3_openstack_node_image_building/).
-The difference between the two jobs is related to their trigger mechanism. `metal3_master_openstack_ipa_and_ironic_image_building` is triggered periodically, manually and whenever there is
-a change in `metal3-dev-tools` repository. `metal3_openstack_ipa_and_ironic_image_building` is used to test `GitHub` pull requests and the job is triggered by
-commenting `/test-ipa` on a pull request.
+There are two pipelines related to the combined Fullstack build process, one of them is called
+`metal3_main_fullstack_building` that can be found [here](https://jenkins.nordix.org/view/Metal3%20Periodic/job/metal3_daily_main_fullstack_building/).
+The other one is the `metal3_fullstack_building` and that is [here](https://jenkins.nordix.org/view/Metal3/job/metal3_fullstack_building_test/).
+The difference between the two jobs is related to their trigger mechanism. `metal3_main_fullstack_building` is triggered periodically, manually and whenever there is
+a change in `metal3-dev-tools` repository. `metal3_fullstack_building` is used to test `GitHub` pull requests and the job is triggered by
+commenting `/test-metal3-fullstack` on a pull request.
 
 The JJB configurations for the jobs are located in [Nordix gerrit](https://gerrit.nordix.org/infra/cicd) and inside the repository
-the files are located at `jjb/metal3/job_ipa_image_building.yml` for `metal3_master_openstack_ipa_and_ironic_image_building` and at `jjb/metal3/job_ipa_image_building_test.yml` for `metal3_openstack_ipa_and_ironic_image_building`.
+the files are located at `jjb/metal3/job_fullstack_building.yml` for `metal3_main_fullstack_building` and at
+`jjb/metal3/job_fullstack_building_test.yml` for `metal3_fullstack_building`.
 
 The pipeline script has only a single stage that starts a wrapper script that runs on a `static worker VM` and the wrapper script will
-bootstrap the VM that will actually build and test both IPA and Ironic. The wrapper script is located at
-`ci/scripts/image_scripts/start_centos_ipa_ironic_build.sh`.
+bootstrap the VM that will actually build and test both the whole stack. The wrapper script is located at
+`ci/scripts/image_scripts/start_centos_fullstack_build.sh`.
 
 After the wrapper script has bootstrapped the builder VM it will first copy the Ironic build script from the `static worker VM` to the `builder VM` and the
 Ironic build will be started on the `builder VM`. The script that builds the Ironic container image is located at
 `ci/scripts/image_scripts/run_build_ironic.sh`. The script that builds the IPA and runs the combined test of the previously built Ironic and IPA components is
-located at `ci/scripts/image_scripts/build_ipa.sh`
+located at `ci/scripts/image_scripts/build_ipa.sh` and this script can and by default will build also CAPM3, IPAM, BMO from source and there is also an option
+to build CAPI locally from source in case the build is executed manually from Jenkins webUI.
 
 ## Ironic build
 
@@ -56,8 +58,10 @@ and the path to the patch file will be supplied with the `docker build` command'
 The goal of the IPA build process is to create a custom `.tar` archive that contains the linux kernel and the rootfs image that make up an IPA instance. The
 resulting IPA `.tar` archive is uploaded to [nordix artifactory](https://artifactory.nordix.org/)
 
-The IPA build process uses the python tool called [IPA builder](https://github.com/Nordix/ironic-python-agent-builder.git) to build a selected version of
-[IPA](https://github.com/Nordix/ironic-python-agent). The version of the IPA repository tha will be built is specified via the `IPA_REF` and the `IPA_BRANCH` environment variables. The `IPA_BRANCH`specifies what branch of IPA will be used during the build and the `IPA_REF` specifies the git commit hash that is used to select a specific version of the repository on the branch. By using the Nordix fork of the IPA repository and custom commit hash and branch name it is possible to build versions of ipa that are not part of the [upstream IPA repository](https://opendev.org/openstack/ironic-python-agent).
+The IPA build process uses the python tool called [IPA builder](https://opendev.org/openstack/ironic-python-agent-builder) to build a selected version of
+[IPA](https://github.com/Nordix/ironic-python-agent). The version of the IPA repository that will be built is specified via the `IPA_REF` and the `IPA_BRANCH` environment variables. The `IPA_BRANCH`specifies
+what branch of IPA will be used during the build and the `IPA_REF` specifies the git commit hash that is used to select a specific version of the repository on the branch. By using the Nordix fork of the IPA
+repository and custom commit hash and branch name it is possible to build versions of ipa that are not part of the [upstream IPA repository](https://opendev.org/openstack/ironic-python-agent).
 
 The build process consists of the following steps:
 
@@ -74,7 +78,7 @@ The build process consists of the following steps:
 6. Check the size of the archive
 
 7. Clone the [metal3-dev-env](https://github.com/Nordix/metal3-dev-env) and use it to test whether the newly built IPA is compatible with the previously built
-Ironic version
+Ironic, CAPI, CAPM3, IPAM, BMO
 
 8. When the combined IPA and Ironic test succeeds IPA archive will be uploaded to Nordix artifactory
 
@@ -82,9 +86,10 @@ Ironic version
 ## Combined IPA and Ironic testing
 
 As it was already mentioned as the 7. step of the IPA build process the newly built IPA and Ironic images are tested together with the help of the
-[metal3-dev-env](https://github.com/Nordix/metal3-dev-env). The test process has two major parts the first one just simply bootstraps a development environment
+[metal3-dev-env](https://github.com/metal3-io/metal3-dev-env.git). The test process has two major parts the first one just simply bootstraps a development environment
 using IPA and Ironic it is done by executing the `make` command in metal3-dev-env that will bootstrap a cluster (bootstrap cluster) that will serve as the test
-environment. After the environment setup has been successful then with the `make test` command the build script executes the `05_test.sh` and that will run the
+environment. The bootstrap process of the dev-ev also handles the building of images (e.g. CAPI, CAPM3, IPAM, BMO) according to the implementation in the `02_configure_host.sh` script of dev-env.
+After the environment setup has been successful then with the `make test` command the build script executes the `05_test.sh` and that will run the
 ansible based test process.
 
 The process started by the `make test` command will provision control plane and worker nodes for a new cluster (target cluster) then it will also test
@@ -110,29 +115,50 @@ As an example shows the directory structure is the following: `ipa/<staging or r
 
 # Metadata and customization
 
-The pipeline that handles the IPA and Ironic build offers a number of customization options:
+The pipeline that handles the Metal3 fullstack build offers a number of customization options:
 
   - `IRONIC_REFSPEC`: Gerrit refspec of the patch we want to test. `Example: refs/changes/84/800084/22`
   - `IRONIC_IMAGE_REPO_COMMIT`: Ironic Image repository commit hash to build
   - `IRONIC_IMAGE_BRANCH`: Ironic image repository branch to build
   - `IRONIC_INSPECTOR_REFSPEC`: Gerrit refspec of the patch we want to test. `Example: refs/changes/84/800084/22`
+  - `IPA_REPO`: The default Git repository of the Ironic Python Agent
+  - `IPA_REF`: Ironic Python Agent Git repository reference string
+  - `IPA_BRANCH`: Ironic Python Agent Git repository branch to build
+  - `IPA_BUILDER_REPO`: Ironic Python Agent builder Git repository
+  - `IPA_BUILDER_BRANCH`: Ironic Python Agent builder Git repository branch
+  - `IPA_BUILDER_COMMIT`: Ironic Python Agent builder Git repository commit
+  - `METAL3_DEV_ENV_REPO`: The Git repository of metal3-dev-env
+  - `METAL3_DEV_ENV_BRANCH`: Metal3 dev env  Git repository branch
+  - `METAL3_DEV_ENV_COMMIT`: Metal3 dev env Git repository commit
+  - `BUILD_BMO_LOCALLY`: Enable or disable BMO local building (enabled by default)
+  - `BUILD_CAPM3_LOCALLY`: Enable or disable CAPM3 local building (enabled by default)'
+  - `BUILD_IPAM_LOCALLY`: Enable or disable IPAM local building (enabled by default)
+  - `BUILD_CAPI_LOCALLY`: Enable or disable CAPI local building (disabled by default)
+  - `BMO_REPO`: `The Git repository used to build BMO`
   - `BMO_BRANCH`: Git branch of the BMO repository to be used
   - `BMO_COMMIT`: Git commit of the BMO repository to be used
-  - `IPA_COMMIT`: Ironic Python Agent repository commit hash to build
-  - `IPA_BRANCH`: Ironic Python Agent repository branch to build
-  - `IPA_BUILDER_BRANCH`: Ironic Python Agent builder repository tool branch
-  - `IPA_BUILDER_COMMIT`: Ironic Python Agent builder repository tool commit
-  - `METAL3_DEV_ENV_BRANCH`: Metal3 dev env repository branch
-  - `METAL3_DEV_ENV_COMMIT`: Metal3 dev env repository commit
+  - `CAPM3_REPO`: The Git repository used to build Cluster API provider Metal3
+  - `CAPM3_BRANCH`: Cluster API provider Metal3 Git repository branch to build
+  - `CAPM3_COMMIT`: Cluster API provider Metal3 Git repository commit hash to build
+  - `IPAM_REPO`: IP Address Manager Git repository branch to build
+  - `IPAM_BRANCH`: IP Address Manager Git repository branch to build
+  - `IPAM_COMMIT`: IP Address Manager Git repository commit hash to build
+  - `CAPI_REPO`: Cluster API Git repository branch to build
+  - `CAPI_BRANCH`: Cluster API Git repository branch to build
+  - `CAPI_COMMIT`: Cluster API Git repository commit hash to build
   - `STAGING`: Configures IPA builder upload mode (staging/review)
 
-The custumization options provide git branch, commit and refspec customization options in case of a manually triggered IPA-Ironic build job.
-There is one additional type of custumization option that is called `STAGING` this controls whether the IPA artifact will be uploaded to
+The custumization options provide git repository, branch, commit and refspec customization options in case of a manually triggered IPA-Ironic build job.
+The options also provide the possibility to selectively enable/disable CAPI, CAPM3, IPAM, and BMO local building.
+There is one additional type of custumization option that is called `STAGING` that controlls whether the IPA artifact will be uploaded to
 `Artifactory` as part of a review or a staging group.
 
-The IPA build script also creates a metadata file and packages into the IPA `.tar` archive. The metadata file contains git metadata
-such as repositories, branches and commit hashes and in some cases refspec and container image version for components used for
-Ironic and IPA build.
+The IPA build script also creates a metadata file and packages into the IPA `.tar` archive. The metadata file contains metadata
+such as repositories, branches and commit hashes and in some cases references and container image version for components used during
+the building and testing of the Metal3 stack.
+
+In case of CAPI the metadata content depends on whether CAPI is built from source or not. By default CAPI is not built from source
+during the fullstack build because the Metal3 project's components (CAPM3, IPAM, BMO) are developed against stable CAPI releases.
 
 Metadata is generated for the following components:
  - IPA builder
@@ -144,3 +170,4 @@ Metadata is generated for the following components:
  - BMO
  - CAPI
  - CAPM3
+ - IPAM
