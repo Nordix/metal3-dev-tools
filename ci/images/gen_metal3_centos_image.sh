@@ -22,15 +22,12 @@ if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   BUILDER_CONFIG_FILE="image_builder_template_node.json"
   IMAGE_FLAVOR="1C-4GB-20GB"
   FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
-  REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} CRICTL_VERSION=${CRICTL_VERSION} /home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
   CI_KEYPAIR_NAME="metal3ci-key-centos"
   BUILDER_CONFIG_FILE="image_builder_template.json"
   IMAGE_FLAVOR="4C-16GB-50GB"
   FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
-  REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
-
 else
   echo "Available provisioning scripts are:"
   echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
@@ -50,6 +47,12 @@ SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"
 NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 SSH_USER_GROUP="wheel"
+
+if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
+  REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} CRICTL_VERSION=${CRICTL_VERSION} /home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
+elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
+  REMOTE_EXEC_CMD="KUBERNETES_VERSION=${KUBERNETES_VERSION} /home/${SSH_USER_NAME}/image_scripts/${PROVISIONING_SCRIPT}"
+fi
 
 SSH_AUTHORIZED_KEY="$(cat "${OS_SCRIPTS_DIR}/id_ed25519_metal3ci.pub")"
 render_user_data \
