@@ -7,9 +7,9 @@ set -eu
 CURRENT_SCRIPT_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")"
 # Repository configuration options
 # IPA BRANCH IS PINNED ATM
-IPA_REPO="https://github.com/Nordix/ironic-python-agent"
-IPA_BRANCH="quick_fix_root_device"
-IPA_REF="refs/heads/quick_fix_root_device"
+IPA_REPO="${IPA_REPO:-https://opendev.org/openstack/ironic-python-agent.git}"
+IPA_BRANCH="${IPA_BRANCH:-master}"
+IPA_REF="${IPA_REF:-HEAD}"
 IPA_BUILDER_REPO="${IPA_BUILDER_REPO:-https://opendev.org/openstack/ironic-python-agent-builder.git}"
 IPA_BUILDER_BRANCH="${IPA_BUILDER_BRANCH:-master}"
 IPA_BUILDER_COMMIT="${IPA_BUILDER_COMMIT:-HEAD}"
@@ -45,6 +45,11 @@ BUILD_CAPI_LOCALLY="${BUILD_CAPI_LOCALLY:-false}"
 DISABLE_UPLOAD="${DISABLE_UPLOAD:-false}"
 RT_UTILS="${RT_UTILS:-/tmp/utils.sh}"
 ENABLE_BOOTSTRAP_TEST="${ENABLE_BOOTSTRAP_TEST:-true}"
+TEST_IN_CI="${TEST_IN_CI:-true}"
+ENABLE_DEV_USER_PASS="${ENABLE_DEV_USER_PASS:-false}"
+ENABLE_DEV_USER_SSH="${ENABLE_DEV_USER_SSH:-false}"
+DEV_USER_SSH_PATH="${DEV_USER_SSH_PATH:-$HOME/.ssh/id_rsa.pub}"
+
 
 RT_URL="${RT_URL:-https://artifactory.nordix.org/artifactory}"
 IPA_BUILDER_PATH="ironic-python-agent-builder"
@@ -102,6 +107,14 @@ python3 -m pip install "./${IPA_BUILDER_PATH}"
 export DIB_REPOLOCATION_ironic_python_agent="${IPA_REPO}"
 export DIB_REPOREF_requirements="${OPENSTACK_REQUIREMENTS_REF}"
 export DIB_REPOREF_ironic_python_agent="${IPA_REF}"
+export DIB_DEV_USER_USERNAME=metal3
+if [ "${ENABLE_DEV_USER_PASS}" == "true" ]; then
+export DIB_DEV_USER_PWDLESS_SUDO=yes
+export DIB_DEV_USER_PASSWORD="metal3"
+fi
+if [ "${ENABLE_DEV_USER_SSH}" == "true" ]; then
+export DIB_DEV_USER_AUTHORIZED_KEYS="${DEV_USER_SSH_PATH}"
+fi
 
 # IPA builder customisation variables
 # Path to custom IPA builder kernel module element
@@ -140,9 +153,11 @@ fi
 # the Metal3 dev-env
 if $ENABLE_BOOTSTRAP_TEST; then
     git clone --single-branch --branch "${METAL3_DEV_ENV_BRANCH}" "${METAL3_DEV_ENV_REPO}"
-    # shellcheck source=/dev/null
-    source "/tmp/vars.sh"
-    export IRONIC_IMAGE="${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"
+    if $TEST_IN_CI; then
+        # shellcheck source=/dev/null
+        source "/tmp/vars.sh"
+        export IRONIC_IMAGE="${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"
+    fi
     export USE_LOCAL_IPA=true
     export IPA_DOWNLOAD_ENABLED=false
     export BMOREPO
@@ -170,8 +185,6 @@ if $ENABLE_BOOTSTRAP_TEST; then
     # shellcheck source=/dev/null
     source "./lib/releases.sh"
     make
-    kubectl patch bmh node-0 -n metal3 --type merge --patch-file \
-        "/tmp/bmh-patch-long-serial.yaml"
     kubectl patch bmh node-1 -n metal3 --type merge --patch-file \
         "/tmp/bmh-patch-short-serial.yaml"
     make test
