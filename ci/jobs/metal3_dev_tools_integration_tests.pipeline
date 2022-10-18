@@ -50,9 +50,9 @@ pipeline {
     TESTS_FOR="${TESTS_FOR}"
     IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
     DST_FOLDER="metal3/images/temp"
-    FINAL_IMAGE_NAME="${IMAGE_OS}_tmp_img_${RAND_NAME}"
-    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.25.2' }"
-    CRICTL_VERSION="${CRICTL_VERSION ?: 'v1.25.0' }"
+    FINAL_IMAGE_NAME="CENTOS_8_NODE_IMAGE_K8S_FOR_BML_v1.23.3"
+    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.23.3' }"
+    CRICTL_VERSION="${CRICTL_VERSION ?: 'v1.23.0' }"
 
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
@@ -204,7 +204,6 @@ EOF
           /* Delete temporary image from artifactory */
           sh """#!/bin/bash
           source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
-          rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
           """
       }
     }

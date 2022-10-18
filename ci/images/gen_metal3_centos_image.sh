@@ -10,8 +10,8 @@ CI_DIR="$(dirname "$(readlink -f "${0}")")/.."
 IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
-CENTOS_VERSION="9"
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.25.2"}
+CENTOS_VERSION="8"
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.23.3"}
 
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
@@ -21,7 +21,7 @@ if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   CI_KEYPAIR_NAME="metal3ci-key-centos"
   BUILDER_CONFIG_FILE="image_builder_template_node.json"
   IMAGE_FLAVOR="1C-4GB-20GB"
-  FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
+  FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_FOR_BML_""${KUBERNETES_VERSION}"}
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
   CI_KEYPAIR_NAME="metal3ci-key-centos"
@@ -40,7 +40,7 @@ fi
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"
-SOURCE_IMAGE_NAME="CentOS-Stream-9-20220829"
+SOURCE_IMAGE_NAME="CentOS-Stream-GenericCloud-8"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
 SSH_KEYPAIR_NAME="${CI_KEYPAIR_NAME}"

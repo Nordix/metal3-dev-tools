@@ -2,7 +2,7 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.25.0"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.23.3"}
 ARCH=${ARCH:-"amd64"}
 # CRI-O version goes 1:1 with Kubernetes version. Thus,
 # please make sure that k8s version given in
@@ -37,3 +37,6 @@ sudo systemctl start crio
 # Download crictl
 curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
 sudo tar -C /usr/local/bin -xzf crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
+
+# Delete default cni config for crio
+sudo rm /etc/cni/net.d/*
