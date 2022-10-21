@@ -10,4 +10,3 @@ users:
 runcmd:
   - sed -i "/^127.0.0.1/ s/$/ ${HOSTNAME}/" /etc/hosts
   - sed -i 's/#Storage.*/Storage=persistent/' /etc/systemd/journald.conf
-  - echo exclude=NetworkManager* >> /etc/yum.conf
