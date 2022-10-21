@@ -25,6 +25,31 @@ sudo dnf install -y ebtables socat conntrack-tools
 sudo dnf install python3 -y
 sudo dnf install gcc kernel-headers kernel-devel keepalived -y
 sudo dnf install device-mapper-persistent-data lvm2 -y
+# Workaround on centos network manager versions higher than 1.40.0-1.el9 are failing after creating a bridge e.g running:
+
+# tee -a /etc/NetworkManager/system-connections/provisioning-1.nmconnection <<EOF
+# [connection]
+# id=provisioning-1
+# type=bridge
+# interface-name=provisioning-1
+# [bridge]
+# stp=false
+# [ipv4]
+# address1=172.22.0.1/24
+# method=manual
+# [ipv6]
+# addr-gen-mode=eui64
+# method=disabled
+# EOF
+# chmod 600 /etc/NetworkManager/system-connections/provisioning-1.nmconnection
+# nmcli con load /etc/NetworkManager/system-connections/provisioning-1.nmconnection
+# nmcli con up provisioning-1
+
+# After those commands ssh connection will be lost
+# This workaround downgrade NetworkManager version to NetworkManager-1.40.0-1.el9
+sudo yum downgrade -y NetworkManager-1.40.0-1.el9
+sudo systemctl restart NetworkManager
+
 
 # Disable SELINUX enforcing
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
