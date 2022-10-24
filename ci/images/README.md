@@ -128,7 +128,7 @@ And here is how to use it:
 ```bash
 source vars.sh
 source openstack.rc
-./run_local.sh provision_metal3_image_ubuntu.sh
+./run_local.sh provision_metal3_image.sh
 ```
 
 **Remember to clean up the images when you no longer need them!**
