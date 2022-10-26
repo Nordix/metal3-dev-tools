@@ -96,6 +96,7 @@ pipeline {
                   sh "docker run --rm \
                     ${DOCKER_CMD_ENV}\
                     -v ${CURRENT_DIR}:/data \
+                    -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
                     registry.nordix.org/metal3/image-builder \
                     /data/ci/images/gen_base_ubuntu_image.sh \
                     /data/id_ed25519_metal3ci 1"
