@@ -87,19 +87,18 @@ pipeline {
           stage('Building Ubuntu base image') {
             steps {
               echo 'Building Ubuntu base image for ${REGION} region'
-              withCredentials([
-                usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD'),
-                sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')
-              ]) {
-                catchError([stageResult: 'FAILURE', message: "Failed to build Ubuntu base image in ${REGION}"]) {
+              withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                  catchError([stageResult: 'FAILURE', message: "Failed to build Ubuntu base image in ${REGION}"]) {
                   /* Generate base ubuntu image */
-                  sh "docker run --rm \
-                    ${DOCKER_CMD_ENV}\
-                    -v ${CURRENT_DIR}:/data \
-                    -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
-                    registry.nordix.org/metal3/image-builder \
-                    /data/ci/images/gen_base_ubuntu_image.sh \
-                    /data/id_ed25519_metal3ci 1"
+                    sh "docker run --rm \
+                      ${DOCKER_CMD_ENV}\
+                      -v ${CURRENT_DIR}:/data \
+                      -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
+                      registry.nordix.org/metal3/image-builder \
+                      /data/ci/images/gen_base_ubuntu_image.sh \
+                      /data/id_ed25519_metal3ci 1"
+                  }
                 }
               }
             }
@@ -111,19 +110,18 @@ pipeline {
             }
             steps {
               echo 'Building Jenkins image for ${REGION} region'
-              withCredentials([
-                usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD'),
-                sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')
-              ]) {
-                catchError([stageResult: 'FAILURE', message: "Failed to build Ubuntu Jenkins image in ${REGION}"]) {
-                  /* Generate Jumphost / Jenkins ubuntu image */
-                  sh "docker run --rm \
-                    ${DOCKER_CMD_ENV}\
-                    -v ${CURRENT_DIR}:/data \
-                    -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
-                    registry.nordix.org/metal3/image-builder \
-                    /data/ci/images/gen_jumphost_jenkins_ubuntu_image.sh \
-                    /data/id_ed25519_metal3ci 1"
+              withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                  catchError([stageResult: 'FAILURE', message: "Failed to build Ubuntu Jenkins image in ${REGION}"]) {
+                    /* Generate Jumphost / Jenkins ubuntu image */
+                    sh "docker run --rm \
+                      ${DOCKER_CMD_ENV}\
+                      -v ${CURRENT_DIR}:/data \
+                      -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
+                      registry.nordix.org/metal3/image-builder \
+                      /data/ci/images/gen_jumphost_jenkins_ubuntu_image.sh \
+                      /data/id_ed25519_metal3ci 1"
+                  }
                 }
               }
             }
@@ -155,20 +153,19 @@ pipeline {
             }
             steps {
               echo 'Building Metal3 ${IMAGE_OS} image for ${REGION} region'
-              withCredentials([
-                usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD'),
-                sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')
-              ]) {
-                catchError([stageResult: 'FAILURE', message: "Failed to build the Metal3 ${IMAGE_OS} image for ${REGION} region"]) {
-                  /* Generate Metal3 image */
-                  sh "docker run --rm \
-                    ${DOCKER_CMD_ENV}\
-                    -v ${CURRENT_DIR}:/data \
-                    -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
-                    registry.nordix.org/metal3/image-builder \
-                    /data/ci/images/gen_metal3_${IMAGE_OS.toLowerCase()}_image.sh \
-                    /data/id_ed25519_metal3ci 1 \
-                    provision_metal3_image_${IMAGE_OS.toLowerCase()}.sh"
+              withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){
+                  catchError([stageResult: 'FAILURE', message: "Failed to build the Metal3 ${IMAGE_OS} image for ${REGION} region"]) {
+                    /* Generate Metal3 image */
+                    sh "docker run --rm \
+                      ${DOCKER_CMD_ENV}\
+                      -v ${CURRENT_DIR}:/data \
+                      -v ${METAL3_CI_USER_KEY}=/data/id_ed25519_metal3ci \
+                      registry.nordix.org/metal3/image-builder \
+                      /data/ci/images/gen_metal3_${IMAGE_OS.toLowerCase()}_image.sh \
+                      /data/id_ed25519_metal3ci 1 \
+                      provision_metal3_image_${IMAGE_OS.toLowerCase()}.sh"
+                  }
                 }
               }
             }
