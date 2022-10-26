@@ -2,11 +2,11 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.25.0"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.17.0"}
 source /etc/os-release
-if [[ ${VERSION_ID} == "20.04" ]]
+if [[ ${VERSION_ID} == "18.04" ]]
 then
-  OS=${OS:-"xUbuntu_20.04"}
+  OS=${OS:-"xUbuntu_18.04"}
 else
   OS=${OS:-"xUbuntu_22.04"}
 fi
@@ -50,9 +50,16 @@ curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:sta
 sudo apt-get update
 sudo apt-get install cri-o cri-o-runc -y
 
+# mount option with meta copy removed
+sudo sed 's/\(^mountopt = *\)/#\1/' /etc/containers/storage.conf
 # Start CRI-O
 sudo systemctl daemon-reload
+sudo ln -s /usr/lib/cri-o-runc/sbin/runc /usr/bin/runc
+sudo sed 's|conmon = ""|conmon = "/usr/bin/conmon"|' -i /etc/crio/crio.conf
+sudo cat /etc/crio/crio.conf
 sudo systemctl start crio
+# conmon =
+# conmon = "/usr/bin/conmon"
 
 # Download crictl
 curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
