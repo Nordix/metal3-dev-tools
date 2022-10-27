@@ -119,7 +119,7 @@ export RT_USER=<your-username>
 export RT_TOKEN=<your-token>
 ```
 
-**NOTE:** The script uploads the node images (i.e. those produced by `provision_node_image.sh` and `provision_node_image_centos.sh`) to Artifactory.
+**NOTE:** The script uploads the node images (i.e. those produced by `provision_node_image_ubuntu.sh` and `provision_node_image_centos.sh`) to Artifactory.
 Make sure you use an image name that does not conflict with existing images!
 This is also a good idea for other images since they will end up in Openstack.
 

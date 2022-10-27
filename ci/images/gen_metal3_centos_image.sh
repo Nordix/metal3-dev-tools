@@ -29,10 +29,11 @@ elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   IMAGE_FLAVOR="4C-16GB-50GB"
   FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
 else
-  echo "Available provisioning scripts are:"
-  echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
-  echo "Example:"
-  echo "./gen_metal3_centos_image.sh /data/keys/id_ed25519_metal3ci 1 provision_node_image_centos.sh"
+  PROVISIONING_SCRIPTS=($(ls ${CI_DIR}/scripts/image_scripts | egrep 'provision_(node|metal3)_image_centos.sh'))
+  echo """
+Available provisioning scripts are: ${PROVISIONING_SCRIPTS[*]}
+Example:
+$(realpath $0) /data/keys/id_ed25519_metal3ci 1 ${PROVISIONING_SCRIPTS[0]:-}"""
   exit 1
 fi
 
