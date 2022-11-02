@@ -42,7 +42,7 @@ elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   IMAGE_FLAVOR="4C-16GB-50GB"
   BUILDER_CONFIG_FILE="image_builder_template.json"
 else
-  PROVISIONING_SCRIPTS=($(ls ${CI_DIR}/scripts/image_scripts | egrep 'provision_(node|metal3)_image(_ubuntu)?.sh'))
+  PROVISIONING_SCRIPTS=($(ls ${CI_DIR}/scripts/image_scripts | egrep 'provision_(node|metal3)_image_ubuntu.sh'))
   echo """
 Available provisioning scripts are: ${PROVISIONING_SCRIPTS[*]}
 Example:
