@@ -81,7 +81,7 @@ pipeline {
                     registry.nordix.org/metal3/image-builder \
                     /data/ci/images/gen_metal3_${IMAGE_OS.toLowerCase()}_image.sh \
                     /data/id_ed25519_metal3ci 1 \
-                    provision_node_image_${IMAGE_OS.toLowerCase()}.sh
+                    provision_node_image_${IMAGE_OS.toLowerCase()}.sh"
                 }
               }
             }
