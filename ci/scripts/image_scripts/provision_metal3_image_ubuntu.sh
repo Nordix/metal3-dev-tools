@@ -28,6 +28,8 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 export IMAGE_OS="${IMAGE_OS:-Ubuntu}"
 export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-kind}"
 
+"${SCRIPTS_DIR}"/configure_network_ubuntu.sh
+
 #Install Operator SDK
 OSDK_RELEASE_VERSION=v0.19.0
 curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OSDK_RELEASE_VERSION}/operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
