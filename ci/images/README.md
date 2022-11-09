@@ -94,6 +94,7 @@ It allows overriding many variables so it should be easy to customize to your ne
 
 This is how you use it:
 
+0. Create an ssh key using `ssh-keygen` if you don't have one already and add it to openstack: `openstack keypair create --public-key /path/to/key <name>`.
 1. Check the comments and variables at the top of `run_local.sh` and determine what you want/need to override.
 2. Create a file with your custom variables.
 3. Get an openstack.rc file with credentials to the cloud you want to build in.
