@@ -35,9 +35,6 @@ RUN curl -LO https://raw.githubusercontent.com/golang/dep/master/install.sh && \
     mkdir -p /data/go/bin && chmod +x install.sh && ./install.sh && rm install.sh && \
     mv /data/go/bin/dep /usr/local/bin && \
     \
-    curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && \
-    chmod +x operator-sdk-v0.9.0-x86_64-linux-gnu && cp operator-sdk-v0.9.0-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-v0.9.0-x86_64-linux-gnu && \
-    \
     curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \
