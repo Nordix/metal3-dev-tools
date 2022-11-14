@@ -60,9 +60,6 @@ RUN apk add --update \
     tar xzf ./kustomize_v*_linux_amd64.tar.gz && \
     chmod u+x kustomize && \
     mv kustomize /usr/local/bin \
-    && curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && \
-    chmod +x operator-sdk-v0.9.0-x86_64-linux-gnu && cp operator-sdk-v0.9.0-x86_64-linux-gnu /usr/local/bin/operator-sdk  \
-    && rm operator-sdk-v0.9.0-x86_64-linux-gnu && \
     go get github.com/securego/gosec/cmd/gosec && \
     mv /go/bin/gosec /usr/local/bin && \
     go get -u golang.org/x/lint/golint && \

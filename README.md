@@ -69,7 +69,7 @@ make workspace
 ### Running the tests
 
 All the following actions take place in the container. Otherwise
-check you have installed everything properly (go 1.12, bazel, operator-sdk etc.)
+check you have installed everything properly (go 1.18, bazel, etc.)
 
 If you want to run the metal3 tests, you first need to fetch the dependencies.
 

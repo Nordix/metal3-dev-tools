@@ -30,13 +30,6 @@ export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-kind}"
 
 "${SCRIPTS_DIR}"/configure_network_ubuntu.sh
 
-#Install Operator SDK
-OSDK_RELEASE_VERSION=v0.19.0
-curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OSDK_RELEASE_VERSION}/operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
-chmod +x operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu
-sudo mkdir -p /usr/local/bin/
-sudo mv operator-sdk-${OSDK_RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
-
 sudo apt install -y git
 
 ## Install metal3 requirements
