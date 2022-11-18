@@ -172,3 +172,90 @@ source openstack.rc
 openstack image list
 openstack image delete ${IMAGE_NAME}
 ```
+
+## Packer image build flow
+
+This describes the flow of configuration and invocation of scripts in order to build an image with `run_local.sh`. This flow matches `provision_metal3_image_ubuntu.sh` provisioning.
+
+Requirements for the build are:
+
+* `openstack.rc` from an OpenStack instance
+* `SSH_KEYPAIR_NAME` for pre-created SSH keypair in OpenStack
+* Docker or other `CONTAINER_RUNTIME` installed
+* Access to `registry.nordix.org` Docker registry for `image-builder` image
+* OpenStack needs to have source image preloaded
+* Write access to `artifactory.nordix.org` for node image upload after build
+
+```mermaid
+graph TD
+   runtime[Container runtime]
+   registry[Artifactory Registry]
+   imagebuilder[image-builder Docker image]
+   sourceimage[Preloaded source image]
+   packer_variables[Packer Variables]
+   packer_provisioner[Packer Provisioners]
+   packer_builder[Packer Builders]
+   packer_template[Packer JSON config / image_builder_template*.json]
+   openstack[OpenStack]
+   packer[Packer]
+   env_config[Configuration via environment vars]
+   uservar_template[Uservars template file]
+   opt_env_vars[Optional environment vars]
+   provision_script[provision_*.sh]
+   provision_script_body[Inline commands]
+
+   env_config --> |Refers| sourceimage
+
+   subgraph packer_variables_sub[Packer variables]
+      openstack.rc --> |User sourced| env_config
+      SSH_KEYPAIR_NAME --> |User defined| env_config
+      opt_env_vars --> env_config
+      infra_defines.sh --> |Constants| env_config
+      env_config --> packer_variables
+      env_config --> uservar_template
+      ubuntu_userdata.tpl --> uservar_template
+      openstack/utils.sh --> uservar_template
+      %% uservar_template --> |Passed to| packer_variables
+      uservar_template --> |Passed to| packer
+   end
+
+   subgraph packer_provisioners_sub[Packer provisioning]
+      configure_network.sh --> |Executed by| provision_script
+      cluster_container_images.sh --> |Executed by| provision_script
+      setup_monitoring.sh --> |Executed by| provision_script
+      cloud_init.sh --> |Executed by| provision_script
+      provision_script_body --> provision_script
+      provision_script --> packer_provisioner
+   end
+
+   subgraph packer_builders_sub[Packer builders]
+      openstack_builder[OpenStack Builder] --> |Defined in| packer_builder
+   end
+
+   packer_provisioner --> packer_template
+   packer_builder --> packer_template
+   packer_variables --> packer_template
+
+   subgraph docker_image[Packer in Docker]
+      registry --> |Pre-built| imagebuilder
+      imagebuilder --> |Pulls| runtime
+      runtime --> |Runs in| packer
+   end
+
+   packer_template --> |Configures| packer
+   packer --> |Executes| openstack
+   sourceimage --> |Built on| openstack
+
+   subgraph image_handling[Image handling]
+      openstack --> |Builds| openstack_image
+      openstack_image --> node_image_q{Is it node image?}
+      node_image_q --> |No| non-node_image[Non-node image]
+      node_image_q --> |Yes| node_image
+      node_image[Node image] --> upload_node_image.sh
+      artifactory/utils.sh --> upload_node_image.sh
+      openstack_image[OpenStack image] --> |Download| local_image
+      upload_node_image.sh --> local_image
+      local_image[Local image file] --> |Upload| artifactory_repo[Artifactory Repository]
+      RT_ENV_VARS[RT_* environment vars] --> upload_node_image.sh
+   end
+```
