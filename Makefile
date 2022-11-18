@@ -5,7 +5,6 @@ NAME    := ${PROJECT}-${APP}
 lint_folder ?= $(CURDIR)
 
 image_registry        := registry.nordix.org
-workspace_img_ver     := latest
 lint_md_img_ver       := latest
 lint_go_img_ver       := latest
 gotest_unit_img_ver   := latest
@@ -31,29 +30,6 @@ update-remote-repos: ## Update nordix repos
 .PHONY: update-nordix-artifacts
 update-nordix-artifacts: ## Update Nordix Artifactory
 	$(CURDIR)/scripts/update-nordix-artifacts.sh
-
-.PHONY: build-workspace
-build-workspace: ## Build Docker Image for workspace
-	docker build \
-		-t ${NAME}-workspace \
-		-f resources/docker/workspace/Dockerfile resources/docker/workspace/
-	docker tag ${NAME}-workspace:latest ${image_registry}/metal3/${NAME}-workspace:${workspace_img_ver}
-
-.PHONY: push-workspace
-push-workspace: ## Push Docker Image for Workspace to nordix registry
-	docker push ${image_registry}/metal3/${NAME}-workspace:${workspace_img_ver}
-
-.PHONY: workspace
-workspace: ## Create and execute dev workspace for nordix repos
-	docker run \
-		--rm -it \
-		--name workspace \
-		--network host \
-		-v "${CURDIR}:/data" \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v "${HOME}"/.kube/:/root/.kube \
-		-v "${HOME}"/.minikube:"${HOME}"/.minikube \
-		${image_registry}/metal3/${NAME}-workspace:${workspace_img_ver}
 
 .PHONY: lint-md
 lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
