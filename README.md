@@ -60,12 +60,6 @@ cd metal3-dev-env
 make
 ```
 
-## Alternative way to run a development container
-
-```sh
-make workspace
-```
-
 ### Running the tests
 
 All the following actions take place in the container. Otherwise
