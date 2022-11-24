@@ -129,11 +129,6 @@ pipeline {
               /data/id_ed25519_metal3ci 1 \
               provision_node_image_centos.sh"
 
-            /* Delete image */
-            sh """#!/bin/bash
-              source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/openstack/utils.sh)
-              delete_image "${FINAL_IMAGE_NAME}"
-            """
             }
           }
         }
@@ -198,16 +193,6 @@ EOF
     }
   }
   post {
-    always {
-      withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')]) {
-
-          /* Delete temporary image from artifactory */
-          sh """#!/bin/bash
-          source <(curl -s https://raw.githubusercontent.com/Nordix/metal3-dev-tools/${UPDATED_BRANCH}/ci/scripts/artifactory/utils.sh)
-          rt_delete_artifact "${DST_FOLDER}/${FINAL_IMAGE_NAME}.qcow2" "0"
-          """
-      }
-    }
     success {
       withCredentials([usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')]) {
         withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]){

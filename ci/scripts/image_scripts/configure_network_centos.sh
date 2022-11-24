@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Set NetworkManagers plugin to keyfile
 sudo sed -i 's/^plugins.*/plugins = keyfile/g' /etc/NetworkManager/NetworkManager.conf
+sudo sed -i 's/^#level=TRACE.*/level=TRACE/g' /etc/NetworkManager/NetworkManager.conf
 
 # Disable cloud-init network configuration that would overwrite the network config.
 cat <<EOF | sudo tee /etc/cloud/cloud.cfg.d/01-network.cfg
@@ -40,3 +40,5 @@ EOF
 sudo chmod 600 /etc/NetworkManager/system-connections/System-eth0.nmconnection
 sudo nmcli connection reload
 sudo nmcli connection up 'System eth0'
+
+

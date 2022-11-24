@@ -50,6 +50,9 @@ sudo dnf install device-mapper-persistent-data lvm2 -y
 sudo yum downgrade -y NetworkManager-1.40.0-1.el9
 sudo systemctl restart NetworkManager
 
+#set password and install missing firmware in kernel for bml
+sudo yum install linux-firmware -y
+sudo usermod --password $(echo password123 | openssl passwd -1 -stdin) metal3ci
 
 # Disable SELINUX enforcing
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
