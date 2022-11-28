@@ -65,7 +65,7 @@ STAGING="${STAGING:-false}"
 METADATA_PATH="/tmp/metadata.txt"
 
 # Install required packages
-sudo apt install --yes python3-pip python3-virtualenv qemu-utils
+sudo apt-get install --yes python3-pip python3-virtualenv qemu-utils
 
 # Create the work directory
 mkdir --parents "${IPA_BUILD_WORKSPACE}"

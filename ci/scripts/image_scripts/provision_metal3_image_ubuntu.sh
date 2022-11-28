@@ -30,7 +30,7 @@ export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-kind}"
 
 "${SCRIPTS_DIR}"/configure_network_ubuntu.sh
 
-sudo apt install -y git
+sudo apt-get install -y git
 
 ## Install metal3 requirements
 mkdir -p "${M3_DENV_ROOT}"
