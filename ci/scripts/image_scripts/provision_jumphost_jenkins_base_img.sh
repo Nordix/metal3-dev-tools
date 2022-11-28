@@ -8,7 +8,7 @@ set -eux
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
 # Install required packages.
-sudo apt install -y \
+sudo apt-get install -y \
   openjdk-8-jre \
   python3-pip
 

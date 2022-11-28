@@ -54,7 +54,7 @@ pipeline {
       }
       steps {
 
-        sh 'sudo apt install -y make'
+        sh 'sudo apt-get install -y make'
         sh 'make build-lint-md'
         sh 'make build-lint-go'
       }

@@ -28,7 +28,7 @@ fi
 # Install utility binaries on machines, Eg. net-tools
 machines=$(kinder get nodes --name "${cluster_name}")
 for machine in ${machines}; do
-    docker exec "${machine}" bash -c 'apt update -y;apt install -y tree vim net-tools mlocate iputils-ping'
+    docker exec "${machine}" bash -c 'apt-get update -y; apt-get install -y tree vim net-tools mlocate iputils-ping'
 done
 
 # Remove existing and create more control plane networks

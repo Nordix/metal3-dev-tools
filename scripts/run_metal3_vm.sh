@@ -33,7 +33,7 @@ if [[ ! -f "$WORK_DIR/ubuntu_metal3_vm.qcow2" ]] || [[ $vm_defined != *"ubuntu-m
 
   echo "Creating config ISO"
   # Install this package to generate iso from qcow2 file
-  sudo apt install  -y cloud-utils
+  sudo apt-get install -y cloud-utils
   # Create file iso
   sudo rm "$WORK_DIR/config.iso" || true
   cloud-localds "$WORK_DIR/ubuntu-metal3-config.iso" "$WORK_DIR/ubuntu-metal3-config.yaml"
