@@ -9,7 +9,7 @@ SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
 # Install required packages.
 sudo apt-get install -y \
-  openjdk-8-jre \
+  openjdk-11-jre \
   python3-pip
 
 sudo pip3 install \
