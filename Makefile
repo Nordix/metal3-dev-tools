@@ -72,8 +72,9 @@ build-go-unittest: ## Build Docker Image for go unit test
 push-go-unittest: ## Push Docker Image for go unit test to nordix registry
 	docker push ${image_registry}/metal3/${NAME}-gotest-unit:${gotest_unit_img_ver}
 
-SHELLCHECK_VERSION := "v0.7.0"
-SHELLCHECK_IMAGE := "koalaman/shellcheck-alpine:${SHELLCHECK_VERSION}"
+SHELLCHECK_VERSION := "v0.9.0"
+SHELLCHECK_DIGEST := "sha256:e19ed93c22423970d56568e171b4512c9244fc75dd9114045016b4a0073ac4b7"
+SHELLCHECK_IMAGE := "docker.io/koalaman/shellcheck-alpine:${SHELLCHECK_VERSION}@${SHELLCHECK_DIGEST}"
 .PHONY: lint-shell
 lint-shell: ## Lint shell scripts (ex: make lint-shell or make lint-shell lint_folder=abspath)
 	docker run --rm \
