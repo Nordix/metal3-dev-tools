@@ -144,16 +144,16 @@ done
 
 # Sync non default branches on selected repos
 
-CAPM3_RELEASE_BRANCHES="release-0.3 release-0.4 release-0.5"
+CAPM3_RELEASE_BRANCHES="release-0.5 release-1.1 release-1.2 release-1.3"
 update_custom_branch "$CAPM3_RELEASE_BRANCHES" "$LOCAL_CAPM3_REPO" "$NORDIX_CAPM3_REPO"
 
-IPAM_RELEASE_BRANCHES="release-0.0 release-0.1"
+IPAM_RELEASE_BRANCHES="release-0.1 release-1.1 release-1.2 release-1.3"
 update_custom_branch "$IPAM_RELEASE_BRANCHES" "$LOCAL_IPAM_REPO" "$NORDIX_IPAM_REPO"
 
-CAPI_RELEASE_BRANCHES="release-0.4 release-1.0 release-1.1"
+CAPI_RELEASE_BRANCHES="release-0.4 release-1.1 release-1.2 release-1.3"
 update_custom_branch "$CAPI_RELEASE_BRANCHES" "$LOCAL_CAPI_REPO" "$NORDIX_CAPI_REPO"
 
-CAPO_RELEASE_BRANCHES="release-0.3 release-0.4 release-0.5"
+CAPO_RELEASE_BRANCHES="release-0.3 release-0.4 release-0.5 release-0.6 release-0.7"
 update_custom_branch "$CAPO_RELEASE_BRANCHES" "$LOCAL_CAPO_REPO" "$NORDIX_CAPO_REPO"
 
 popd || exit
