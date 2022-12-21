@@ -17,7 +17,7 @@ source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 # shellcheck disable=SC1090
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.25.2"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.0"}
 CI_KEYPAIR_NAME=${CI_KEYPAIR_NAME:-"metal3ci-key"}
 
 IMAGE_NAME="${CI_METAL3_IMAGE}-$(get_random_string 10)"

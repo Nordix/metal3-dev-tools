@@ -51,7 +51,7 @@ pipeline {
     IMAGE_LOCATION="https://artifactory.nordix.org/artifactory/metal3/images/temp/"
     DST_FOLDER="metal3/images/temp"
     FINAL_IMAGE_NAME="${IMAGE_OS}_tmp_img_${RAND_NAME}"
-    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.25.2' }"
+    KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.26.0' }"
     CRICTL_VERSION="${CRICTL_VERSION ?: 'v1.25.0' }"
 
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
