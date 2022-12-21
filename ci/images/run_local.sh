@@ -38,7 +38,7 @@ IMAGE_NAME="${IMAGE_NAME:-${USER}-test}"
 SOURCE_IMAGE_NAME="${SOURCE_IMAGE_NAME:-CentOS-Stream-GenericCloud-8}"
 # Group to add user to. To get sudo access on CentOS: wheel, on Ubuntu: sudo
 SSH_USER_GROUP="${SSH_USER_GROUP:-wheel}"
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.25.2"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.0"}
 # The network name is by defualt set to $DEV_EXT_NET. You can override it here.
 NETWORK_NAME=""
 # Or if you want to use ID, set this instead:
