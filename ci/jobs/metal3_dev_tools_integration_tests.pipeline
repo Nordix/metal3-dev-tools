@@ -96,8 +96,8 @@ pipeline {
               -v ${CURRENT_DIR}:/data \
               -v ${METAL3_CI_USER_KEY}:/data/id_ed25519_metal3ci \
               registry.nordix.org/metal3/image-builder \
-              /data/ci/images/gen_node_ubuntu_image.sh \
-              /data/id_ed25519_metal3ci 1"
+              /data/ci/images/gen_metal3_ubuntu_image.sh \
+              /data/id_ed25519_metal3ci 1 provision_node_image_ubuntu.sh"
 
             /* Delete image */
             sh """#!/bin/bash
