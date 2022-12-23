@@ -30,7 +30,7 @@ EOF
 sudo sysctl --system
 sudo setenforce 0
 
-curl https://raw.githubusercontent.com/cri-o/cri-o/main/scripts/get | sudo bash -s -- -t ${VERSION}
+curl https://raw.githubusercontent.com/cri-o/cri-o/${VERSION}/scripts/get | sudo bash -s -- -t ${VERSION}
 sudo systemctl daemon-reload
 sudo systemctl start crio
 
