@@ -20,15 +20,15 @@
     },
     {
       "matchPackageNames": ["kubernetes/kubernetes"],
-      "allowedVersions": "<=1.26"
+      "allowedVersions": "<=1.23"
     },
     {
       "matchPackageNames": ["kindest/node"],
-      "allowedVersions": "<=1.26"
+      "allowedVersions": "<=1.23"
     },
     {
       "matchPackageNames": ["kubernetes-sigs/cri-tools"],
-      "allowedVersions": "<=1.26"
+      "allowedVersions": "<=1.23"
     }
   ],
   "prHourlyLimit": 5,

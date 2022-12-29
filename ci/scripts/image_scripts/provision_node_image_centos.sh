@@ -3,7 +3,7 @@
 set -uex
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.0"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.25.2"}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.14.0"}
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
@@ -50,9 +50,8 @@ sudo dnf install device-mapper-persistent-data lvm2 -y
 sudo yum downgrade -y NetworkManager-1.40.0-1.el9
 sudo systemctl restart NetworkManager
 
-#set password and install missing firmware in kernel for bml
+# Fixes bnx2x firmware issue with NIC (reported here https://bugzilla.redhat.com/show_bug.cgi?id=1952463)
 sudo yum install linux-firmware -y
-sudo usermod --password $(echo password123 | openssl passwd -1 -stdin) metal3ci
 
 # Disable SELINUX enforcing
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
