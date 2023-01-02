@@ -115,6 +115,9 @@ fi
 if [ "${ENABLE_DEV_USER_SSH}" == "true" ]; then
 export DIB_DEV_USER_AUTHORIZED_KEYS="${DEV_USER_SSH_PATH}"
 fi
+export DIB_INSTALLTYPE_simple_init="repo"
+export DIB_REPOLOCATION_glean="https://github.com/Nordix/glean.git"
+export DIB_REPOREF_glean="refs/heads/extend_label_support"
 
 # IPA builder customisation variables
 # Path to custom IPA builder kernel module element
@@ -130,7 +133,8 @@ ironic-python-agent-builder --output "${IPA_IMAGE_NAME}" \
     --element='dynamic-login' --element='journal-to-console' \
     --element='devuser' --element='openssh-server' \
     --element='extra-hardware' --element='ipa-module-autoload' \
-    --element='ipa-add-buildinfo' --element='ipa-cleanup-dracut' --verbose
+    --element='ipa-add-buildinfo' --element='ipa-cleanup-dracut' \
+    --element='simple-init' --element='override-simple-init' --verbose
 
 # Deactivate the python virtual environment
 deactivate
