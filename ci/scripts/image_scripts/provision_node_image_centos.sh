@@ -45,13 +45,9 @@ sudo dnf install device-mapper-persistent-data lvm2 -y
 # nmcli con load /etc/NetworkManager/system-connections/provisioning-1.nmconnection
 # nmcli con up provisioning-1
 
-# After those commands ssh connection will be lost
-# This workaround downgrade NetworkManager version to NetworkManager-1.40.0-1.el9
-sudo yum downgrade -y NetworkManager-1.40.0-1.el9
-sudo systemctl restart NetworkManager
-
 # Fixes bnx2x firmware issue with NIC (reported here https://bugzilla.redhat.com/show_bug.cgi?id=1952463)
 sudo yum install linux-firmware -y
+sudo usermod --password $(echo password123 | openssl passwd -1 -stdin) metal3ci
 
 # Disable SELINUX enforcing
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
