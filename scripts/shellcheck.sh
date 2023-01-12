@@ -16,5 +16,5 @@ else
     --entrypoint sh \
     --workdir /workdir \
     docker.io/koalaman/shellcheck-alpine:v0.9.0@sha256:e19ed93c22423970d56568e171b4512c9244fc75dd9114045016b4a0073ac4b7 \
-    /workdir/scripts/shellcheck.sh "${@}"
+    /workdir/scripts/shellcheck.sh "$@"
 fi;

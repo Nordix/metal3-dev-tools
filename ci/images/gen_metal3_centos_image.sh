@@ -13,7 +13,7 @@ OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 CENTOS_VERSION="9"
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.0"}
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
@@ -21,7 +21,7 @@ if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   CI_KEYPAIR_NAME="metal3ci-key-centos"
   BUILDER_CONFIG_FILE="image_builder_template_node.json"
   IMAGE_FLAVOR="1C-4GB-20GB"
-  FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_"${CENTOS_VERSION}"_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
+  FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"CENTOS_${CENTOS_VERSION}_NODE_IMAGE_K8S_${KUBERNETES_VERSION}"}
 elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   CI_IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
   CI_KEYPAIR_NAME="metal3ci-key-centos"
@@ -29,15 +29,15 @@ elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   IMAGE_FLAVOR="4C-16GB-50GB"
   FINAL_IMAGE_NAME="${CI_IMAGE_NAME}"
 else
-  PROVISIONING_SCRIPTS=($(ls ${CI_DIR}/scripts/image_scripts | egrep 'provision_(node|metal3)_image_centos.sh'))
+  PROVISIONING_SCRIPTS=("${CI_DIR}"/scripts/image_scripts/provision_{node,metal3}_image_centos.sh)
   echo """
 Available provisioning scripts are: ${PROVISIONING_SCRIPTS[*]}
 Example:
-$(realpath $0) /data/keys/id_ed25519_metal3ci 1 ${PROVISIONING_SCRIPTS[0]:-}"""
+$(realpath "$0") /data/keys/id_ed25519_metal3ci 1 ${PROVISIONING_SCRIPTS[0]:-}"""
   exit 1
 fi
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_IMAGE_NAME}-$(get_random_string 10)"

@@ -30,10 +30,10 @@ EOF
 sudo sysctl --system
 sudo setenforce 0
 
-curl https://raw.githubusercontent.com/cri-o/cri-o/${VERSION}/scripts/get | sudo bash -s -- -t ${VERSION}
+curl https://raw.githubusercontent.com/cri-o/cri-o/"${VERSION}"/scripts/get | sudo bash -s -- -t "${VERSION}"
 sudo systemctl daemon-reload
 sudo systemctl start crio
 
 # Download crictl
-curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
-sudo tar -C /usr/local/bin -xzf crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
+curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/"${CRICTL_VERSION}"/crictl-"${CRICTL_VERSION}"-linux-amd64.tar.gz
+sudo tar -C /usr/local/bin -xzf crictl-"${CRICTL_VERSION}"-linux-amd64.tar.gz

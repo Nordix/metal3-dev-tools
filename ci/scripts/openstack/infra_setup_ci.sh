@@ -4,10 +4,10 @@ set -eu
 
 SCRIPTPATH="$(dirname "$(readlink -f "${0}")")"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${SCRIPTPATH}/infra_defines.sh"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${SCRIPTPATH}/utils.sh"
 
 # Create CI Infrastructure

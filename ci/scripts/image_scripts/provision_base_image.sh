@@ -11,6 +11,7 @@ SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 # This makes needrestart (l)ist the packages instead of prompting with a dialog.
 # It also makes it only print kernel hints instead of prompting users to acknowledge.
 # The alternative would be sudo apt-get remove -y needrestart.
+#shellcheck disable=SC2016
 echo -e '$nrconf{restart} = "l";\n$nrconf{kernelhints} = -1;' | sudo tee /etc/needrestart/needrestart.conf || true
 
 # Upgrade all packages

@@ -14,6 +14,7 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 # This makes needrestart (l)ist the packages instead of prompting with a dialog.
 # It also makes it only print kernel hints instead of prompting users to aknowledge.
 # The alternative would be sudo apt-get remove -y needrestart.
+#shellcheck disable=SC2016
 echo -e '$nrconf{restart} = "l";\n$nrconf{kernelhints} = -1;' | sudo tee /etc/needrestart/needrestart.conf || true
 
 # Upgrade all packages
@@ -37,10 +38,10 @@ sudo apt-get install -y \
   software-properties-common \
   openssl
 
-sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
+sudo mv "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo apt-get install -y conntrack socat
-sudo apt-get install net-tools gcc linux-headers-$(uname -r) bridge-utils -y
+sudo apt-get install net-tools gcc linux-headers-"$(uname -r)" bridge-utils -y
 sudo apt-get install -y keepalived && sudo systemctl stop keepalived
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'

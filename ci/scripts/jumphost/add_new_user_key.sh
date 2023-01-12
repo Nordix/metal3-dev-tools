@@ -20,7 +20,7 @@ NEW_USER="${1:?}"
 USER_PUB_KEY_NAME="${2:?}"
 USER_PUB_KEY="${3:?}"
 
-# shellcheck disable=SC1090
+#shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
 
 rt_add_user_public_key "${NEW_USER}" "${USER_PUB_KEY_NAME}" "${USER_PUB_KEY}"

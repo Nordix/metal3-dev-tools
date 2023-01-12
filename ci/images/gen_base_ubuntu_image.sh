@@ -10,10 +10,10 @@ IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_BASE_IMAGE}-$(get_random_string 10)"

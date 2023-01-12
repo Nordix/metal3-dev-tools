@@ -14,7 +14,7 @@ if [ "${DISTRIBUTION}" == "ubuntu" ]; then
 else
   CONTAINER_RUNTIME="podman"
 fi
-mkdir -p ${LOGS_DIR}
+mkdir -p "${LOGS_DIR}"
 
 # Fetch cluster manifests
 mkdir -p "${LOGS_DIR}/manifests"
@@ -24,20 +24,20 @@ function fetch_k8s_logs() {
 dir_name=k8s_${1}
 kconfig=$2
 
-NAMESPACES="$(kubectl --kubeconfig=${kconfig} get namespace -o json | jq -r '.items[].metadata.name')"
+NAMESPACES="$(kubectl --kubeconfig="${kconfig}" get namespace -o json | jq -r '.items[].metadata.name')"
 mkdir -p "${LOGS_DIR}/${dir_name}"
 for NAMESPACE in $NAMESPACES
 do
   mkdir -p "${LOGS_DIR}/${dir_name}/${NAMESPACE}"
-  PODS="$(kubectl --kubeconfig=${kconfig} get pods -n "$NAMESPACE" -o json | jq -r '.items[].metadata.name')"
+  PODS="$(kubectl --kubeconfig="${kconfig}" get pods -n "$NAMESPACE" -o json | jq -r '.items[].metadata.name')"
   for POD in $PODS
   do
     mkdir -p "${LOGS_DIR}/${dir_name}/${NAMESPACE}/${POD}"
-    CONTAINERS="$(kubectl --kubeconfig=${kconfig} get pods -n "$NAMESPACE" "$POD" -o json | jq -r '.spec.containers[].name')"
+    CONTAINERS="$(kubectl --kubeconfig="${kconfig}" get pods -n "$NAMESPACE" "$POD" -o json | jq -r '.spec.containers[].name')"
     for CONTAINER in $CONTAINERS
     do
       mkdir -p "${LOGS_DIR}/${dir_name}/${NAMESPACE}/${POD}/${CONTAINER}"
-      kubectl --kubeconfig=${kconfig} logs -n "$NAMESPACE" "$POD" "$CONTAINER" \
+      kubectl --kubeconfig="${kconfig}" logs -n "$NAMESPACE" "$POD" "$CONTAINER" \
       > "${LOGS_DIR}/${dir_name}/${NAMESPACE}/${POD}/${CONTAINER}/stdout.log"\
       2> "${LOGS_DIR}/${dir_name}/${NAMESPACE}/${POD}/${CONTAINER}/stderr.log"
     done
@@ -61,13 +61,14 @@ LOCAL_CONTAINERS="$(sudo "${CONTAINER_RUNTIME}" ps -a --format "{{.Names}}")"
 for LOCAL_CONTAINER in $LOCAL_CONTAINERS
 do
   mkdir -p "${CONTAINER_LOGS_DIR}/${LOCAL_CONTAINER}"
+  # shellcheck disable=SC2024
   sudo "${CONTAINER_RUNTIME}" logs "$LOCAL_CONTAINER" > "${CONTAINER_LOGS_DIR}/${LOCAL_CONTAINER}/stdout.log" \
   2> "${CONTAINER_LOGS_DIR}/${LOCAL_CONTAINER}/stderr.log"
 done
 
 mkdir -p "${LOGS_DIR}/qemu"
 sudo sh -c "cp -r /var/log/libvirt/qemu/* ${LOGS_DIR}/qemu/"
-sudo chown -R ${USER}:${USER} "${LOGS_DIR}/qemu"
+sudo chown -R "${USER}":"${USER}" "${LOGS_DIR}/qemu"
 
 mkdir -p "${LOGS_DIR}/cluster-api-config"
 cp -r "/home/metal3ci/.cluster-api/." "${LOGS_DIR}/cluster-api-config/"
@@ -76,14 +77,14 @@ if [[ "${TESTS_FOR}" == "feature_tests_upgrade"* ]]
 then
   mkdir -p "${LOGS_DIR}/upgrade"
   sudo sh -c "cp /tmp/\.*upgrade.result.txt ${LOGS_DIR}/upgrade/"
-  sudo chown -R ${USER}:${USER} "${LOGS_DIR}/upgrade"
+  sudo chown -R "${USER}":"${USER}" "${LOGS_DIR}/upgrade"
 fi
 
 target_config=$(sudo find /tmp/ -type f -name "kubeconfig*")
-if [ ! -z "${target_config}" ]
+if [ -n "${target_config}" ]
 then
   #fetch target cluster k8s logs
-  fetch_k8s_logs "target_cluster" $target_config
+  fetch_k8s_logs "target_cluster" "${target_config}"
 fi
 
-tar -cvzf "$LOGS_TARBALL" ${LOGS_DIR}/*
+tar -cvzf "${LOGS_TARBALL}" "${LOGS_DIR}"/*

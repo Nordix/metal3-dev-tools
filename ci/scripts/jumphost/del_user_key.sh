@@ -15,7 +15,7 @@ RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 _USER="${1:?}"
 USER_PUB_KEY_NAME="${2:?}"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
 
 rt_del_user_public_key "${_USER}" "${USER_PUB_KEY_NAME}"

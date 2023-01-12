@@ -15,11 +15,11 @@ CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${OS_SCRIPTS_DIR}/utils.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
 JUMPOST_EXT_PORT_NAME="${DEV_JUMPHOST_NAME}-ext-port"
