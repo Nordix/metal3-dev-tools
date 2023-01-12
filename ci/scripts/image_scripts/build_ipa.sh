@@ -79,6 +79,7 @@ IPA_BUILDER_COMMIT="$(git rev-parse  HEAD)"
 
 # Handle oslo-log dependency issue, the issue is caused by a missmatch between
 # IPA dependency list and this https://opendev.org/openstack/requirements/src/branch/master/upper-constraints.txt
+# shellcheck disable=SC2016
 sed -i '43i sed -i "s/oslo.log===5.0.0//" "$UPPER_CONSTRAINTS"' \
     "${IPA_BUILD_WORKSPACE}/${IPA_BUILDER_PATH}/dib/ironic-python-agent-ramdisk/install.d/ironic-python-agent-ramdisk-source-install/60-ironic-python-agent-ramdisk-install"
 popd

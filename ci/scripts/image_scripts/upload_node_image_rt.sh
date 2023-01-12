@@ -26,7 +26,7 @@ echo "Downloading node Image from openstack"
 openstack image save --file "${WORK_DIR}"/"$IMAGE_NAME".qcow2 "$IMAGE_NAME"
 IMAGE_NAME="$IMAGE_NAME".qcow2
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
 SOURCE_PATH="${WORK_DIR}/${IMAGE_NAME}"
 DST_FOLDER=${DST_FOLDER:-metal3/images/k8s_${KUBERNETES_VERSION}}

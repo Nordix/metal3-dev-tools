@@ -16,8 +16,8 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 # /usr/local/bin is NOT read by sudo commands, but rather /usr/bin.
 sudo cp /usr/local/bin/crictl /usr/bin/
 
-echo $PATH|tr ':' '\n'
-sudo mv $SCRIPTS_DIR/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
+echo "${PATH}"|tr ':' '\n'
+sudo mv "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo ls -la /usr/local/bin/retrieve.configuration.files.sh
 sudo dnf update -y

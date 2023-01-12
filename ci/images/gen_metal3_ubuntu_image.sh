@@ -11,10 +11,10 @@ IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.0"}
@@ -42,11 +42,11 @@ elif [[ "$PROVISIONING_SCRIPT" == *"metal3"* ]]; then
   IMAGE_FLAVOR="4C-16GB-50GB"
   BUILDER_CONFIG_FILE="image_builder_template.json"
 else
-  PROVISIONING_SCRIPTS=($(ls ${CI_DIR}/scripts/image_scripts | egrep 'provision_(node|metal3)_image_ubuntu.sh'))
+  PROVISIONING_SCRIPTS=("${CI_DIR}"/scripts/image_scripts/provision_{node,metal3}_image_ubuntu.sh)
   echo """
 Available provisioning scripts are: ${PROVISIONING_SCRIPTS[*]}
 Example:
-$(realpath $0) /data/keys/id_ed25519_metal3ci 1 ${PROVISIONING_SCRIPTS[0]:-}"""
+$(realpath "$0") /data/keys/id_ed25519_metal3ci 1 ${PROVISIONING_SCRIPTS[0]:-}"""
   exit 1
 fi
 

@@ -23,9 +23,9 @@ CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 JUMPHOST_SCRIPTS_DIR="${CI_DIR}/scripts/jumphost"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/jumphost/utils.sh
 source "${JUMPHOST_SCRIPTS_DIR}/utils.sh"
 
 # Fetch List of users from artifactory

@@ -11,7 +11,7 @@ IPA_BUILDER_SCRIPT_NAME="${IPA_BUILDER_SCRIPT_NAME:-build_ipa.sh}"
 CI_EXT_NET="metal3-ci-ext-net"
 IMAGE_NAME="metal3-ci-ubuntu-metal3-img"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${CI_DIR}/../openstack/utils.sh"
 
 # Creating new port, needed to immediately get the ip

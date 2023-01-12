@@ -56,7 +56,7 @@ elif [[ "$PROVISIONING_SCRIPT" == *"base"* ]]; then
   IMAGE_FLAVOR="1C-4GB-20GB"
 else
   echo "Available provisioning scripts are:"
-  echo "$(ls -l ../scripts/image_scripts/provision_* | cut -f4 -d'/')"
+  find ../scripts/image_scripts/provision_* | cut -f4 -d'/'
   exit 1
 fi
 
@@ -71,9 +71,9 @@ SCRIPTS_DIR="${DEV_TOOLS}/ci/scripts/image_scripts"
 OS_SCRIPTS_DIR="${DEV_TOOLS}/ci/scripts/openstack"
 IMAGES_DIR="${DEV_TOOLS}/ci/images"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${OS_SCRIPTS_DIR}/utils.sh"
 
 NETWORK_NAME="${NETWORK_NAME:-${DEV_EXT_NET}}"
@@ -118,10 +118,10 @@ CONTAINER_IMAGES_DIR="/data/metal3-dev-tools/ci/images"
 
 # Run the script in a docker container
 "${CONTAINER_RUNTIME}" run --rm \
-  ${CR_CMD_ENV}\
-  -v ${DEV_TOOLS}:/data/metal3-dev-tools \
-  -v ${SSH_PRIVATE_KEY_FILE}:/data/private_key \
-  -v ${TMP}:${TMP} \
+  "${CR_CMD_ENV}"\
+  -v "${DEV_TOOLS}":/data/metal3-dev-tools \
+  -v "${SSH_PRIVATE_KEY_FILE}":/data/private_key \
+  -v "${TMP}":"${TMP}" \
   registry.nordix.org/metal3/image-builder \
   packer build \
     -var "image_name=${IMAGE_NAME}" \

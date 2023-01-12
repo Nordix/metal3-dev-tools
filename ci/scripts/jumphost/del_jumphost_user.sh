@@ -19,13 +19,13 @@ JUMPHOST_SCRIPTS_DIR="${CI_DIR}/scripts/jumphost"
 
 _USER="${1:?}"
 
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/utils.sh
 source "${OS_SCRIPTS_DIR}/utils.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
-# shellcheck disable=SC1090
+# shellcheck source=ci/scripts/jumphost/utils.sh
 source "${JUMPHOST_SCRIPTS_DIR}/utils.sh"
 
 JUMPHOST_PUBLIC_IP="$(get_dev_jumphost_public_ip)"
