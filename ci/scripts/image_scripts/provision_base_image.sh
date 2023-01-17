@@ -19,6 +19,9 @@ sudo apt-get update
 sudo apt-get dist-upgrade -f -y
 
 # Install required packages.
+# Set apt retry limit to higher than default
+# to make the data retrival more reliable
+sudo sh -c 'echo "Acquire::Retries \"10\";" > /etc/apt/apt.conf.d/80-retries'
 sudo apt-get update
 sudo apt-get install -y \
   vim \

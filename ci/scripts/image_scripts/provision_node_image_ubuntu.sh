@@ -17,6 +17,10 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 #shellcheck disable=SC2016
 echo -e '$nrconf{restart} = "l";\n$nrconf{kernelhints} = -1;' | sudo tee /etc/needrestart/needrestart.conf || true
 
+# Set apt retry limit to higher than default to
+# make the data retrival more reliable
+sudo sh -c 'echo "Acquire::Retries \"10\";" > /etc/apt/apt.conf.d/80-retries'
+
 # Upgrade all packages
 sudo apt-get update
 sudo apt-get dist-upgrade -f -y

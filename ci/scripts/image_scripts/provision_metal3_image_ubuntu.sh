@@ -8,6 +8,10 @@ APT::Periodic::Update-Package-Lists "0";
 APT::Periodic::Unattended-Upgrade "0";
 EOF
 
+# Set apt retry limit to higher than default
+# robust to make the data retrival more reliable
+sudo sh -c 'echo "Acquire::Retries \"10\";" > /etc/apt/apt.conf.d/80-retries'
+
 sudo systemctl disable apt-daily-upgrade.timer
 sudo systemctl disable apt-daily.timer
 sudo systemctl stop apt-daily-upgrade.timer

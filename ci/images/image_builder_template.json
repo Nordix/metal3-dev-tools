@@ -35,11 +35,13 @@
     {
       "type": "file",
       "source": "{{user `local_scripts_dir`}}",
-      "destination": "/home/{{user `ssh_username`}}/"
+      "destination": "/home/{{user `ssh_username`}}/",
+      "max_retries": 5
     },
     {
       "type": "shell",
-      "script": "{{user `exec_script_path`}}"
+      "script": "{{user `exec_script_path`}}",
+      "max_retries": 5
     }
   ]
 }
