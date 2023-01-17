@@ -46,12 +46,12 @@ fi
 # Mount failure is ignored as it could happen that the mounts already exist and that is fine.
 # blkid failures are ignored as they are handled explicitly later to help with debugging.
 mkdir -p "${MOUNT_POINT}"
-BLOCKDEV="$(blkid -L ${CONFIG_DRIVE_LABEL})" || true
+BLOCKDEV="$(blkid -L "${CONFIG_DRIVE_LABEL}")" || true
 if [ -z "${BLOCKDEV}" ]; then
     echo "ERROR: The block device with the ${CONFIG_DRIVE_LABEL} label can't be found!"
     exit 1
 fi
-TYPE="$(blkid -t LABEL=${CONFIG_DRIVE_LABEL} -s TYPE -o value || true )"
+TYPE="$(blkid -t LABEL="${CONFIG_DRIVE_LABEL}" -s TYPE -o value || true )"
 
 # Mounting won't fail if the mount already exists
 # If the mount didn't exists at all it is expected to fail in the copy_files_from_drive function
