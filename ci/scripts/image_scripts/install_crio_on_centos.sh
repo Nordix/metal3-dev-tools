@@ -2,14 +2,10 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.25.0"}
-ARCH=${ARCH:-"amd64"}
-# CRI-O version goes 1:1 with Kubernetes version. Thus,
-# please make sure that k8s version given in
-# KUBERNETES_VERSION variable matches CRI-O version
-# give in VERSION variable.
-VERSION=${VERSION:-"${CRICTL_VERSION}"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.26.0"}
+export CRIO_VERSION=${CRIO_VERSION:-"v1.26.1"}
 
+ARCH=${ARCH:-"amd64"}
 # Create the .conf file to load the modules at bootup
 cat <<EOF | sudo tee /etc/modules-load.d/crio.conf
 overlay
@@ -30,7 +26,7 @@ EOF
 sudo sysctl --system
 sudo setenforce 0
 
-curl https://raw.githubusercontent.com/cri-o/cri-o/"${VERSION}"/scripts/get | sudo bash -s -- -t "${VERSION}"
+curl https://raw.githubusercontent.com/cri-o/cri-o/"${CRIO_VERSION}"/scripts/get | sudo bash -s -- -t "${CRIO_VERSION}"
 sudo systemctl daemon-reload
 sudo systemctl start crio
 

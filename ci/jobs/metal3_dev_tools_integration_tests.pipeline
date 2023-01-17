@@ -52,7 +52,8 @@ pipeline {
     DST_FOLDER="metal3/images/temp"
     FINAL_IMAGE_NAME="${IMAGE_OS}_tmp_img_${RAND_NAME}"
     KUBERNETES_VERSION="${KUBERNETES_VERSION ?: 'v1.26.0' }"
-    CRICTL_VERSION="${CRICTL_VERSION ?: 'v1.25.0' }"
+    CRICTL_VERSION="${CRICTL_VERSION ?: 'v1.26.0' }"
+    CRIO_VERSION="${CRIO_VERSION ?: 'v1.26.1' }"
 
     DOCKER_CMD_ENV="--env METAL3_CI_USER \
       --env METAL3_CI_USER_KEY=/data/id_ed25519_metal3ci \
@@ -73,6 +74,7 @@ pipeline {
       --env DST_FOLDER \
       --env KUBERNETES_VERSION \
       --env CRICTL_VERSION \
+      --env CRIO_VERSION \
       --env FINAL_IMAGE_NAME"
     CURRENT_DIR = sh (
                       script: 'readlink -f "."',
