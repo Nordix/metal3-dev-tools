@@ -7,6 +7,10 @@ set -eux
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
+# Set apt retry limit to higher than default
+# robust to make the data retrival more reliable
+sudo sh -c 'echo "Acquire::Retries \"10\";" > /etc/apt/apt.conf.d/80-retries'
+
 # Install required packages.
 sudo apt-get install -y \
   openjdk-11-jre \
