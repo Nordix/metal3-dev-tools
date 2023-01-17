@@ -2,7 +2,8 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.25.0"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.26.0"}
+export CRIO_VERSION=${CRIO_VERSION:-"v1.26.1"}
 # shellcheck disable=SC1091
 source /etc/os-release
 if [[ ${VERSION_ID} == "20.04" ]]
@@ -11,12 +12,9 @@ then
 else
   OS=${OS:-"xUbuntu_22.04"}
 fi
-# CRI-O version goes 1:1 with Kubernetes version. Thus,
-# please make sure that k8s version given in
-# KUBERNETES_VERSION variable matches CRI-O version
-# give in VERSION variable.
-TEMP_CRIO_VERSION="${CRICTL_VERSION#v}" && TEMP_CRIO_VERSION="${TEMP_CRIO_VERSION%.*}" # e.g. v1.20.2 -> 1.20
-CRIO_VERSION=${CRIO_VERSION:-"${TEMP_CRIO_VERSION}"}
+
+TEMP_CRIO_VERSION="${CRIO_VERSION#v}" && TEMP_CRIO_VERSION="${TEMP_CRIO_VERSION%.*}" # e.g. v1.20.2 -> 1.20
+CRIO_VERSION="${TEMP_CRIO_VERSION}"
 
 # Prerequisites for CRI-O
 # Create the .conf file to load the modules at bootup

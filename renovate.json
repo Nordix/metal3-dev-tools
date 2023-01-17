@@ -45,8 +45,8 @@
      },
      {
        "fileMatch": ["^ci/.*$"],
-       "matchStrings": ["CRICTL_VERSION:-\"(?<currentValue>v.*?)\"}"],
-       "depNameTemplate": "kubernetes-sigs/cri-tools",
+       "matchStrings": ["CRIO_VERSION:-\"(?<currentValue>v.*?)\"}"],
+       "depNameTemplate": "cri-o/cri-o",
        "datasourceTemplate": "github-tags"
      },
      {
