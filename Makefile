@@ -87,14 +87,6 @@ push-lint-go: ## Push Docker Image for Lint go to nordix registry
 	docker tag ${NAME}-go-lint:latest ${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver}
 	docker push ${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver}
 
-.PHONY: lint-go
-lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_folder=abspath)
-	docker run --rm \
-		-v "${CURDIR}:/mnt" \
-		-v "${lint_folder}:/data" \
-		${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver} \
-		sh /mnt/scripts/go-linter.sh
-
 .PHONY: run-dev-env
 run-dev-env: ## Create or start the metal3 dev env vm
 	$(CURDIR)/scripts/run_metal3_vm.sh
