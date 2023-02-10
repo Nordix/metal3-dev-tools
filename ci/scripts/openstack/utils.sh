@@ -81,10 +81,10 @@ render_user_data() {
 
   local IN_FILE OUT_FILE
 
-  export SSH_AUTHORIZED_KEY="${1:?}"
-  export DEFAULT_SSH_USER="${2:?}"
-  export DEFAULT_SSH_USER_GROUP="${3:?}"
-  export HOSTNAME="${4:?}"
+  export USERDATA_SSH_AUTHORIZED_KEY="${1:?}"
+  export USERDATA_SSH_USER="${2:?}"
+  export USERDATA_SSH_USER_GROUP="${3:?}"
+  export USERDATA_HOSTNAME="${4:?}"
   IN_FILE="${5:?}"
   OUT_FILE="${6:?}"
 
