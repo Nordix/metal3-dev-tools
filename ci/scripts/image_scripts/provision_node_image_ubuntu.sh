@@ -47,8 +47,8 @@ sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo apt-get install -y conntrack socat
 sudo apt-get install net-tools gcc linux-headers-"$(uname -r)" bridge-utils -y
 sudo apt-get install -y keepalived && sudo systemctl stop keepalived
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
+sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+sudo bash -c 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
 sudo apt-get update -y
 
 # Install CRI-O
