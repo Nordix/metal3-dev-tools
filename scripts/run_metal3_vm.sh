@@ -48,7 +48,7 @@ if [[ ! -f "$WORK_DIR/ubuntu_metal3_vm.qcow2" ]] || [[ $vm_defined != *"ubuntu-m
     --disk "$WORK_DIR/ubuntu_metal3_vm.qcow2,device=disk" \
     --disk "$WORK_DIR/ubuntu-metal3-config.iso,device=cdrom" \
     --os-type Linux \
-    --os-variant ubuntu18.04 \
+    --os-variant ubuntu22.04 \
     --virt-type kvm \
     --network network=default \
     --import \

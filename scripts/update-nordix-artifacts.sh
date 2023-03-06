@@ -26,7 +26,7 @@ ARTIFACTORY_UTILS="${GIT_ROOT}/ci/scripts/artifactory/utils.sh"
 
 WORKSPACE=${WORKSPACE:=/tmp}
 
-IPA_UPSTREAM="https://images.rdoproject.org/centos8/master/rdo_trunk/current-tripleo/ironic-python-agent.tar"
+IPA_UPSTREAM="https://images.rdoproject.org/centos9/master/rdo_trunk/current-tripleo/ironic-python-agent.tar"
 IPA_MD5_UPSTREAM="${IPA_UPSTREAM}.md5"
 IPA_ARTIFACTORY_PATH="metal3/ironic-python-agent/"
 
