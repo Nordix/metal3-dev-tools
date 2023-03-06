@@ -106,10 +106,10 @@ The versioned IPA images are sorted to different groups, the artifacts are group
 takes into consideration the version of the distribution and whether the artifact was created as part of a review process or is it already in a finalized format
 called staging.
 
-Example of the location of a `Centos 8 Stream` based staging and review artifacts:
+Example of the location of a `Centos 9 Stream` based staging and review artifacts:
 
-  - review: https://artifactory.nordix.org/artifactory/metal3/images/ipa/review/centos/8-stream/20210908T1017Z-2acdf3c
-  - staging:  https://artifactory.nordix.org/artifactory/metal3/images/ipa/staging/centos/8-stream/20210918T0020Z-47a7fb5
+  - review: https://artifactory.nordix.org/artifactory/metal3/images/ipa/review/centos/9-stream/20230112T0701Z-06413e5/
+  - staging: https://artifactory.nordix.org/ui/native/metal3/images/ipa/staging/centos/9-stream/20221228T0412Z-5c0eab3/
 
 As an example shows the directory structure is the following: `ipa/<staging or review>/<linux distribution>/<distribution version>/<artifact version>`
 
