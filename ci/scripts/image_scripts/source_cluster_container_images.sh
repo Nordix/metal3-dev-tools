@@ -6,7 +6,7 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME}"
 # Container images that we pre-pull into the CI image.
 export IMG_REGISTRY="${IMG_REGISTRY:-"docker.io/registry:latest"}"
 export IMG_GOLANG_IMG="${IMG_GOLANG_IMG:-"docker.io/golang:1.19"}"
-export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"docker.io/centos:stream9"}"
+export IMG_CENTOS_IMG="${IMG_CENTOS_IMG:-"quay.io/centos/centos:stream9"}"
 export IMG_UBUNTU_IMG="${IMG_UBUNTU_IMG:-"docker.io/ubuntu:22.04"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
