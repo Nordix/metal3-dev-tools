@@ -1,6 +1,6 @@
 # metal3-dev-tools
 
-Set of internal tools for metal3 development
+Set of internal tools for metal3 development.
 
 ## Setup
 
