@@ -3,7 +3,7 @@
 set -uex
 
 export CRICTL_VERSION=${CRICTL_VERSION:-"v1.26.0"}
-export CRIO_VERSION=${CRIO_VERSION:-"v1.26.1"}
+export CRIO_VERSION=${CRIO_VERSION:-"v1.26.3"}
 
 ARCH=${ARCH:-"amd64"}
 # Create the .conf file to load the modules at bootup
