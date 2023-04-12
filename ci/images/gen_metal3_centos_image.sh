@@ -11,7 +11,7 @@ IMAGES_DIR="${CI_DIR}/images"
 SCRIPTS_DIR="${CI_DIR}/scripts/image_scripts"
 OS_SCRIPTS_DIR="${CI_DIR}/scripts/openstack"
 CENTOS_VERSION="9"
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.0"}
+KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.4"}
 
 # shellcheck source=ci/scripts/openstack/infra_defines.sh
 source "${OS_SCRIPTS_DIR}/infra_defines.sh"
