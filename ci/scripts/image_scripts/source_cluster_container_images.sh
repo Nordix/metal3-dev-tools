@@ -11,7 +11,7 @@ export IMG_UBUNTU_IMG="${IMG_UBUNTU_IMG:-"docker.io/ubuntu:22.04"}"
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
     export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.26.4"}
-    export KIND_NODE_IMAGE_VERSION=${KIND_NODE_IMAGE_VERSION:-"v1.26.0"}
+    export KIND_NODE_IMAGE_VERSION=${KIND_NODE_IMAGE_VERSION:-"v1.26.3"}
     export IMG_KIND_NODE_IMAGE="${IMG_KIND_NODE_IMAGE:-"kindest/node:${KIND_NODE_IMAGE_VERSION}"}"
 fi
 
