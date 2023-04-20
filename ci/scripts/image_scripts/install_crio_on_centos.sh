@@ -2,10 +2,9 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.26.1"}
-export CRIO_VERSION=${CRIO_VERSION:-"v1.26.3"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.27.0"}
+export CRIO_VERSION=${CRIO_VERSION:-"v1.27.0"}
 
-ARCH=${ARCH:-"amd64"}
 # Create the .conf file to load the modules at bootup
 cat <<EOF | sudo tee /etc/modules-load.d/crio.conf
 overlay

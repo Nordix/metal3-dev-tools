@@ -16,19 +16,19 @@
     },
     {
       "matchPackageNames": ["golang"],
-      "allowedVersions": "<=1.17"
+      "allowedVersions": "<=1.19"
     },
     {
       "matchPackageNames": ["kubernetes/kubernetes"],
-      "allowedVersions": "<=1.26"
+      "allowedVersions": "<=1.27"
     },
     {
       "matchPackageNames": ["kindest/node"],
-      "allowedVersions": "<=1.26"
+      "allowedVersions": "<=1.27"
     },
     {
       "matchPackageNames": ["kubernetes-sigs/cri-tools"],
-      "allowedVersions": "<=1.26"
+      "allowedVersions": "<=1.27"
     }
   ],
   "prHourlyLimit": 5,
@@ -63,7 +63,6 @@
      }
    ],
    "assignees": [
-     "furkatgofurov7",
      "kashifest",
      "lentzi90",
      "mboukhalfa",
@@ -71,6 +70,8 @@
      "smoshiur1237",
      "Sunnatillo",
      "adilGhaffarDev"
+     "tuminoid",
+     "mquhuy",
    ],
    "assigneesSampleSize": 2
  }
