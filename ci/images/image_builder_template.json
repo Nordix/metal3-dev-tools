@@ -29,7 +29,8 @@
     "ssh_username": "{{user `ssh_username`}}",
     "image_visibility": "shared",
     "force_delete": true,
-    "ssh_pty" : "{{user `ssh_pty`}}"
+    "ssh_pty" : "{{user `ssh_pty`}}",
+    "temporary_key_pair_type": "ed25519"
   }],
   "provisioners": [
     {
