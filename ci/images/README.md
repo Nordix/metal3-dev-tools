@@ -105,16 +105,14 @@ Here is an example of custom variables:
 
 ```bash
 # My custom variables
-export PACKER_SSH_USER_NAME="foo"
-export USERDATA_SSH_PUBLIC_KEY_FILE="/home/foo/.ssh/id_rsa.pub"
-export PACKER_SSH_PRIVATE_KEY_FILE="/home/foo/.ssh/id_rsa"
+export SSH_USER_NAME="foo"
+export SSH_USER_GROUP="wheel"
+export SSH_KEYPAIR_NAME="foo-key"
+export SSH_PUBLIC_KEY_FILE="/home/foo/.ssh/id_rsa.pub"
+export SSH_PRIVATE_KEY_FILE="/home/foo/.ssh/id_rsa"
 export IMAGE_NAME="foo-test-image"
 export SOURCE_IMAGE_NAME="Upstream-centos-or-ubuntu"
-# Openstack network name, vm will receive Openstack internal IP from this network.
-export OS_NETWORK_NAME="ext-net"
-# If user wants to use Openstack network ID instead of the network name,
-# then this variable can be set this instead (then network ID lookup won't happen):
-export OS_NETWORK_ID="abcdefg"
+export NETWORK="abcdefg"
 # Artifactory variables
 # These are needed if you want to build Node images and upload them to Artifactory
 export RT_URL="https://artifactory.nordix.org/artifactory"
@@ -125,19 +123,6 @@ export RT_TOKEN=<your-token>
 **NOTE:** The script uploads the node images (i.e. those produced by `provision_node_image_ubuntu.sh` and `provision_node_image_centos.sh`) to Artifactory.
 Make sure you use an image name that does not conflict with existing images!
 This is also a good idea for other images since they will end up in Openstack.
-
-Additional configuration options:
-```bash
-export PACKER_DEBUG_ENABLED="true/false" # if true runs the packer build in interactive debug mode,
-                                         # packer stops between build stages
-export IMAGE_CLEANUP="true/false" # if true deletes the image from openstack that has an equivalent
-                                  # name with the one specifed in the IMAGE_NAME variable, if false doesn't delete any image,
-                                  # instead appends a timestamp to the name of each newly built image to avoid collision
-```
-
-If the the `./run_local sandbox` command is issued the packer build and the artifactory upload process
-won't be executed, rather the user will be presented with an interactive container environment where
-the openstack cli can be used to check the openstack resources.
 
 And here is how to use it:
 
