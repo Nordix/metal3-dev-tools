@@ -118,7 +118,7 @@ export DIB_DEV_USER_AUTHORIZED_KEYS="${DEV_USER_SSH_PATH}"
 fi
 export DIB_INSTALLTYPE_simple_init="repo"
 export DIB_REPOLOCATION_glean="https://github.com/Nordix/glean.git"
-export DIB_REPOREF_glean="refs/heads/extend_label_support"
+export DIB_REPOREF_glean="refs/heads/parsing_error"
 
 # IPA builder customisation variables
 # Path to custom IPA builder kernel module element
@@ -209,7 +209,7 @@ CERT_MANAGER_VERSION="${CERT_MANAGER_VERSION}"
 EOF
     pushd "${BMOPATH}"
     cat << EOF >> "${METADATA_PATH}"
-BMO_REPO="${BMOREPO}"
+BMOREPO="${BMOREPO}"
 BMO_BRANCH="${BMOBRANCH}"
 BMO_COMMIT="$(git rev-parse HEAD)"
 EOF
