@@ -8,9 +8,6 @@ export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_
 export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.15.1"}
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
-"${SCRIPTS_DIR}"/configure_network_centos.sh
-
-# Install CRI-O
 "${SCRIPTS_DIR}"/install_crio_on_centos.sh
 # NOTE: When running with sudo, PATH is different.
 # /usr/local/bin is NOT read by sudo commands, but rather /usr/bin.

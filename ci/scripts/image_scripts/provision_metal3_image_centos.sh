@@ -19,8 +19,6 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 export CONTAINER_REGISTRY="registry.nordix.org/quay-io-proxy"
 export DOCKER_HUB_PROXY="registry.nordix.org/docker-hub-proxy"
 
-"${SCRIPTS_DIR}"/configure_network_centos.sh
-
 sudo dnf distro-sync -y
 sudo dnf install -y git make
 
