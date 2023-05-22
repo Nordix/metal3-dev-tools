@@ -95,8 +95,6 @@ function update_custom_branch {
     do
         echo "Updating ${branch} branch in ${LOCAL_REPO}"
         git checkout "origin/${branch}"
-        git fetch "origin" "${branch}"
-        git rebase "origin/${branch}"
         git remote add "remote-${branch}" "${NORDIX_REPO}"
         git push -uf "remote-${branch}" "HEAD:refs/heads/${branch}"
         echo "Push done to ${branch} branch in ${NORDIX_REPO}"
@@ -136,9 +134,6 @@ do
     BRANCH=$(git rev-parse --abbrev-ref HEAD)
     echo "Updating ${BRANCH} branch in ${repo}"
     git checkout "${BRANCH}"
-    # origin points to upstream repos
-    git fetch origin
-    git rebase origin/"${BRANCH}"
     git remote add nordixrepo "${ndxarray[$i]}"
     git push -uf nordixrepo "${BRANCH}"
     echo "Push done to ${ndxarray[$i]}"
