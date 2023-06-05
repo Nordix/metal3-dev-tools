@@ -25,9 +25,10 @@ RUN apk add --update --no-cache git bash wget openssl \
     curl -fL https://getcli.jfrog.io | sh && \
     mv jfrog /usr/bin
 
-
 #Copy the executables
 COPY --from=packer /bin/packer /bin/packer
 COPY --from=builder /app /
+
+RUN packer plugins install github.com/hashicorp/openstack
 
 WORKDIR /data
