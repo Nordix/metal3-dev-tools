@@ -87,6 +87,18 @@ pipeline {
                 }
               }
             }
+            post{
+              success{
+                echo "Backup ${IMAGE_OS} node image"
+                withCredentials([
+                  usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD'),
+                  sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY'),
+                  usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN')
+                ]){
+                    sh  "${CURRENT_DIR}/ci/scripts/image_scripts/backup_node_image.sh"
+                  }
+              }
+            }
           }
         }
       }
