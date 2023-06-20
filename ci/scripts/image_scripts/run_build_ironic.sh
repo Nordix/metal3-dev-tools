@@ -16,7 +16,6 @@ IRONIC_REPO="https://opendev.org/openstack/ironic.git"
 IRONIC_IMAGE_REPO="https://github.com/metal3-io/ironic-image.git"
 IRONIC_IMAGE_REPO_COMMIT="${IRONIC_IMAGE_REPO_COMMIT:-"HEAD"}"
 IRONIC_IMAGE_BRANCH="${IRONIC_IMAGE_BRANCH:-"main"}"
-PATCH_LIST_FILE=patchList.txt
 
 # shellcheck disable=SC1091
 source "/tmp/harbor_utils.sh"
@@ -60,24 +59,9 @@ else
     git checkout "${IRONIC_IMAGE_REPO_COMMIT}"
     IRONIC_IMAGE_REPO_COMMIT="$(git rev-parse HEAD)"
 
-    # Create a patchlist
-    touch "${PATCH_LIST_FILE}"
-    if [ -z "${IRONIC_REFSPEC}" ]; then
-      echo "No Ironic refspec is provided to checkout. Going to build the image from master"
-      docker build -t "${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}" .
-    else
-      echo "Ironic patch we are going to switch to is: ${IRONIC_REFSPEC}"
-      PROJECT_DIR="openstack/ironic"
-      cat << EOF | tee -a "${PATCH_LIST_FILE}"
-${PROJECT_DIR} ${IRONIC_REFSPEC}
-${PROJECT_DIR}-inspector ${IRONIC_INSPECTOR_REFSPEC}
-EOF
-    # Build container image
-      docker build -t "${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}" --build-arg PATCH_LIST=${PATCH_LIST_FILE} .
-    fi
-
-  docker push "${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"
-  popd
+    docker build -t "${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}" .
+    docker push "${IMAGE_REGISTRY}/${CONTAINER_IMAGE_REPO}/ironic-image:${IRONIC_TAG}"
+    popd
 fi
 
 # Get the digest(s) belonging to the image(s) with the specified tag.
