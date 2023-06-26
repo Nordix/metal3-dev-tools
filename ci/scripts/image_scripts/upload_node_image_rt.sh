@@ -12,7 +12,7 @@
 #   ./upload_node_image_rt.sh CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8
 # Don't include the image format, only the name.
 # Example: CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8 instead of CENTOS_8.2_NODE_IMAGE_K8S_v1.18.8.qcow2
-set -x
+set -eux
 IMAGE_NAME="${1:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
@@ -24,13 +24,19 @@ WORK_DIR=/tmp/node_image
 mkdir -p "$WORK_DIR"
 echo "Downloading node Image from openstack"
 openstack image save --file "${WORK_DIR}"/"$IMAGE_NAME".qcow2 "$IMAGE_NAME"
-IMAGE_NAME="$IMAGE_NAME".qcow2
+
+# Verify the image for any signs of corruption before pushing it to artifactory
+echo "Verifing the image for any signs of corruption by converting it to the IMG format"
+qemu-img convert -O raw "${WORK_DIR}"/"${IMAGE_NAME}".qcow2  "${WORK_DIR}"/"${IMAGE_NAME}-raw.img"
+
+# delete converted image
+rm "${WORK_DIR}"/"${IMAGE_NAME}-raw.img"
 
 # shellcheck source=ci/scripts/artifactory/utils.sh
 source "${RT_SCRIPTS_DIR}/utils.sh"
-SOURCE_PATH="${WORK_DIR}/${IMAGE_NAME}"
+SOURCE_PATH="${WORK_DIR}/${IMAGE_NAME}.qcow2"
 DST_FOLDER=${DST_FOLDER:-metal3/images/k8s_${KUBERNETES_VERSION}}
-DST_PATH="${DST_FOLDER}/${IMAGE_NAME}"
+DST_PATH="${DST_FOLDER}/${IMAGE_NAME}.qcow2"
 
 # Following environment variables should be set 
 # to push the image to artifactory
