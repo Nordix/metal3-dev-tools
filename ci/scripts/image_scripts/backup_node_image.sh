@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 # The goal of this script is to backup newly build image and 
-#   remove outdated backup node images from artifactory, while retaining the n (RETENTION_NUM) most recent ones
+# remove outdated backup node images from artifactory, while
+# retaining the n (RETENTION_NUM, default is 5) most recent ones
 
 set -eux
+
+CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
+RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
+
+# shellcheck source=ci/scripts/artifactory/utils.sh
+. "${RT_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_OS="${IMAGE_OS:-}"
 KUBERNETES_VERSION="${KUBERNETES_VERSION:-"v1.27.1"}"
 
 # The newest n number of artifacts should be kept in the directory 
 RETENTION_NUM=5
-
-CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
-RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
-WORK_DIR=/tmp/node_image
 
 if [[ "${IMAGE_OS}" == "Ubuntu" ]]; then
   UBUNTU_VERSION=${UBUNTU_VERSION:-"22.04"}
@@ -25,38 +28,36 @@ else
   exit 1
 fi
 
-# COMMIT_SHORT defines last commit on the repo
-# NODE_IMAGE_IDENTIFIER consists of date of image build and COMMIT_SHORT
-# Node image name example: CENTOS_9_NODE_IMAGE_K8S_v1.27.1_20230607T1319Z_22101ef.qcow2
+# RT_FOLDER is the folder where images are stored in Artifactory
+RT_FOLDER=${RT_FOLDER:-metal3/images/k8s_${KUBERNETES_VERSION}}
+
+# Download newly built image from artifactory
+wget "${RT_URL}/${RT_FOLDER}/${IMAGE_NAME}.qcow2"  -O "${IMAGE_NAME}.qcow2"
+
+# Define name for backup image
+#   COMMIT_SHORT defines last commit on the repo
+#   NODE_IMAGE_IDENTIFIER consists of date of image build and COMMIT_SHORT
+#   Node image name example: CENTOS_9_NODE_IMAGE_K8S_v1.27.1_20230607T1319Z_22101ef.qcow2
 COMMIT_SHORT="$(git rev-parse --short HEAD)"
 NODE_IMAGE_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")_${COMMIT_SHORT}"
 echo "NODE_IMAGE_IDENTIFIER: ${NODE_IMAGE_IDENTIFIER}"
 
-# shellcheck source=ci/scripts/artifactory/utils.sh
-. "${RT_SCRIPTS_DIR}/utils.sh"
-SOURCE_PATH="${WORK_DIR}/${IMAGE_NAME}.qcow2"
-DST_FOLDER=${DST_FOLDER:-metal3/images/k8s_${KUBERNETES_VERSION}}
-DST_PATH="${DST_FOLDER}/${IMAGE_NAME}_${NODE_IMAGE_IDENTIFIER}.qcow2"
+BACKUP_IMAGE_NAME="${IMAGE_NAME}_${NODE_IMAGE_IDENTIFIER}.qcow2"
+echo "BACKUP_IMAGE_NAME: ${BACKUP_IMAGE_NAME}"
 
-# Following environment variables should be set 
-# to push the image to artifactory
-#   RT_USER: artifactory user name.
-#   RT_TOKEN: artifactory password or api token
-#   RT_URL: Artifactory URL
+# Upload image with new name
+rt_upload_artifact  "${IMAGE_NAME}.qcow2" "${RT_FOLDER}/${BACKUP_IMAGE_NAME}" "0"
 
-rt_upload_artifact  "${SOURCE_PATH}" "${DST_PATH}" "0"
-
-# Remove outdated node images, while retaining the n number of most recent ones
-
-# Gets list of artifacts into an array
-mapfile -t < <(rt_list_directory "${DST_FOLDER}" 0 | \
+# Remove outdated node images, keep n number of latest ones
+#   Get list of artifacts into an array
+mapfile -t < <(rt_list_directory "${RT_FOLDER}" 0 | \
   jq '.children | .[] | .uri' | \
   sort -r |\
   grep "${IMAGE_NAME}_20" | \
   sed -e 's/\"\/\([^"]*\)"/\1/g') 
 
-# deletes artifacts
+#   Delete artifacts
 for ((i="${RETENTION_NUM}"; i<${#MAPFILE[@]}; i++)); do
-  rt_delete_artifact "${DST_FOLDER}/${MAPFILE[i]}" "0"
+  rt_delete_artifact "${RT_FOLDER}/${MAPFILE[i]}" "0"
   echo "${MAPFILE[i]} has been deleted!"
 done
