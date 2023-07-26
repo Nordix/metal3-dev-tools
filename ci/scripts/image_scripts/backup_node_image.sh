@@ -32,7 +32,7 @@ fi
 RT_FOLDER=${RT_FOLDER:-metal3/images/k8s_${KUBERNETES_VERSION}}
 
 # Download newly built image from artifactory
-wget "${RT_URL}/${RT_FOLDER}/${IMAGE_NAME}.qcow2"  -O "${IMAGE_NAME}.qcow2"
+wget -q "${RT_URL}/${RT_FOLDER}/${IMAGE_NAME}.qcow2"  -O "${IMAGE_NAME}.qcow2"
 
 # Define name for backup image
 #   COMMIT_SHORT defines last commit on the repo
