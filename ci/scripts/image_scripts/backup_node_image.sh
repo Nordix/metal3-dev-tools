@@ -12,7 +12,7 @@ RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
 . "${RT_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_OS="${IMAGE_OS:-}"
-KUBERNETES_VERSION="${KUBERNETES_VERSION:-"v1.27.1"}"
+KUBERNETES_VERSION="${KUBERNETES_VERSION:-"v1.27.4"}"
 
 # The newest n number of artifacts should be kept in the directory 
 RETENTION_NUM=5

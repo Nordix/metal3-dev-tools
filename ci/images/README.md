@@ -171,13 +171,13 @@ List and delete images in Artifactory:
 export RT_URL="https://artifactory.nordix.org/artifactory"
 source ../scripts/artifactory/utils.sh
 rt_list_directory "metal3/images"
-rt_list_directory "metal3/images/k8s_v1.27.1"
+rt_list_directory "metal3/images/k8s_v1.27.4"
 
 # Please check carefully the path and name before deleting.
 # Note that you need to add the suffix ".qcow2" here.
 export RT_USER=<your-username>
 export RT_TOKEN=<your-token>
-rt_delete_artifact "metal3/images/k8s_v1.27.1/${IMAGE_NAME}.qcow2" "0"
+rt_delete_artifact "metal3/images/k8s_v1.27.4/${IMAGE_NAME}.qcow2" "0"
 ```
 
 List and delete images in Openstack:
