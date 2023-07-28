@@ -17,7 +17,7 @@ IMAGE_NAME="${1:?}"
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 RT_SCRIPTS_DIR="${CI_DIR}/scripts/artifactory"
-export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.27.1"}
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.27.4"}
 
 # Download and push the image to artifactory
 WORK_DIR=/tmp/node_image
