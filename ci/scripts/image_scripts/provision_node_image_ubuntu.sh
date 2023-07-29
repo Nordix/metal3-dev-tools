@@ -72,5 +72,8 @@ sudo rm "${HOME}"/.ssh/authorized_keys
 # Reset cloud-init to run on next boot.
 "${SCRIPTS_DIR}"/reset_cloud_init.sh
 
+# Reset machine-id to regenerate on next boot.
+"${SCRIPTS_DIR}"/reset_machine_id.sh
+
 # Remove the scripts
 sudo rm -r "${SCRIPTS_DIR}"
