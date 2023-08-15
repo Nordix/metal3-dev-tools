@@ -64,6 +64,8 @@ CONTAINER_IMAGE_REPO="metal3"
 STAGING="${STAGING:-false}"
 METADATA_PATH="/tmp/metadata.txt"
 
+sudo rm -rf "${IPA_BUILD_WORKSPACE}"
+
 # Install required packages
 sudo apt-get install --yes python3-pip python3-virtualenv qemu-utils
 
@@ -105,7 +107,7 @@ python3 -m pip install --upgrade pip
 python3 -m pip install "./${IPA_BUILDER_PATH}"
 
 # Configure the IPA builder to pull the IPA source from Nordix fork
-export DIB_REPOLOCATION_ironic_python_agent="${IPA_REPO}"
+export DIB_REPOLOCATION_ironic_python_agent="${IPA_BUILD_WORKSPACE}/ironic-python-agent"
 export DIB_REPOREF_requirements="${OPENSTACK_REQUIREMENTS_REF}"
 export DIB_REPOREF_ironic_python_agent="${IPA_REF}"
 export DIB_DEV_USER_USERNAME=metal3
