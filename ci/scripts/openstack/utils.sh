@@ -583,3 +583,51 @@ delete_sg() {
 
   openstack security group delete "${SG}" > /dev/null 2>&1 || true
 }
+
+# Description:
+# Shares image beween projects.
+#
+# Usage share_image <IMAGE_ID> <PROJECT_ID>
+share_image() {
+  local PROJECT_ID IMAGE_ID
+
+  IMAGE_ID="${1:?}"
+  PROJECT_ID="${2:?}"
+
+  openstack image set --shared "${IMAGE_ID}"
+  openstack image add project "${IMAGE_ID}" "${PROJECT_ID}" > /dev/null 2>&1 || true
+}
+
+# Description:
+# Accepts shared image.
+#
+# Usage accept_shared_image <IMAGE_ID>
+accept_shared_image() {
+  local IMAGE_ID
+
+  IMAGE_ID="${1:?}"
+  openstack image set --accept "${IMAGE_ID}"
+}
+
+# Description:
+# Gets Project ID by Project Name.
+#
+# Usage get_project_id <PROJECT_NAME>
+
+get_project_id() {
+  local PROJECT_NAME
+
+  PROJECT_NAME="${1:?}"
+  openstack project list  -f json | jq -r --arg projectName "${PROJECT_NAME}" '.[] | select(.Name == $projectName ).ID'
+}
+
+# Description:
+# Gets IMAGE ID by IMAGE Name.
+#
+# Usage get_image_id <IMAGE_NAME>
+get_image_id() {
+  local IMAGE_NAME
+
+  IMAGE_NAME="${1:?}"
+  openstack image show "$IMAGE_NAME" -f json | jq -r '.id'
+}

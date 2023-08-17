@@ -152,6 +152,7 @@ pipeline {
               OS_AUTH_URL=os_auth_urls.get(env.REGION)
               OS_REGION_NAME=os_region_names.get(env.REGION)
               TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-${IMAGE_OS}-based"
+              IMAGE_OS="${IMAGE_OS}"
             }
             steps {
               echo 'Building Metal3 ${IMAGE_OS} image for ${REGION} region'
@@ -169,6 +170,20 @@ pipeline {
                     /data/ci/images/gen_metal3_${IMAGE_OS.toLowerCase()}_image.sh \
                     /data/id_ed25519_metal3ci 1 \
                     provision_metal3_image_${IMAGE_OS.toLowerCase()}.sh"
+                }
+              }
+            }
+          }
+        }
+        post{
+          success {
+            script {
+              if (REGION == 'Karlskrona') {
+                echo 'Share newly built image to dev2 project'
+                withCredentials([
+                  usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')
+                ]) {
+                    sh "/data/ci/scripts/image_scripts/share_image.sh"
                 }
               }
             }
