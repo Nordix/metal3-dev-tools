@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#! /usr/bin/env bash
+
 set -eux
 
 export IMAGE_ID
