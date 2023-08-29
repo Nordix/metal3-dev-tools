@@ -152,7 +152,6 @@ pipeline {
               OS_AUTH_URL=os_auth_urls.get(env.REGION)
               OS_REGION_NAME=os_region_names.get(env.REGION)
               TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-${IMAGE_OS}-based"
-              IMAGE_OS="${IMAGE_OS}"
             }
             steps {
               echo 'Building Metal3 ${IMAGE_OS} image for ${REGION} region'
@@ -183,7 +182,14 @@ pipeline {
                 withCredentials([
                   usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')
                 ]) {
-                    sh "/data/ci/scripts/image_scripts/share_image.sh"
+                  catchError([stageResult: 'FAILURE', message: "Failed to share the Metal3 ${IMAGE_OS} image for dev2 project ${REGION} region"]) {
+                    sh "docker run --rm \
+                    ${DOCKER_CMD_ENV}\
+                    --env IMAGE_OS \
+                    -v ${CURRENT_DIR}:/data \
+                    registry.nordix.org/metal3/image-builder \
+                    /data/ci/scripts/image_scripts/share_image.sh"
+                  }
                 }
               }
             }
