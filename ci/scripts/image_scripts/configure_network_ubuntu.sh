@@ -9,7 +9,7 @@ network:
       dhcp4-overrides:
         use-dns: no
       nameservers:
-        addresses: [1.1.1.1, 1.0.0.1]
+        addresses: [1.1.1.1, 8.8.8.8]
 
 EOF
 # Apply the changes
