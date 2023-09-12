@@ -3,7 +3,7 @@
 set -uex
 
 export CRICTL_VERSION=${CRICTL_VERSION:-"v1.28.0"}
-export CRIO_VERSION=${CRIO_VERSION:-"v1.28.0"}
+export CRIO_VERSION=${CRIO_VERSION:-"v1.28.1"}
 
 # Prerequisites for CRI-O
 # Create the .conf file to load the modules at bootup
