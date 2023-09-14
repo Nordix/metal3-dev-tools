@@ -88,9 +88,13 @@ packer build \
   -var "flavor=${IMAGE_FLAVOR}" \
   "${IMAGES_DIR}/${BUILDER_CONFIG_FILE}"
 
-# Replace any old image
-
-replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
+# Replace image. Backup image if it is building Metal3 image in Kna region
+# We keep metal3 backup images in only Kna region
+if [[ "${PROVISIONING_SCRIPT}" == *"metal3-img"* ]] && [[ "${OS_REGION_NAME}" == "Kna1" ]]; then
+  backup_and_replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
+else
+  replace_image "${IMAGE_NAME}" "${FINAL_IMAGE_NAME}"
+fi
 
 # upload node image to artifactory
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then

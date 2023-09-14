@@ -486,6 +486,42 @@ replace_image() {
 }
 
 # Description:
+# backups old image with and saves new image
+#
+# Usage:
+#   backup_and_replace_image <new_image_name> <old_image_name>
+#
+backup_and_replace_image() {
+  local NEW_IMAGE OLD_IMAGE IMAGE_IDENTIFIER
+
+  RETENTION_NUM=5
+  NEW_IMAGE="${1:?}"
+  OLD_IMAGE="${2:?}"
+
+  #Backup old image by setting new name with identifier
+  # We keep last 5 of metal3 backup images
+  # Example name for backup metal3 image: metal3-ci-centos-metal3-img-20230918T0916Z
+  IMAGE_IDENTIFIER="$(date --utc +"%Y%m%dT%H%MZ")"
+  openstack image set --name "${OLD_IMAGE}" "${OLD_IMAGE}-${IMAGE_IDENTIFIER}"
+
+  # Delete outdated old images and keep last RETENTION_NUM
+  mapfile -t < <(openstack image list  -f json | \
+    jq .[].Name | \
+    sort -r |\
+    grep "metal3-ci-centos-metal3-img-" | \
+    sed 's/"//g')
+
+  for ((i="${RETENTION_NUM}"; i<${#MAPFILE[@]}; i++)); do
+    openstack image set "${MAPFILE[i]}" --deactivate
+    openstack image delete "${MAPFILE[i]}" 
+    echo "${MAPFILE[i]} has been deleted!"
+  done
+
+  echo "Setting image name from ${NEW_IMAGE} to ${OLD_IMAGE}"
+  openstack image set --name "${NEW_IMAGE}" "${OLD_IMAGE}"
+}
+
+# Description:
 # deletes Openstack image.
 #
 # Usage:
