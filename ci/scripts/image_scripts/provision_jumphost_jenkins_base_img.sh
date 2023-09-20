@@ -13,8 +13,10 @@ sudo sh -c 'echo "Acquire::Retries \"10\";" > /etc/apt/apt.conf.d/80-retries'
 
 # Install required packages.
 sudo apt-get install -y \
-  openjdk-11-jre \
-  python3-pip
+  openjdk-11-jre python3-pip \
+  build-essential qemu-kvm libvirt-daemon-system virt-manager dnsmasq
+
+sudo adduser "${USER}" libvirt
 
 sudo pip3 install \
   python-openstackclient
