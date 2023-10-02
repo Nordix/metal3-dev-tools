@@ -42,7 +42,7 @@ sudo apt-get install -y \
   software-properties-common \
   openssl
 
-sudo mv "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
+sudo cp "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo apt-get install -y conntrack socat
 sudo apt-get install net-tools gcc linux-headers-"$(uname -r)" bridge-utils -y
@@ -57,7 +57,7 @@ sudo apt-get update -y
 echo  "Installing kubernetes binaries"
 curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
 sudo chmod a+x kubeadm kubelet kubectl
-sudo mv kubeadm kubelet kubectl /usr/local/bin/
+sudo cp kubeadm kubelet kubectl /usr/local/bin/
 sudo mkdir -p /etc/systemd/system/kubelet.service.d
 sudo retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service /etc/systemd/system/kubelet.service
 sudo retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf /etc/systemd/system/kubelet.service.d/10-kubeadm.conf

@@ -14,7 +14,7 @@ export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 sudo cp /usr/local/bin/crictl /usr/bin/
 
 echo "${PATH}"|tr ':' '\n'
-sudo mv "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
+sudo cp "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh
 sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo ls -la /usr/local/bin/retrieve.configuration.files.sh
 sudo dnf update -y
@@ -32,7 +32,7 @@ sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 echo  \"Installing kubernetes binaries\"
 curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
 chmod a+x kubeadm kubelet kubectl
-sudo mv kubeadm kubelet kubectl /usr/local/bin/
+sudo cp kubeadm kubelet kubectl /usr/local/bin/
 sudo mkdir -p /etc/systemd/system/kubelet.service.d
 sudo /usr/local/bin/retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service /etc/systemd/system/kubelet.service
 sudo /usr/local/bin/retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
