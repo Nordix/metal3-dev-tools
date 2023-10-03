@@ -9,11 +9,11 @@ set -eu
 
 set -o pipefail
 
-HUB="quay.io"
-REPO="metal3-io"
-IMAGE_NAME=$1
-BRANCH_NAME=${2:-main}
-KEEP_TAGS=${3:-3}
+HUB="${CONTAINER_IMAGE_HUB:-quay.io}"
+HUB_ORG="${CONTAINER_IMAGE_HUB_ORG:-metal3-io}"
+IMAGE_NAME=${BUILD_CONTAINER_IMAGE_NAME:-${1}}
+BRANCH_NAME=${BUILD_CONTAINER_IMAGE_BRANCH:-main}
+KEEP_TAGS=${BUILD_CONTAINER_IMAGE_KEEP_TAGS:-3}
 REPO_LOCATION="/tmp/metal3-io"
 NEEDED_TOOLS=("git" "curl" "docker" "jq")
 __dir__=$(realpath "$(dirname "$0")")
@@ -26,12 +26,12 @@ check_tools() {
 }
 
 list_tags() {
-  curl -s "https://${HUB}/v2/${REPO}/${IMAGE_NAME}/tags/list" | jq -r '.tags[]'
+  curl -s "https://${HUB}/v2/${HUB_ORG}/${IMAGE_NAME}/tags/list" | jq -r '.tags[]'
 }
 
 get_tag_sha256() {
   tag=${1:?}
-  SHA_REQ=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" "https://${HUB}/v2/${REPO}/${IMAGE_NAME}/manifests/${tag}" | jq -r '.config.digest')
+  SHA_REQ=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" "https://${HUB}/v2/${HUB_ORG}/${IMAGE_NAME}/manifests/${tag}" | jq -r '.config.digest')
   SHA=$(echo "${SHA_REQ}" | cut -f 2- -d ":" | tr -d '[:space:]')
   echo "${SHA}"
 }
@@ -40,7 +40,7 @@ delete_tag() {
   # Untested
   tag=${1:?}
   sha256=$(get_tag_sha256 "${tag}")
-  curl -X DELETE -s "https://${HUB}/v2/${REPO}/${IMAGE_NAME}/manifests/${sha256}"
+  curl -X DELETE -s "https://${HUB}/v2/${HUB_ORG}/${IMAGE_NAME}/manifests/${sha256}"
 }
 
 git_get_current_commit_short_hash() {
@@ -87,7 +87,7 @@ get_image_latest_tag() {
 
 get_image_path() {
   image_tag=${1:?}
-  echo "${HUB}/${REPO}/${IMAGE_NAME}:${image_tag}"
+  echo "${HUB}/${HUB_ORG}/${IMAGE_NAME}:${image_tag}"
 }
 
 build_container_image() {
