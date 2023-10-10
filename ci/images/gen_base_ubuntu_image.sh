@@ -18,7 +18,7 @@ source "${OS_SCRIPTS_DIR}/utils.sh"
 
 IMAGE_NAME="${CI_BASE_IMAGE}-$(get_random_string 10)"
 FINAL_IMAGE_NAME="${CI_BASE_IMAGE}"
-SOURCE_IMAGE_NAME="ubuntu-22.04-server-cloudimg-amd64_29_09_23"
+SOURCE_IMAGE_NAME="ubuntu-22.04-server-cloudimg-amd64_01_09_22"
 IMAGE_FLAVOR="1C-4GB-20GB"
 USER_DATA_FILE="$(mktemp -d)/userdata"
 SSH_USER_NAME="${CI_SSH_USER_NAME}"
