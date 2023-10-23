@@ -5,7 +5,7 @@
    
    Download the target raw version from http://cloud-images.ubuntu.com/ then convert it to `qcow2` 
 ```
-qemu-img convert -O qcow2 ubuntu-22.04-server-cloudimg-amd64.img ubuntu-22.04-server-cloudimg-amd64_01_09_22.qcow2
+qemu-img convert -O qcow2 ubuntu-22.04-server-cloudimg-amd64.img ubuntu-22.04-server-cloudimg-amd64.qcow2
 ```
    - **Centos**
 
