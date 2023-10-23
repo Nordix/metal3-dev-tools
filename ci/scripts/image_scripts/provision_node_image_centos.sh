@@ -9,9 +9,6 @@ export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
 "${SCRIPTS_DIR}"/install_crio_on_centos.sh
-# NOTE: When running with sudo, PATH is different.
-# /usr/local/bin is NOT read by sudo commands, but rather /usr/bin.
-sudo cp /usr/local/bin/crictl /usr/bin/
 
 echo "${PATH}"|tr ':' '\n'
 sudo cp "${SCRIPTS_DIR}"/node-image-cloud-init/retrieve.configuration.files.sh /usr/local/bin/retrieve.configuration.files.sh

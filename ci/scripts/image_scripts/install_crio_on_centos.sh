@@ -31,4 +31,4 @@ sudo systemctl start crio
 
 # Download crictl
 curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/"${CRICTL_VERSION}"/crictl-"${CRICTL_VERSION}"-linux-amd64.tar.gz
-sudo tar -C /usr/local/bin -xzf crictl-"${CRICTL_VERSION}"-linux-amd64.tar.gz
+sudo tar -C /usr/bin -xzf crictl-"${CRICTL_VERSION}"-linux-amd64.tar.gz
