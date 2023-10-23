@@ -37,7 +37,7 @@ pipeline {
               timeout(time: 30, unit: 'MINUTES')
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'metal3ci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
+                withCredentials([usernamePassword(credentialsId: 'metal3ci-quay-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
                 }
                 sh "make build-container-image"
