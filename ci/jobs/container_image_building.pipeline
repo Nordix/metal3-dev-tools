@@ -1,10 +1,8 @@
-
 ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
 ci_git_credential_id = "nordix-metal3-ci-github-prod-token"
 ci_git_branch = "main"
 image_registry = "quay.io"
 image_registry_organization = "metal3-io"
-image_builder_img_ver = "latest"
 
 pipeline {
     agent { label 'metal3-workers' }
@@ -13,7 +11,7 @@ pipeline {
         CONTAINER_IMAGE_HUB = "${image_registry}"
         CONTAINER_IMAGE_HUB_ORG = "${image_registry_organization}"
         BUILD_CONTAINER_IMAGE_NAME = "${BUILD_CONTAINER_IMAGE_NAME}"
-        BUILD_CONTAINER_IMAGE_BRANCH = "${ghprbTargetBranch}"
+        BUILD_CONTAINER_IMAGE_BRANCH = "${BUILD_CONTAINER_IMAGE_BRANCH}"
     }
     stages {
         stage('SCM'){
