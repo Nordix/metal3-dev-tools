@@ -1,5 +1,5 @@
 # Get packer executables
-FROM hashicorp/packer:light AS packer
+FROM hashicorp/packer:light-1.9.2 AS packer
 
 # Build openstack client
 FROM python:3.12-alpine@sha256:ae35274f417fc81ba6ee1fc84206e8517f28117566ee6a04a64f004c1409bdac AS builder
