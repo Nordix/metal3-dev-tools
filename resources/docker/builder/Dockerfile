@@ -1,8 +1,8 @@
 # Get packer executables
-FROM hashicorp/packer:light AS packer
+FROM hashicorp/packer@sha256:33386b90aeb67a1dde1730b75a67d306dc8b9aebf2a0bbb96d9e96164b484e2b AS packer  # light-1.9.4
 
 # Build openstack client
-FROM python:3.12-alpine@sha256:ae35274f417fc81ba6ee1fc84206e8517f28117566ee6a04a64f004c1409bdac AS builder
+FROM python:sha256:a5d1738d6abbdff3e81c10b7f86923ebcb340ca536e21e8c5ee7d938d263dba1 AS builder  # 3.12.0-alpine3.18
 
 RUN apk add --update --no-cache git build-base linux-headers libffi-dev openssl-dev cargo
 RUN git clone --depth 1 https://github.com/openstack/python-openstackclient.git /src
