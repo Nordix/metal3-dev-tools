@@ -28,6 +28,11 @@ NETWORK="$(get_resource_id_from_name network "${CI_EXT_NET}")"
 FLOATING_IP_NETWORK="$( [ "${USE_FLOATING_IP}" = 1 ] && echo "${EXT_NET}")"
 SSH_USER_GROUP="sudo"
 
+if [[ -z "${NETWORK}" ]]; then
+  echo "fatal: network id empty, check for previous errors"
+  exit 1
+fi
+
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   export UBUNTU_VERSION=${UBUNTU_VERSION:-"22.04"}
   FINAL_IMAGE_NAME=${FINAL_IMAGE_NAME:-"UBUNTU_""${UBUNTU_VERSION}""_NODE_IMAGE_K8S_""${KUBERNETES_VERSION}"}
@@ -62,11 +67,6 @@ render_user_data \
 STARTER_SCRIPT_PATH="/tmp/build_starter.sh"
 echo "${REMOTE_EXEC_CMD}" > "${STARTER_SCRIPT_PATH}"
 
-# Create CI Keypair
-CI_PUBLIC_KEY_FILE="${OS_SCRIPTS_DIR}/id_ed25519_metal3ci.pub"
-delete_keypair "${SSH_KEYPAIR_NAME}"
-create_keypair "${CI_PUBLIC_KEY_FILE}" "${SSH_KEYPAIR_NAME}"
-
 # Build Image
 packer build \
   -var "image_name=${IMAGE_NAME}" \
@@ -94,4 +94,3 @@ fi
 if [[ "$PROVISIONING_SCRIPT" == *"node"* ]]; then
   bash "${SCRIPTS_DIR}/upload_node_image_rt.sh" "${FINAL_IMAGE_NAME}"
 fi
-
