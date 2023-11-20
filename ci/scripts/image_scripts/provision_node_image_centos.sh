@@ -4,9 +4,20 @@ set -uex
 
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.28.1"}
+export KUBERNETES_MINOR_VERSION=${KUBERNETES_VERSION%.*}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
-export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.15.1"}
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
+
+# migrate to the Kubernetes community-owned repositories
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://pkgs.k8s.io/core:/stable:/${KUBERNETES_MINOR_VERSION}/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.k8s.io/core:/stable:/${KUBERNETES_MINOR_VERSION}/rpm/repodata/repomd.xml.key
+exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+EOF
 
 "${SCRIPTS_DIR}"/install_crio_on_centos.sh
 
@@ -27,12 +38,8 @@ sudo yum install linux-firmware -y
 sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
 echo  \"Installing kubernetes binaries\"
-curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
-chmod a+x kubeadm kubelet kubectl
-sudo cp kubeadm kubelet kubectl /usr/local/bin/
-sudo mkdir -p /etc/systemd/system/kubelet.service.d
-sudo /usr/local/bin/retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service /etc/systemd/system/kubelet.service
-sudo /usr/local/bin/retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+sudo dnf install -y kubelet-"${KUBERNETES_BINARIES_VERSION//v}" kubeadm-"${KUBERNETES_BINARIES_VERSION//v}" kubectl-"${KUBERNETES_BINARIES_VERSION//v}" --disableexcludes=kubernetes
+sudo systemctl enable --now kubelet
 
 # Last checkup and cleanup
 sudo yum clean all && sudo rm -rf /var/cache/yum

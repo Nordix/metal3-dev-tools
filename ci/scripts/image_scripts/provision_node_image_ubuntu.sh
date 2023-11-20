@@ -5,8 +5,8 @@ set -uex
 SCRIPTS_DIR="$(dirname "$(readlink -f "${0}")")"
 
 export KUBERNETES_VERSION=${KUBERNETES_VERSION:-"v1.28.1"}
+export KUBERNETES_MINOR_VERSION=${KUBERNETES_VERSION%.*}
 export KUBERNETES_BINARIES_VERSION="${KUBERNETES_BINARIES_VERSION:-${KUBERNETES_VERSION}}"
-export KUBERNETES_BINARIES_CONFIG_VERSION=${KUBERNETES_BINARIES_CONFIG_VERSION:-"v0.15.1"}
 export CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
 
 # Needrestart and packer does not seem to work well together. Needrestart is
@@ -47,20 +47,23 @@ sudo chmod +x /usr/local/bin/retrieve.configuration.files.sh
 sudo apt-get install -y conntrack socat
 sudo apt-get install net-tools gcc linux-headers-"$(uname -r)" bridge-utils -y
 sudo apt-get install -y keepalived && sudo systemctl stop keepalived
-sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://dl.k8s.io/apt/doc/apt-key.gpg
-sudo bash -c 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
+
+# migrate to the Kubernetes community-owned repositories
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/${KUBERNETES_MINOR_VERSION}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/"${KUBERNETES_MINOR_VERSION}"/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 sudo apt-get update -y
 
 # Install CRI-O
 "${SCRIPTS_DIR}"/install_crio_on_ubuntu.sh
 
 echo  "Installing kubernetes binaries"
-curl -L --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_BINARIES_VERSION}/bin/linux/amd64/{kubeadm,kubelet,kubectl}"
-sudo chmod a+x kubeadm kubelet kubectl
-sudo cp kubeadm kubelet kubectl /usr/local/bin/
-sudo mkdir -p /etc/systemd/system/kubelet.service.d
-sudo retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service /etc/systemd/system/kubelet.service
-sudo retrieve.configuration.files.sh https://raw.githubusercontent.com/kubernetes/release/"${KUBERNETES_BINARIES_CONFIG_VERSION}"/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+# deb versions doesn't have a 'v' in the beginning and has a build version suffix
+# like -1.1, we are using * to make sure it takes the latest build. We checked
+# manually that for a specific version, only one built is present in the apt list.
+KUBERNETES_DEB_VERSION="${KUBERNETES_VERSION//v}"-\*
+sudo apt-get install -y kubelet="${KUBERNETES_DEB_VERSION}" kubeadm="${KUBERNETES_DEB_VERSION}" kubectl="${KUBERNETES_DEB_VERSION}"
+sudo apt-mark hold kubelet kubeadm kubectl
 
 # Last checkup and cleanup
 sudo sed -i "0,/.*PermitRootLogin.*/s//PermitRootLogin yes/" /etc/ssh/sshd_config
