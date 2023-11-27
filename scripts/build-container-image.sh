@@ -11,13 +11,30 @@ set -o pipefail
 
 HUB="${CONTAINER_IMAGE_HUB:-quay.io}"
 HUB_ORG="${CONTAINER_IMAGE_HUB_ORG:-metal3-io}"
-IMAGE_NAME=${BUILD_CONTAINER_IMAGE_NAME:-${1}}
-BRANCH_NAME=${BUILD_CONTAINER_IMAGE_BRANCH:-main}
-KEEP_TAGS=${BUILD_CONTAINER_IMAGE_KEEP_TAGS:-3}
+IMAGE_NAME="${BUILD_CONTAINER_IMAGE_NAME:-${1}}"
+REPO_URL="${BUILD_CONTAINER_IMAGE_REPO:-${2}}"
+GIT_REFERENCE="${BUILD_CONTAINER_IMAGE_GIT_REFERENCE:-main}"
+DOCKERFILE_DIRECTORY="${BUILD_CONTAINER_IMAGE_DOCKERFILE_LOCATION:-/}"
 REPO_LOCATION="/tmp/metal3-io"
 NEEDED_TOOLS=("git" "curl" "docker" "jq")
 __dir__=$(realpath "$(dirname "$0")")
-IMAGES_JSON="${__dir__}/files/container_image_names.json"
+
+case "${GIT_REFERENCE}" in
+  *"refs/heads"*)
+    GIT_REFERENCE_TYPE="branch"
+    GIT_REFERENCE=$(echo "${GIT_REFERENCE}" | sed 's/refs\/heads\///')
+    echo "Detected branch name: ${GIT_REFERENCE}"
+    ;;
+  *"refs/tags"*)
+    GIT_REFERENCE_TYPE="tags"
+    GIT_REFERENCE=$(echo "${GIT_REFERENCE}" | sed 's/refs\/tags\///')
+    echo "Detected tag name: ${GIT_REFERENCE}"
+    ;;
+  *)
+    GIT_REFERENCE_TYPE="branch"
+    echo "No reference type detected. Treating as a branch name: ${GIT_REFERENCE}"
+    ;;
+esac
 
 check_tools() {
   for tool in "${NEEDED_TOOLS[@]}"; do
@@ -29,60 +46,13 @@ list_tags() {
   curl -s "https://${HUB}/v2/${HUB_ORG}/${IMAGE_NAME}/tags/list" | jq -r '.tags[]'
 }
 
-get_tag_sha256() {
-  tag=${1:?}
-  SHA_REQ=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" "https://${HUB}/v2/${HUB_ORG}/${IMAGE_NAME}/manifests/${tag}" | jq -r '.config.digest')
-  SHA=$(echo "${SHA_REQ}" | cut -f 2- -d ":" | tr -d '[:space:]')
-  echo "${SHA}"
-}
-
-delete_tag() {
-  # Untested
-  tag=${1:?}
-  sha256=$(get_tag_sha256 "${tag}")
-  curl -X DELETE -s "https://${HUB}/v2/${HUB_ORG}/${IMAGE_NAME}/manifests/${sha256}"
-}
-
 git_get_current_commit_short_hash() {
   git rev-parse --short HEAD
-}
-
-git_get_current_branch() {
-  git rev-parse --abbrev-ref HEAD
 }
 
 get_date() {
   # Should this be current date, or latest commit date?
   date +%Y%m%d
-}
-
-get_image_tag() {
-  echo "$(git_get_current_branch)_$(get_date)_$(git_get_current_commit_short_hash)"
-}
-
-cleanup_old_tags() {
-  all_tags=$(list_tags)
-  branch=$(git_get_current_branch)
-
-  declare -a branch_tags=()
-
-  for tag in "${all_tags[@]}"; do
-    if [[ "${tag}" == "${branch}_20"* ]]; then
-      branch_tags+=("${tag}")
-    fi
-  done
-  IFS=$'\n' sorted_existing_tags=("$(sort <<<"${branch_tags[*]}")")
-  number_of_tags=${#sorted_existing_tags[@]}
-  if [[ ${number_of_tags} -gt ${KEEP_TAGS} ]]; then
-    for i in $(seq 0 $(( number_of_tags - KEEP_TAGS - 1 ))); do
-      echo "Deleting tag: ${sorted_existing_tags[$i]}"
-      delete_tag "${sorted_existing_tags[$i]}"
-    done
-  fi
-}
-
-get_image_latest_tag() {
-  echo "$(git_get_current_branch)_latest"
 }
 
 get_image_path() {
@@ -91,34 +61,38 @@ get_image_path() {
 }
 
 build_container_image() {
-  image_tag=$(get_image_tag)
-  image_latest_tag=$(get_image_latest_tag)
+  image_tag=$(echo "${GIT_REFERENCE}" | sed 's/\//_/')
   image_path=$(get_image_path "${image_tag}")
-  image_latest_path=$(get_image_path "${image_latest_tag}")
+  echo "Building the image as ${image_path}"
   docker build -t "${image_path}" .
   docker push "${image_path}"
-  docker tag "${image_path}" "${image_latest_path}"
-  docker push "${image_latest_path}"
+  if [[ "${GIT_REFERENCE_TYPE}" != "branch" ]]; then
+    return
+  fi
+  # If the image was built for a branch, we include some more tags
+  declare -a new_image_tags=()
+  new_image_tags+=("${GIT_REFERENCE}_$(get_date)_$(git_get_current_commit_short_hash)")
+  if [[ "${GIT_REFERENCE}" == "main" ]]; then
+    new_image_tags+=("latest")
+  fi
+  for new_tag in "${new_image_tags[@]}"; do
+    new_image_path=$(get_image_path "${new_tag}")
+    echo "Tagging the image as ${new_image_path}"
+    docker tag "${image_path}" "${new_image_path}"
+    docker push "${new_image_path}"
+  done
 }
 
 build_image() {
-  if [[ $(jq < "${IMAGES_JSON}" .\""${IMAGE_NAME}"\") == "null" ]]; then
-    echo "Error: No such image ${IMAGE_NAME}"
-    exit 1
-  fi
-  repo_link=$(jq < "${IMAGES_JSON}" -r .\""${IMAGE_NAME}"\".repo)
-  repo_name=$(jq < "${IMAGES_JSON}"  -r .\""${IMAGE_NAME}"\".repo_name)
   mkdir -p "${REPO_LOCATION}"
   cd "${REPO_LOCATION}"
-  rm -rf "${repo_name}"
-  git clone "${repo_link}" "${repo_name}"
-  dockerfile_directory=$(jq < "${IMAGES_JSON}" -r .\""${IMAGE_NAME}"\".dockerfile_location)
-  cd "${repo_name}"
-  git checkout "${BRANCH_NAME}"
-  cd "${REPO_LOCATION}/${repo_name}${dockerfile_directory}"
+  rm -rf "${IMAGE_NAME}"
+  git clone "${REPO_URL}" "${IMAGE_NAME}"
+  cd "${IMAGE_NAME}"
+  git checkout "${GIT_REFERENCE}"
+  cd "${REPO_LOCATION}/${IMAGE_NAME}${DOCKERFILE_DIRECTORY}"
   build_container_image
 }
 
 check_tools
 build_image
-cleanup_old_tags
