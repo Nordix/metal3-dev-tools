@@ -9,7 +9,7 @@ RUN git clone --depth 1 https://github.com/openstack/python-openstackclient.git 
 RUN cd /src && pip install --no-cache-dir --root=/app .
 
 # Builder image
-FROM python:3.12-alpine@sha256:ae35274f417fc81ba6ee1fc84206e8517f28117566ee6a04a64f004c1409bdac
+FROM python:3.12-alpine@sha256:a5d1738d6abbdff3e81c10b7f86923ebcb340ca536e21e8c5ee7d938d263dba1
 
 RUN apk add --update --no-cache git bash openssl qemu-img \
     jq curl wget gettext openssh && \
