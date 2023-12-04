@@ -2,11 +2,7 @@ PROJECT := metal3
 APP     := tools
 NAME    := ${PROJECT}-${APP}
 
-lint_folder ?= $(CURDIR)
-
 image_registry        := registry.nordix.org
-lint_md_img_ver       := latest
-lint_go_img_ver       := latest
 gotest_unit_img_ver   := latest
 image_builder_img_ver := latest
 
@@ -36,18 +32,6 @@ build-image-builder: ## Build Docker Image for qcow2 image building
 		-t image-builder \
 		-f resources/docker/builder/Dockerfile resources/docker/builder/
 
-.PHONY: build-lint-go
-build-lint-go: ## Build Docker Image for go lint
-	docker build \
-		-t ${NAME}-go-lint \
-		-f resources/docker/linter/golang/Dockerfile resources/docker/linter/golang
-
-.PHONY: build-lint-md
-build-lint-md: ## Build Docker Image for markdown lint
-	docker build \
-		-t ${NAME}-md-lint \
-		-f resources/docker/linter/Dockerfile resources/docker/linter/
-
 .PHONY: build_fullstack
 build_fullstack:
 	$(CURDIR)/ci/scripts/image_scripts/start_centos_fullstack_build.sh
@@ -64,30 +48,9 @@ integration_test: ## Run integration test
 integration_test_cleanup: ## Clean integration test setup
 	$(CURDIR)/ci/scripts/tests/integration_delete.sh
 
-.PHONY: lint-go
-lint-go: ## Lint go and execute gosec (ex: make lint-go or make lint-go lint_folder=abspath)
-	docker run --rm \
-		-v "${CURDIR}:/mnt" \
-		-v "${lint_folder}:/data" \
-		${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver} \
-		sh /mnt/scripts/go-linter.sh
-
-.PHONY: lint-md
-lint-md: ## Lint markdown (ex: make lint-md or make lint-md lint_folder=abspath)
-	docker run --rm \
-		-v "${CURDIR}:/data" \
-		-v "${lint_folder}:/lintdata" \
-		${image_registry}/metal3/${NAME}-md-lint:${lint_md_img_ver} \
-		mdl -s configs/linter/.mdstylerc.rb "/lintdata"
-
 .PHONY: lint-shell
 lint-shell: 
 	./scripts/shellcheck.sh
-
-.PHONY: push-lint-go
-push-lint-go: ## Push Docker Image for Lint go to nordix registry
-	docker tag ${NAME}-go-lint:latest ${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver}
-	docker push ${image_registry}/metal3/${NAME}-go-lint:${lint_go_img_ver}
 
 .PHONY: push-go-unittest
 push-go-unittest: ## Push Docker Image for go unit test to nordix registry
@@ -97,11 +60,6 @@ push-go-unittest: ## Push Docker Image for go unit test to nordix registry
 push-image-builder: ## Push Docker Image for qcow2 image building to nordix registry
 	docker tag image-builder:latest ${image_registry}/metal3/image-builder:${image_builder_img_ver}
 	docker push ${image_registry}/metal3/image-builder:${image_builder_img_ver}
-
-.PHONY: push-lint-md
-push-lint-md: ## Push Docker Image for Lint markdown to nordix registry
-	docker tag ${NAME}-md-lint:latest ${image_registry}/metal3/${NAME}-md-lint:${lint_md_img_ver}
-	docker push ${image_registry}/metal3/${NAME}-md-lint:${lint_md_img_ver}
 
 .PHONY: run-dev-env
 run-dev-env: ## Create or start the metal3 dev env vm

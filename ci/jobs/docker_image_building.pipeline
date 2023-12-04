@@ -3,8 +3,6 @@ ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
 ci_git_credential_id = "nordix-metal3-ci-github-prod-token"
 ci_git_branch = "main"
 image_registry = "registry.nordix.org"
-lint_md_img_ver = "latest"
-lint_go_img_ver = "latest"
 image_builder_img_ver = "latest"
 
 
@@ -32,9 +30,7 @@ pipeline {
               timeout(time: 30, unit: 'MINUTES')
             }
             steps {
-                sh "make build-lint-md"
                 sh "make build-image-builder"
-                sh "make build-lint-go"
             }
         }
         stage('Push docker images'){
@@ -45,9 +41,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'metal3ci_harbor', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')])  {
                     sh "docker login '${image_registry}' -u $DOCKER_USER -p $DOCKER_PASSWORD"
                 }
-                sh "make push-lint-md"
                 sh "make push-image-builder"
-                sh "make push-lint-go"
             }
         }
     }
