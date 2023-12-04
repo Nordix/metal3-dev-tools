@@ -48,12 +48,6 @@ PINNED_IRONIC_IMAGE_ARTIFACTS="${PINNED_IRONIC_IMAGE_ARTIFACTS:-${SCRIPT_DIR}/ir
 # Clean (delete) ironic-image container images
 harbor_clean_OCI_repository "ironic-image" "${PINNED_IRONIC_IMAGE_ARTIFACTS}" "5" "${DRY_RUN}"
 
-# Clean (delete) metal3-tools-md-lint container images
-harbor_clean_OCI_repository "metal3-tools-md-lint" "/dev/null" "5" "${DRY_RUN}"
-
 # Clean (delete) image-builder container images
 harbor_clean_OCI_repository "image-builder" "/dev/null" "5" "${DRY_RUN}"
-
-# Clean (delete) metal3-tools-go-lint container images
-harbor_clean_OCI_repository "metal3-tools-go-lint" "/dev/null" "5" "${DRY_RUN}"
 
