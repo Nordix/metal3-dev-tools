@@ -2,14 +2,14 @@
 FROM hashicorp/packer:light-1.9.4@sha256:33386b90aeb67a1dde1730b75a67d306dc8b9aebf2a0bbb96d9e96164b484e2b AS packer
 
 # Build openstack client
-FROM python:3.12.0-alpine3.18@sha256:c5bbde5ada8f427a1f2e2fb41f08077bfb4f1c779e82ab7e603a145275bec840 AS builder
+FROM python:3.12.1-alpine3.18@sha256:af0d8da43677e3000ebdf4045508d891a87e7bd2d3ec87bc6e40403be97291b8 AS builder
 
 RUN apk add --update --no-cache git build-base linux-headers libffi-dev openssl-dev cargo
 RUN git clone --depth 1 https://github.com/openstack/python-openstackclient.git /src
 RUN cd /src && pip install --no-cache-dir --root=/app .
 
 # Builder image
-FROM python:3.12.0-alpine3.18@sha256:c5bbde5ada8f427a1f2e2fb41f08077bfb4f1c779e82ab7e603a145275bec840
+FROM python:3.12.1-alpine3.18@sha256:af0d8da43677e3000ebdf4045508d891a87e7bd2d3ec87bc6e40403be97291b8
 
 RUN apk add --update --no-cache git bash openssl qemu-img \
     jq curl wget gettext openssh && \
