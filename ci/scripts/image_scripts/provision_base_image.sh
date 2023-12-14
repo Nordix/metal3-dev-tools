@@ -36,7 +36,14 @@ sudo apt-get install -y \
   make \
   gnupg-agent \
   software-properties-common \
-  openssl
+  openssl \
+  openjdk-11-jre \
+  python3-pip \
+  build-essential \
+  qemu-kvm \
+  libvirt-daemon-system \
+  virt-manager \
+  dnsmasq
 
 # Install docker.
 "${SCRIPTS_DIR}"/setup_docker_ubuntu.sh
