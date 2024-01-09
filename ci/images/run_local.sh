@@ -25,7 +25,7 @@ PROVISIONING_SCRIPT="${1:?}"
 # These variables can be overridden by the user, but have defaults that may or
 # may not be useful.
 CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
-KUBERNETES_VERSION="${KUBERNETES_VERSION:-v1.28.1}"
+KUBERNETES_VERSION="${KUBERNETES_VERSION:-v1.29.0}"
 # ssh user name used by packer for provisioning
 PACKER_SSH_USER_NAME="${PACKER_SSH_USER_NAME:-${USER}}"
 # ssh username injected to the userdata files (could differ from what packer is using)
