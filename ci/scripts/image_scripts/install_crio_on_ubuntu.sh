@@ -2,8 +2,8 @@
 
 set -uex
 
-export CRICTL_VERSION=${CRICTL_VERSION:-"v1.28.0"}
-export CRIO_VERSION=${CRIO_VERSION:-"v1.28.2"}
+export CRICTL_VERSION=${CRICTL_VERSION:-"v1.29.0"}
+export CRIO_VERSION=${CRIO_VERSION:-"v1.29.0"}
 
 # Prerequisites for CRI-O
 # Create the .conf file to load the modules at bootup
@@ -25,7 +25,7 @@ EOF
 sudo sysctl --system
 
 # Install CRI-O
-curl https://raw.githubusercontent.com/cri-o/cri-o/"${CRIO_VERSION}"/scripts/get | sudo bash -s -- -t "${CRIO_VERSION}"
+curl https://raw.githubusercontent.com/cri-o/packaging/main/get | sudo bash -s -- -t "${CRIO_VERSION}"
 # Start CRI-O
 sudo systemctl daemon-reload
 sudo systemctl start crio
