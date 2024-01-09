@@ -42,7 +42,8 @@
     {
       "type": "shell",
       "script": "{{user `exec_script_path`}}",
-      "max_retries": 5
+      "max_retries": 15,
+      "valid_exit_codes": [0, 2300218]
     }
   ]
 }
