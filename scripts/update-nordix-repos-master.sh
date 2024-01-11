@@ -162,7 +162,7 @@ update_custom_branch "${BMO_RELEASE_BRANCHES}" "${LOCAL_BMO_REPO}" "${NORDIX_BMO
 CAPI_RELEASE_BRANCHES="release-1.3 release-1.4 release-1.5 release-1.6"
 update_custom_branch "${CAPI_RELEASE_BRANCHES}" "${LOCAL_CAPI_REPO}" "${NORDIX_CAPI_REPO}"
 
-CAPO_RELEASE_BRANCHES="release-0.5 release-0.6 release-0.7 release-0.8"
+CAPO_RELEASE_BRANCHES="release-0.6 release-0.7 release-0.8 release-0.9"
 update_custom_branch "${CAPO_RELEASE_BRANCHES}" "${LOCAL_CAPO_REPO}" "${NORDIX_CAPO_REPO}"
 
 IRONIC_IMAGE_RELEASE_BRANCHES="release-23.1"
