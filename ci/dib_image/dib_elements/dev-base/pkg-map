@@ -1,0 +1,33 @@
+{
+    "release": {
+      "ubuntu": {
+        "22.04": {
+          "ntp": "chrony"
+        }
+      }
+    },
+    "family": {
+        "redhat": {
+            "curl": "curl",
+            "git": "git",
+            "tree": "tree",
+            "vim": "vim-enhanced",
+            "wget": "wget",
+            "make": "make",
+            "openjdk-11-jre": "java-11-openjdk",
+            "python3": "python3",
+            "python3-pip":"python3-pip"
+        },
+        "debian":{
+            "curl": "curl",
+            "git": "git",
+            "tree": "tree",
+            "vim": "vim",
+            "wget": "wget",
+            "make": "make",
+            "openjdk-11-jre": "openjdk-11-jre",
+            "python3": "python3",
+            "python3-pip":"python3-pip"
+        }
+    }
+}

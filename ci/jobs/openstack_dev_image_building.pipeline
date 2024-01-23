@@ -1,0 +1,79 @@
+
+ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
+ci_git_credential_id = "nordix-metal3-ci-github-prod-token"
+ci_git_branch = "main"
+
+pipeline {
+  agent { none }
+  options { ansiColor('xterm') }
+  environment {
+    IMAGE_OS = "${IMAGE_OS}"
+    METAL3_CI_USER="metal3ci"
+    OS_AUTH_URL="https://kna1.citycloud.com:5000"
+    OS_USER_DOMAIN_NAME="CCP_Domain_37137"
+    OS_PROJECT_DOMAIN_NAME="CCP_Domain_37137"
+    OS_REGION_NAME="Kna1"
+    OS_PROJECT_NAME="Default Project 37137"
+    OS_TENANT_NAME="Default Project 37137"
+    OS_AUTH_VERSION=3
+    OS_IDENTITY_API_VERSION=3
+    KUBERNETES_VERSION = "${KUBERNETES_VERSION}"
+    KIND_NODE_IMAGE_VERSION = "${KIND_NODE_IMAGE_VERSION}"
+  }
+  stages {
+    stage('Build Ubuntu dev image') {
+      agent { label 'metal3ci-large-ubuntu' }
+      options {
+        timeout(time: 30, unit: 'MINUTES')
+      }
+      steps {
+        /* Checkout CI Repo */
+        checkout([$class: 'GitSCM',
+                branches: [[name: ci_git_branch]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'WipeWorkspace'],
+                [$class: 'CleanCheckout'],
+                [$class: 'CleanBeforeCheckout']],
+                submoduleCfg: [],
+                userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                url: ci_git_url]]])
+
+        echo 'Building Ubuntu dev image'
+        withCredentials([
+          usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')
+        ]) {
+          catchError([stageResult: 'FAILURE', message: "Failed to build Ubuntu dev image"]) {
+            sh "./../dib-images/build-ubuntu-dev-image.sh"
+          }
+        }
+      }
+    }
+    stage('Building Centos dev image'){
+      agent { label 'metal3ci-large-centos' }
+      options {
+        timeout(time: 30, unit: 'MINUTES')
+      }
+      steps {
+        /* Checkout CI Repo */
+        checkout([$class: 'GitSCM',
+                branches: [[name: ci_git_branch]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'WipeWorkspace'],
+                [$class: 'CleanCheckout'],
+                [$class: 'CleanBeforeCheckout']],
+                submoduleCfg: [],
+                userRemoteConfigs: [[credentialsId: ci_git_credential_id,
+                url: ci_git_url]]])
+
+        echo 'Building Centos dev image'
+        withCredentials([
+          usernamePassword(credentialsId: 'metal3ci_city_cloud_openstack_credentials', usernameVariable: 'OS_USERNAME', passwordVariable: 'OS_PASSWORD')
+        ]) {
+          catchError([stageResult: 'FAILURE', message: "Failed to build Centos dev image"]) {
+            sh "./../dib-image/build-centos-dev-image.sh"
+          }
+        }
+      }
+    }
+  }
+}
