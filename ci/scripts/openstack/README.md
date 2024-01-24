@@ -1,6 +1,7 @@
 # Openstack Infrastructure
 
-This folder contain scripts to create/delete/interact with openstack infrastructure for CI and DEV environments.
+This folder contain scripts to create/delete/interact with openstack
+infrastructure for CI and DEV environments.
 
 ## Prerequisites
 
@@ -10,7 +11,11 @@ This folder contain scripts to create/delete/interact with openstack infrastruct
 
 ## CI Infrastructure
 
-CI Infrastructure contains Router, external network, SSH Keys, Bastion server, base images e.t.c. There are scripts to delete and create complete infra from scratch. Any changes to the bare minimal infrastructure like routers and networks would require deletion of infrastructure and creating again from scratch.
+CI Infrastructure contains Router, external network, SSH Keys, Bastion
+server, base images e.t.c. There are scripts to delete and create
+complete infra from scratch. Any changes to the bare minimal
+infrastructure like routers and networks would require deletion of
+infrastructure and creating again from scratch.
 
 ### Create Infrastructure
 
@@ -26,7 +31,12 @@ CI Infrastructure contains Router, external network, SSH Keys, Bastion server, b
 
 ### DEV Infrastructure
 
-DEV Infrastructure like CI infra contains basic components like routers, external network and Bastion server e.t.c. Apart from bare minimal infra rest of the things are left to developers. There are scripts to delete and create complete infra from scratch. Any changes to the bare minimal infrastructure like routers and networks would require deletion of infrastructure and creating again from scratch.
+DEV Infrastructure like CI infra contains basic components like routers,
+external network and Bastion server e.t.c. Apart from bare minimal infra
+rest of the things are left to developers. There are scripts to delete
+and create complete infra from scratch. Any changes to the bare minimal
+infrastructure like routers and networks would require deletion of
+infrastructure and creating again from scratch.
 
 Resources which developers can use directly are
 

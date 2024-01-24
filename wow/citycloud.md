@@ -31,7 +31,7 @@ access goes through the jumphosts.
 
 ## Example SSH config
 
-In order to access the dev VMs ( 10.101.10.* or 10.201.10.* ), the SSH traffic
+In order to access the dev VMs (`10.101.10.*` or `10.201.10.*`), the SSH traffic
 needs to go through the jumphost. If you want to SSH to the jumphost itself,
 please use the metal3ci account with the correct SSH key.
 

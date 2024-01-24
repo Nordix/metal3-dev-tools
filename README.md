@@ -29,21 +29,23 @@ Then run
 make run-dev-env
 ```
 
-If the IP address of the newly created virtual machine is not shown, then run the following
+If the IP address of the newly created virtual machine is not shown,
+then run the following
 
-```
+```sh
 virsh net-dhcp-leases default
 ```
 
 ssh into the machine with the metal3ci user
 
-```
+```sh
 ssh metal3ci@VM_IP
 ```
 
-When running ```make``` as described below, if you hit an issue about the default network, saying that it is already in use
-by ens2, you need to modify the file ```/etc/libvirt/qemu/networks/default.xml```
-to change the CIDR to not use the same CIDR as ens2 or any other interface.
+When running ```make``` as described below, if you hit an issue about
+the default network, saying that it is already in use by ens2, you need
+to modify the file ```/etc/libvirt/qemu/networks/default.xml``` to
+change the CIDR to not use the same CIDR as ens2 or any other interface.
 Then run
 
 ```sh
