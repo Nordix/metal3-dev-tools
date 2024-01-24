@@ -5,50 +5,70 @@ In this development environment, deploying kubernetes involves two steps.
 - Create machines with required binaries, such as kubelete, kubeadm and docker
 - Create a kubernetes cluster using tools such as kubeadm
 
-The scripts under `./providers/kinder/` provide the solution to both of the above tasks as follows:
+The scripts under `./providers/kinder/` provide the solution to both of
+the above tasks as follows:
 
-**Creating Machines**: Using the scripts under `/providers/kinder/`, it is possible to create machines with relevant binaries. The versions of the variables is determined by the node-image built using kinder.
+**Creating Machines**: Using the scripts under `/providers/kinder/`, it
+is possible to create machines with relevant binaries. The versions of
+the variables is determined by the node-image built using kinder.
 
-As to networking, each control plane node has multiple control plane networks and workers are connected to multiple traffic networks. Experiments related to workers networking can be ignored for now. When it is considered again, we would like to separate the control plane networks and traffic networks and experiments need to be done on that.
+As to networking, each control plane node has multiple control plane
+networks and workers are connected to multiple traffic networks.
+Experiments related to workers networking can be ignored for now. When
+it is considered again, we would like to separate the control plane
+networks and traffic networks and experiments need to be done on that.
 
-**Creating K8s cluster:** The creation of the K8s cluster is a manual process and needs to be done as described below.
+**Creating K8s cluster:** The creation of the K8s cluster is a manual
+process and needs to be done as described below.
 
-A kubernetes control plane is made of multiple components, such as the API server, etcd and scheduler. The components that are of interest to us at this point are the API server and the etcd database.
+A kubernetes control plane is made of multiple components, such as the
+API server, etcd and scheduler. The components that are of interest to
+us at this point are the API server and the etcd database.
 
 ## Experiments overview
 
-The main focus on studying the behavior of kubeadm when run on a machine with multiple interfaces.
-And, We try to answer the following questions.
+The main focus on studying the behavior of kubeadm when run on a machine
+with multiple interfaces. And, We try to answer the following questions.
 
 - How do these components choose which interfaces to use ?
 - How do we influence the choice during init phase ?
 - How do we influence the choice during join phase ?
 - How granular the configuration could be made.
 
-As shown below, there are multiple traffic networks for the workers and additional control plane networks. Although different kinds of tests can be done, we focus on the extreme case in that:
+As shown below, there are multiple traffic networks for the workers and
+additional control plane networks. Although different kinds of tests can
+be done, we focus on the extreme case in that:
 
 - etcd to etcd communication done over an etcd-network
-- api-server to api-server communication done over an api-network (with or without a load balancer)
+- api-server to api-server communication done over an api-network (with
+  or without a load balancer)
 - api-server to etcd communication over localhost if they are on the same machine
 - api-server to etcd communication not possible if they are on separate machines
 
-Alternative topologies can be found [here](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/)
+Alternative topologies can be found
+[here](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/)
 
 ## Kinder based machine creation
 
 ### prerequisites
 
-- [Kinder](https://github.com/kubernetes/kubeadm/tree/master/kinder) and [jq](https://stedolan.github.io/jq/download/) are installed
-- None of the networks defined in `./setup_test_environment.sh` conflict with existing docker networks
-- No cluster exists with the same name or else it will delete and re-create it
+- [Kinder](https://github.com/kubernetes/kubeadm/tree/master/kinder) and
+  [jq](https://stedolan.github.io/jq/download/) are installed
+- None of the networks defined in `./setup_test_environment.sh` conflict
+  with existing docker networks
+- No cluster exists with the same name or else it will delete and
+  re-create it
 
 ### Setup test environment
 
 ```bash
-./providers/kinder/setup_test_environment.sh <cluster name> [<number of controlplanes> <number of workers> <kindest node version>]
+./providers/kinder/setup_test_environment.sh <cluster name> \
+    [<number of controlplanes> <number of workers> <kindest node version>]
 ```
 
-If you do not provide the number of workers or controlplanes or both, then both default to 3. Kindest node version is by default **kindest/node:v1.18.0**
+If you do not provide the number of workers or controlplanes or both,
+then both default to 3. Kindest node version is by default
+**kindest/node:v1.18.0**
 
 ### Teardown test environment
 
@@ -75,10 +95,16 @@ In a multi interface control plane node, configuring control plane such that
 
 ## Test Cases
 
-- Apply **kubeadm** init and join with default configurations to check how it populates the different static pod manifest files
-- Use a custom **kubeadm-init** config file where we add only **api-server** related configurations and check if a different interface for **api-server** is assigned
-- Extend the 2nd test case by adding **etcd-server** related configurations in **kubeadm-init** config file and check if different interfaces for **api-server**  and **etcd-server** gets assigned.
-- In all of the above cases, consider the impact of these configurations using **kubeadm-join** config file.
+- Apply **kubeadm** init and join with default configurations to check
+  how it populates the different static pod manifest files
+- Use a custom **kubeadm-init** config file where we add only
+  **api-server** related configurations and check if a different
+  interface for **api-server** is assigned
+- Extend the 2nd test case by adding **etcd-server** related
+  configurations in **kubeadm-init** config file and check if different
+  interfaces for **api-server**  and **etcd-server** gets assigned.
+- In all of the above cases, consider the impact of these configurations
+  using **kubeadm-join** config file.
 
 ## Test Results
 
@@ -94,27 +120,42 @@ In a multi interface control plane node, configuring control plane such that
 - Setup: Custom kubeconfig-init with only api-server given a non-default IP
 - Desired result: Both api-server and etcd use the given IP
 - Actual Result: As expected
-- Observation: On the joining node, the default IP was used for both etcd and api-server, i.e. The IP in the joining string did not contribute in IP selection.
+- Observation: On the joining node, the default IP was used for both
+  etcd and api-server, i.e. The IP in the joining string did not
+  contribute in IP selection.
 
 **Test case 3:**
 
-- Setup: Custom kubeconfig-init and kubeconfig-join with etcd on IP1 and api-server on IP2 where both IP1 and IP2 are non-default
+- Setup: Custom kubeconfig-init and kubeconfig-join with etcd on IP1 and
+  api-server on IP2 where both IP1 and IP2 are non-default
 - Desired result: api-server and etcd use their respective IPs
 - Actual Result: As expected
-- Observation: On the joining node, the default IP was used for both etcd and api-server, i.e. The IP in the joining string did not contribute in IP selection.
+- Observation: On the joining node, the default IP was used for both
+  etcd and api-server, i.e. The IP in the joining string did not
+  contribute in IP selection.
 
 **Test case 4:**
 
-- Setup: Custom kubeconfig-init with etcd on master1 has IP1 and api-server on master 1 has IP2 where both IP1 and IP2 are non-default. The kubeconfig-join configures api-server in master 2 to use its own non-default IP3 and points to the api-server IP1 in master 1 as the **K8S_API_ENDPOINT_INTERNAL** (The config files are attache in later sections)
-- Desired result: The api-server and etcd in master 1 and api-server in master 2 use the given IP
+- Setup: Custom kubeconfig-init with etcd on master1 has IP1 and
+  api-server on master 1 has IP2 where both IP1 and IP2 are non-default.
+  The kubeconfig-join configures api-server in master 2 to use its own
+  non-default IP3 and points to the api-server IP1 in master 1 as the
+  **K8S_API_ENDPOINT_INTERNAL** (The config files are attache in later
+  sections)
+- Desired result: The api-server and etcd in master 1 and api-server in
+  master 2 use the given IP
 - Actual Result: As expected
-- Observation: On the joining node, the given IP was used for api-server, i.e. The joining configuration file has an influence in IP selection.
+- Observation: On the joining node, the given IP was used for
+  api-server, i.e. The joining configuration file has an influence in IP
+  selection.
 
 ## Observations
 
-Here we just pinpoint the answers for the questions asked in [Motivation](#Motivation) section:
+Here we just pinpoint the answers for the questions asked in
+[Motivation](#motivation) section:
 
 How do these components choose which interfaces to use?
+
 - They use the interface on default network.
 
 How do we influence the choice during init phase?

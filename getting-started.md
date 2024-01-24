@@ -4,7 +4,7 @@
 
 This walk-through assumes that you have an EST email address set up.
 Any question or issue related to the Nordix setup should be addressed to
-discuss@lists.nordix.org
+[discuss@lists.nordix.org](mailto:discuss@lists.nordix.org)
 
 There is a [Nordix getting started](https://wiki.nordix.org/display/DEV/Getting+Started)
 

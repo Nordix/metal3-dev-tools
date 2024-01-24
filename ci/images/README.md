@@ -45,8 +45,9 @@ A container image is available and contains all the tools to build the images
    ```
 
    ```bash
-      docker run --rm -it -v "<path to metal3-dev-tool repo>:/data"
-   -v "<path to ci keys folder>:/data/keys" registry.nordix.org/metal3/image-builder /bin/bash
+      docker run --rm -it -v "<path to metal3-dev-tool repo>:/data" \
+         -v "<path to ci keys folder>:/data/keys" \
+         registry.nordix.org/metal3/image-builder /bin/bash
    ```
 
 ### Calling the scripts
@@ -86,18 +87,24 @@ The centos building scripts take three arguments :
 
 ### Building and testing locally
 
-The scripts mentioned above (gen_*_image.sh) are made for use in our CI pipelines.
-As such, they make certain assumptions that may not be ideal when developing and testing things locally (e.g. keypair name and ssh-key path).
+The scripts mentioned above (gen_*_image.sh) are made for use in our CI
+pipelines. As such, they make certain assumptions that may not be ideal
+when developing and testing things locally (e.g. keypair name and
+ssh-key path).
 
 For these situations there is another script: `run_local.sh`.
 It allows overriding many variables so it should be easy to customize to your needs.
 
 This is how you use it:
 
-0. Create an ssh key using `ssh-keygen` if you don't have one already and add it to openstack: `openstack keypair create --public-key /path/to/key <name>`.
-1. Check the comments and variables at the top of `run_local.sh` and determine what you want/need to override.
+0. Create an ssh key using `ssh-keygen` if you don't have one already
+   and add it to openstack: `openstack keypair create --public-key
+   /path/to/key <name>`.
+1. Check the comments and variables at the top of `run_local.sh` and
+   determine what you want/need to override.
 2. Create a file with your custom variables.
-3. Get an openstack.rc file with credentials to the cloud you want to build in.
+3. Get an openstack.rc file with credentials to the cloud you want to
+   build in.
 4. Source your variables, source the openstack.rc.
 5. Run the script: `./run_local.sh <provisioning-script>`
 
@@ -122,22 +129,29 @@ export RT_USER=<your-username>
 export RT_TOKEN=<your-token>
 ```
 
-**NOTE:** The script uploads the node images (i.e. those produced by `provision_node_image_ubuntu.sh` and `provision_node_image_centos.sh`) to Artifactory.
-Make sure you use an image name that does not conflict with existing images!
-This is also a good idea for other images since they will end up in Openstack.
+**NOTE:** The script uploads the node images (i.e. those produced by
+`provision_node_image_ubuntu.sh` and `provision_node_image_centos.sh`)
+to Artifactory. Make sure you use an image name that does not conflict
+with existing images! This is also a good idea for other images since
+they will end up in Openstack.
 
 Additional configuration options:
+
 ```bash
-export PACKER_DEBUG_ENABLED="true/false" # if true runs the packer build in interactive debug mode,
-                                         # packer stops between build stages
-export IMAGE_CLEANUP="true/false" # if true deletes the image from openstack that has an equivalent
-                                  # name with the one specifed in the IMAGE_NAME variable, if false doesn't delete any image,
-                                  # instead appends a timestamp to the name of each newly built image to avoid collision
+# if true runs the packer build in interactive debug mode,
+# packer stops between build stages
+export PACKER_DEBUG_ENABLED="true/false"
+# if true deletes the image from openstack that has an equivalent
+# name with the one specifed in the IMAGE_NAME variable, if false doesn't
+# delete any image, instead appends a timestamp to the name of each newly
+# built image to avoid collision
+export IMAGE_CLEANUP="true/false"
 ```
 
-If the the `./run_local sandbox` command is issued the packer build and the artifactory upload process
-won't be executed, rather the user will be presented with an interactive container environment where
-the openstack cli can be used to check the openstack resources.
+If the the `./run_local sandbox` command is issued the packer build and
+the artifactory upload process won't be executed, rather the user will
+be presented with an interactive container environment where the
+openstack cli can be used to check the openstack resources.
 
 And here is how to use it:
 
@@ -161,7 +175,8 @@ export RT_TOKEN=<your-token>
 ../scripts/image_scripts/upload_node_image_rt.sh "${IMAGE_NAME}"
 ```
 
-The script will automatically download the image from Openstack and upload it to the `metal3/images/k8s_${KUBERNETES_VERSION}` folder.
+The script will automatically download the image from Openstack and
+upload it to the `metal3/images/k8s_${KUBERNETES_VERSION}` folder.
 
 #### Clean up images
 
@@ -190,7 +205,9 @@ openstack image delete ${IMAGE_NAME}
 
 ## Packer image build flow
 
-This describes the flow of configuration and invocation of scripts in order to build an image with `run_local.sh`. This flow matches `provision_metal3_image_ubuntu.sh` provisioning.
+This describes the flow of configuration and invocation of scripts in
+order to build an image with `run_local.sh`. This flow matches
+`provision_metal3_image_ubuntu.sh` provisioning.
 
 Requirements for the build are:
 
