@@ -1,4 +1,0 @@
-To Do
-- Given a set of machines (from set_machines phase), deploy kubernetes such that
-    - Kubeadm used
-    - Test cases are define for the combination of different networks for control plane components (kubelet, api server and etcd)
