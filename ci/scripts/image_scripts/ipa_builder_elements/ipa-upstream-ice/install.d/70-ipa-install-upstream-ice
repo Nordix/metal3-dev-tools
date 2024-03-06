@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "${DIB_DEBUG_TRACE:-1}" -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+dnf install -y make kernel-devel kernel-headers
+
+curl "https://downloadmirror.intel.com/812404/ice-1.13.7.tar.gz" --output "/tmp/ice-1.13.7.tar.gz"
+tar -xzvf "/tmp/ice-1.13.7.tar.gz" -C "/tmp"
+pushd "/tmp/ice-1.13.7/src"
+export BUILD_KERNEL=$(ls "/boot" | grep "vmlinuz" | sed -e "s/vmlinuz-//g")
+export ARCH="x86_64"
+echo "BUILD_KERNEL=${BUILD_KERNEL}"
+make -j 8
+make install
+popd

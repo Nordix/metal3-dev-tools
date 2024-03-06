@@ -138,7 +138,7 @@ ironic-python-agent-builder --output "${IPA_IMAGE_NAME}" \
     --element='extra-hardware' --element='ipa-module-autoload' \
     --element='ipa-add-buildinfo' --element='ipa-cleanup-dracut' \
     --element='simple-init' --element='override-simple-init' \
-    --element='ipa-file-injector' --verbose
+    --element='ipa-file-injector' --element='ipa-upstream-ice' --verbose
 
 # Deactivate the python virtual environment
 deactivate
