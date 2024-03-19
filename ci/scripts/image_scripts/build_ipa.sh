@@ -65,9 +65,14 @@ STAGING="${STAGING:-false}"
 METADATA_PATH="/tmp/metadata.txt"
 
 sudo rm -rf "${IPA_BUILD_WORKSPACE}"
+# Update apt packages
+sudo apt-get update -y 
 
 # Install required packages
 sudo apt-get install --yes python3-pip python3-virtualenv qemu-utils
+
+# Clean local repository
+sudo apt-get clean
 
 # Create the work directory
 mkdir --parents "${IPA_BUILD_WORKSPACE}"
