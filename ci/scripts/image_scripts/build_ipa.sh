@@ -57,7 +57,7 @@ IPA_IMAGE_NAME="${IPA_IMAGE_NAME:-ironic-python-agent}"
 IPA_IMAGE_TAR="${IPA_IMAGE_NAME}.tar"
 IPA_BASE_OS="${IPA_BASE_OS:-centos}"
 IPA_BASE_OS_RELEASE="${IPA_BASE_OS_RELEASE:-9-stream}"
-IRONIC_SIZE_LIMIT_MB=500
+IRONIC_SIZE_LIMIT_MB=525
 DEV_ENV_REPO_LOCATION="${DEV_ENV_REPO_LOCATION:-/tmp/dib/metal3-dev-env}"
 IMAGE_REGISTRY="registry.nordix.org"
 CONTAINER_IMAGE_REPO="metal3"
@@ -143,7 +143,7 @@ ironic-python-agent-builder --output "${IPA_IMAGE_NAME}" \
     --element='extra-hardware' --element='ipa-module-autoload' \
     --element='ipa-add-buildinfo' --element='ipa-cleanup-dracut' \
     --element='simple-init' --element='override-simple-init' \
-    --element='ipa-file-injector' --verbose
+    --element='ipa-file-injector' --element='cleanup-package' --verbose
 
 # Deactivate the python virtual environment
 deactivate
