@@ -26,12 +26,6 @@ build-go-unittest: ## Build Docker Image for go unit test
 build-container-image:
 	$(CURDIR)/scripts/build-container-image.sh
 
-.PHONY: build-image-builder
-build-image-builder: ## Build Docker Image for qcow2 image building
-	docker build \
-		-t image-builder \
-		-f resources/docker/builder/Dockerfile resources/docker/builder/
-
 .PHONY: build_fullstack
 build_fullstack:
 	$(CURDIR)/ci/scripts/image_scripts/start_centos_fullstack_build.sh
@@ -55,11 +49,6 @@ lint-shell:
 .PHONY: push-go-unittest
 push-go-unittest: ## Push Docker Image for go unit test to nordix registry
 	docker push ${image_registry}/metal3/${NAME}-gotest-unit:${gotest_unit_img_ver}
-
-.PHONY: push-image-builder
-push-image-builder: ## Push Docker Image for qcow2 image building to nordix registry
-	docker tag image-builder:latest ${image_registry}/metal3/image-builder:${image_builder_img_ver}
-	docker push ${image_registry}/metal3/image-builder:${image_builder_img_ver}
 
 .PHONY: run-dev-env
 run-dev-env: ## Create or start the metal3 dev env vm
