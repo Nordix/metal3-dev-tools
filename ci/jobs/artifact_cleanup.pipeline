@@ -13,7 +13,7 @@ script {
 }
 
 pipeline {
-  agent { label 'metal3-static-workers' }
+  agent { label 'metal3-medium-ubuntu' }
   environment {
     METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"
