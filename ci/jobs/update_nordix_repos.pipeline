@@ -3,7 +3,7 @@ ci_git_branch = "main"
 ci_git_credential_id = "nordix-metal3-github-ssh"
 
 pipeline {
-  agent { label 'metal3ci-4c16gb-ubuntu' }
+  agent { label 'metal3ci-8c16gb-ubuntu' }
   environment {
     CURRENT_DIR = sh (
                       script: 'pwd',
