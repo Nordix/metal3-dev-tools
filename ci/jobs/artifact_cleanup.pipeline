@@ -13,7 +13,7 @@ script {
 }
 
 pipeline {
-  agent { label 'metal3-8c16gb-ubuntu' }
+  agent { label 'metal3ci-8c16gb-ubuntu' }
   environment {
     METAL3_CI_USER="metal3ci"
     VM_KEY = "${VM_KEY}"

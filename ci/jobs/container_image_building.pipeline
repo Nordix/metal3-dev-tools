@@ -5,7 +5,7 @@ image_registry = "quay.io"
 image_registry_organization = "metal3-io"
 
 pipeline {
-    agent { label 'metal3-workers' }
+    agent { label 'metal3ci-8c16gb-ubuntu' }
     options { ansiColor('xterm') }
     environment {
         CONTAINER_IMAGE_HUB = "${image_registry}"
