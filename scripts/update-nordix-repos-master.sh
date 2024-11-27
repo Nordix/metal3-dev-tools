@@ -165,13 +165,13 @@ update_custom_branch "${IPAM_RELEASE_BRANCHES}" "${LOCAL_IPAM_REPO}" "${NORDIX_I
 BMO_RELEASE_BRANCHES="release-0.5 release-0.6 release-0.8"
 update_custom_branch "${BMO_RELEASE_BRANCHES}" "${LOCAL_BMO_REPO}" "${NORDIX_BMO_REPO}"
 
-CAPI_RELEASE_BRANCHES="release-1.6 release-1.7 release-1.8"
+CAPI_RELEASE_BRANCHES="release-1.6 release-1.7 release-1.8 release-1.9"
 update_custom_branch "${CAPI_RELEASE_BRANCHES}" "${LOCAL_CAPI_REPO}" "${NORDIX_CAPI_REPO}"
 
-CAPO_RELEASE_BRANCHES="release-0.7 release-0.8 release-0.9 release-0.10"
+CAPO_RELEASE_BRANCHES="release-0.7 release-0.8 release-0.9 release-0.10 release-0.11"
 update_custom_branch "${CAPO_RELEASE_BRANCHES}" "${LOCAL_CAPO_REPO}" "${NORDIX_CAPO_REPO}"
 
-IRONIC_IMAGE_RELEASE_BRANCHES="release-24.0 release-24.1 release-25.0 release-26.0"
+IRONIC_IMAGE_RELEASE_BRANCHES="release-24.0 release-24.1 release-25.0 release-26.0 release-27.0"
 update_custom_branch "${IRONIC_IMAGE_RELEASE_BRANCHES}" "${LOCAL_IRONIC_IMAGE_REPO}" "${NORDIX_IRONIC_IMAGE_REPO}"
 
 popd || exit
