@@ -217,7 +217,7 @@ update_custom_branch "${CAPI_RELEASE_BRANCHES}" "${LOCAL_CAPI_REPO}" "${NORDIX_C
 CAPO_RELEASE_BRANCHES="release-0.10 release-0.11 release-0.12"
 update_custom_branch "${CAPO_RELEASE_BRANCHES}" "${LOCAL_CAPO_REPO}" "${NORDIX_CAPO_REPO}"
 
-IRONIC_IMAGE_RELEASE_BRANCHES="release-26.0 release-27.0 release-28.0 release-29.0"
+IRONIC_IMAGE_RELEASE_BRANCHES="release-26.0 release-27.0 release-28.0 release-29.0 release-30.0"
 update_custom_branch "${IRONIC_IMAGE_RELEASE_BRANCHES}" "${LOCAL_IRONIC_IMAGE_REPO}" "${NORDIX_IRONIC_IMAGE_REPO}"
 
 popd || exit
