@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -eu
+set -euo pipefail
 
 # Description:
 # Reads all the users and their keys from artifatory and

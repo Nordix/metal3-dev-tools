@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -eu
+set -euo pipefail
 
 # Description:
 #   Creates or updates a dev jumphost in openstack environment
@@ -41,7 +41,7 @@ JUMPHOST_SERVER_ID="$(openstack server list --name "${DEV_JUMPHOST_NAME}" -f jso
 if [ -n "${JUMPHOST_SERVER_ID}" ]
 then
   echo "Rebuilding DEV Jumphost with ID[${JUMPHOST_SERVER_ID}]."
-  openstack server rebuild --image "${CI_JENKINS_IMAGE}" "${JUMPHOST_SERVER_ID}" > /dev/null
+  openstack server rebuild --image "${DEV_JUMPHOST_IMAGE}" "${JUMPHOST_SERVER_ID}" > /dev/null
 else
 
   # Cleanup any stale ports
@@ -70,7 +70,7 @@ else
   # Create new jumphost
   echo "Creating new jumphost Server."
   JUMPHOST_SERVER_ID="$(openstack server create -f json \
-    --image "${CI_JENKINS_IMAGE}" \
+    --image "${DEV_JUMPHOST_IMAGE}" \
     --flavor "${JUMPHOST_FLAVOR}" \
     --port "${EXT_PORT_ID}" \
     "${DEV_JUMPHOST_NAME}" | jq -r '.id')"
