@@ -1,5 +1,11 @@
 #! /usr/bin/env bash
 
+CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
+COMMON_SCRIPTS_DIR="${CI_DIR}/scripts/common"
+
+# shellcheck source=ci/scripts/common/utils.sh
+. "${COMMON_SCRIPTS_DIR}/utils.sh"
+
 # Description:
 # Extract IP from CIDR
 #
@@ -193,17 +199,17 @@ delete_port() {
   # Get device info
   DEVICE_OWNER="$(echo "${PORT_INFO}" | jq -r '.device_owner')"
 
-
   # if connected to router then disconnect from router
   if [[ "${DEVICE_OWNER}" = *router* ]]
   then
     DEVICE_ID="$(echo "${PORT_INFO}" | jq -r '.device_id')"
-    echo "deleting port ${PORT} from device ${DEVICE_ID}"
-    openstack router remove port "${DEVICE_ID}" "${PORT}" > /dev/null
+    common_verbose "Deleting port ${PORT} from device ${DEVICE_ID}"
+    common_run -- openstack router remove port "${DEVICE_ID}" \
+      "${PORT}" > /dev/null
   else
     # delete port
-    echo "deleting port ${PORT}"
-    openstack port delete "${PORT}" > /dev/null
+    common_verbose "Deleting port ${PORT}"
+    common_run -- openstack port delete "${PORT}" > /dev/null
   fi
 }
 
@@ -214,7 +220,7 @@ delete_port() {
 # Usage: delete_subnet <subnet_name_or_id>
 #
 delete_subnet() {
-  local SUBNET SUBNET_INFO PORTS
+  local SUBNET SUBNET_INFO PORTS PORT
 
   SUBNET="${1:?}"
 
@@ -233,8 +239,8 @@ delete_subnet() {
   done
 
   # delete subnet
-  echo "deleting subnet ${SUBNET}"
-  openstack subnet delete "${SUBNET}" > /dev/null
+  common_verbose "Deleting subnet ${SUBNET}"
+  common_run -- openstack subnet delete "${SUBNET}" > /dev/null
 }
 
 # Description:
@@ -249,7 +255,8 @@ delete_subnet() {
 # Usage: delete_port <network_name_or_id>
 #
 delete_network() {
-  local NET NET_LIST_ALL JQ_QUERY NET_LIST NET_ARRAY NET_INFO SUBNETS
+  local NET NET_LIST_ALL JQ_QUERY
+  local NET_LIST NET_ARRAY NET_ID NET_INFO SUBNETS SUBNET
 
   NET="${1:?}"
 
@@ -257,7 +264,8 @@ delete_network() {
   NET_LIST_ALL="$(openstack network list -f json || true)"
   JQ_QUERY="map(select((.Name | contains(\"${NET}\")) or (.ID | contains(\"${NET}\"))))"
   NET_LIST="$(echo "${NET_LIST_ALL}" | jq "${JQ_QUERY}")"
-  NET_ARRAY="$(echo "${NET_LIST}" | jq -r 'map(.ID) | @csv' | tr ',' '\n' | tr -d '"')"
+  NET_ARRAY="$(echo "${NET_LIST}" | jq -r 'map(.ID) | @csv' \
+    | tr ',' '\n' | tr -d '"')"
 
   for NET_ID in ${NET_ARRAY}
   do
@@ -276,18 +284,16 @@ delete_network() {
     done
 
     # delete network
-    echo "deleting network ${NET_ID}"
-    openstack network delete "${NET_ID}" > /dev/null
+    common_verbose "Deleting network ${NET_ID}"
+    common_run -- openstack network delete "${NET_ID}" > /dev/null
   done
 }
 
 # Description:
 # Creates a network and a default subnet.
-# If IS_EXTERNAL is 1 then also sets a gateway
-# for subnet
 #
 # Usage:
-#   create_network_and_subnet <cidr> <is_external:0/1> <network_name>
+#   create_network_and_subnet <cidr> <network_name>
 #
 create_network_and_subnet() {
 
@@ -296,14 +302,15 @@ create_network_and_subnet() {
   local SUBNET_INFO SUBNET_ID
 
   CIDR="${1:?}"
-  NET_NAME="${3:?}"
+  NET_NAME="${2:?}"
 
   SUBNET_NAME="$(get_subnet_name "${NET_NAME}")"
   GATEWAY_IP="$(get_gateway_ip_from_cidr "${CIDR}")"
   START_IP="$(get_nth_ip "${GATEWAY_IP}" 9)"
   END_IP="$(get_nth_ip "${GATEWAY_IP}" 199)"
 
-  NET_INFO="$(openstack network create -f json\
+  NET_INFO="$(common_run -o "{ \"id\": \"<NET-ID>\" }" -- \
+    openstack network create -f json\
     --enable \
     --description "${NET_NAME}" \
     --enable-port-security \
@@ -311,16 +318,16 @@ create_network_and_subnet() {
 
   NET_ID="$(echo "${NET_INFO}" | jq -r '.id')"
 
-  SUBNET_CMD="openstack subnet create -f json\
-    --subnet-range ${CIDR} \
+  SUBNET_INFO="$(common_run -o "{ \"id\": \"<SUBNET-ID>\" }" -- \
+    openstack subnet create -f json\
+    --subnet-range "${CIDR}" \
     --dhcp \
     --ip-version 4 \
-    --network ${NET_ID} \
-    --gateway ${GATEWAY_IP} \
-    --allocation-pool start=${START_IP},end=${END_IP} \
-    ${SUBNET_NAME}"
+    --network "${NET_ID}" \
+    --gateway "${GATEWAY_IP}" \
+    --allocation-pool start="${START_IP}",end="${END_IP}" \
+    "${SUBNET_NAME}")"
 
-  SUBNET_INFO="$(eval "${SUBNET_CMD}")"
   SUBNET_ID="$(echo "${SUBNET_INFO}" | jq -r '.id')"
 
   echo "${NET_ID}" "${SUBNET_ID}"
@@ -345,45 +352,62 @@ create_external_net() {
   PORT_NAME="$(get_external_port_name "${NET_NAME}")"
   GATEWAY_IP="$(get_gateway_ip_from_cidr "${CIDR}")"
 
+  common_verbose "Creating network ${NET_NAME} subnet ${CIDR}"
   NET_INFO="$(create_network_and_subnet "${CIDR}" "${NET_NAME}")"
 
   NET_ID="$(echo "${NET_INFO}" | cut -d' ' -f1)"
   SUBNET_ID="$(echo "${NET_INFO}" | cut -d' ' -f2)"
+  common_verbose "Created network ${NET_ID} subnet ${SUBNET_ID}"
 
-  # Create external Port
-  PORT_INFO="$(openstack port create -f json \
+  # Create a port
+  common_verbose "Creating port ${PORT_NAME} to ${NET_ID}/${SUBNET_ID}"\
+                 "gw=${GATEWAY_IP}"
+  PORT_INFO="$(common_run -o "{ \"id\": \"<PORT-ID>\" }" -- \
+    openstack port create -f json \
     --network "${NET_ID}" \
     --fixed-ip subnet="${SUBNET_ID}",ip-address="${GATEWAY_IP}" \
     "${PORT_NAME}")"
 
   PORT_ID="$(echo "${PORT_INFO}" | jq -r '.id')"
+  common_verbose "Created port ${PORT_ID}"
 
   # Attach port to router
-  openstack router add port "${ROUTER}" "${PORT_ID}" > /dev/null
+  common_verbose "Attaching port ${PORT_ID} to ${ROUTER}"
+  common_run -- openstack router add port "${ROUTER}" \
+    "${PORT_ID}" > /dev/null
 }
 
 # Description:
-# Creates a Router and attaches it to external gateway.
+# Creates a Router and attaches it to external gateway. If no
+# value for <high_available> is specified or the value is
+# false, router is not set as high available.
 #
 # Usage:
-#   create_router <external_network> <router_name>
+#   create_router <external_network> <router_name> <high_available>
 #
 create_router() {
-  local CIDR NET_NAME SUBNET_NAME ROUTER PORT_NAME
-  local GATEWAY_IP NET_INFO NET_ID SUBNET_ID
+  local EXT_NET ROUTER_NAME HA ARGS ROUTER_INFO ROUTER_ID
 
   EXT_NET="${1:?}"
   ROUTER_NAME="${2:?}"
+  HA="${3:-false}"
 
-  ROUTER_INFO="$(openstack router create -f json\
-    --enable \
-    --description "${ROUTER_NAME}" \
-    --ha \
-    "${ROUTER_NAME}")"
+  ARGS=(
+    --enable
+    --description "${ROUTER_NAME}"
+  )
+  [[ "${HA}" == "true" ]] && { ARGS+=("--ha"); }
+
+  common_verbose "Creating router ${ROUTER_NAME} (HA enabled=${HA})"
+  ROUTER_INFO="$(common_run -o "{ \"id\": \"<ROUTER-ID>\" }" -- \
+    openstack router create -f json "${ARGS[@]}" "${ROUTER_NAME}")"
 
   ROUTER_ID="$(echo "${ROUTER_INFO}" | jq -r '.id')"
+  common_verbose "Created router ${ROUTER_ID}"
 
-  openstack router set --external-gateway "${EXT_NET}" "${ROUTER_ID}" > /dev/null
+  common_verbose "Setting external gateway to ${EXT_NET} on ${ROUTER_ID}"
+  common_run -- openstack router set --external-gateway "${EXT_NET}" \
+    "${ROUTER_ID}" > /dev/null
 }
 
 # Description:
@@ -394,7 +418,8 @@ create_router() {
 #
 delete_router() {
   local ROUTER_LIST_ALL JQ_QUERY ROUTER_LIST ROUTER_ARRAY
-  local ROUTER_NAME ROUTER_INFO ROUTER_ID ROUTER_PORT_INFO ROUTER_PORT_ID_LIST
+  local ROUTER_NAME ROUTER_INFO ROUTER_ID
+  local ROUTER_PORT_INFO ROUTER_PORT_ID_LIST PORT
 
   ROUTER_NAME="${1:?}"
 
@@ -422,7 +447,8 @@ delete_router() {
       delete_port "${PORT}"
     done
 
-    openstack router delete "${ROUTER_ID}" > /dev/null
+    common_verbose "Deleting router ${ROUTER_ID}"
+    common_run -- openstack router delete "${ROUTER_ID}" > /dev/null
   done
 }
 
@@ -438,7 +464,8 @@ create_keypair() {
   PUBLIC_KEY="${1:?}"
   KEYPAIR_NAME="${2:?}"
 
-  openstack keypair create -f json \
+  common_verbose "Creating keypair ${KEYPAIR_NAME}"
+  common_run -- openstack keypair create -f json \
     --public-key "${PUBLIC_KEY}" \
     "${KEYPAIR_NAME}" > /dev/null
 }
@@ -454,7 +481,8 @@ delete_keypair() {
 
   KEYPAIR_NAME="${1:?}"
 
-  openstack keypair delete "${KEYPAIR_NAME}" > /dev/null 2>&1 || true
+  common_verbose "Deleting keypair ${KEYPAIR_NAME}"
+  common_run -- openstack keypair delete "${KEYPAIR_NAME}" > /dev/null
 }
 
 # Description:
@@ -476,12 +504,12 @@ replace_image() {
 
   for IMAGE_ID in ${IMAGE_ARRAY}
   do
-    echo "Deleting image ${IMAGE_ID}"
+    common_verbose "Deleting image ${IMAGE_ID}"
     openstack image set "${IMAGE_ID}" --deactivate
-    openstack image delete "${IMAGE_ID}" 
+    openstack image delete "${IMAGE_ID}"
   done
 
-  echo "Setting image name from ${SRC_IMAGE} to ${DST_IMAGE}"
+  common_verbose "Setting image name from ${SRC_IMAGE} to ${DST_IMAGE}"
   openstack image set --name "${DST_IMAGE}" "${SRC_IMAGE}"
 }
 
@@ -513,11 +541,11 @@ backup_and_replace_image() {
 
   for ((i="${RETENTION_NUM}"; i<${#MAPFILE[@]}; i++)); do
     openstack image set "${MAPFILE[i]}" --deactivate
-    openstack image delete "${MAPFILE[i]}" 
-    echo "${MAPFILE[i]} has been deleted!"
+    openstack image delete "${MAPFILE[i]}"
+    common_verbose "${MAPFILE[i]} has been deleted!"
   done
 
-  echo "Setting image name from ${NEW_IMAGE} to ${OLD_IMAGE}"
+  common_verbose "Setting image name from ${NEW_IMAGE} to ${OLD_IMAGE}"
   openstack image set --name "${NEW_IMAGE}" "${OLD_IMAGE}"
 }
 
@@ -531,7 +559,8 @@ delete_image() {
   local IMAGE_NAME
 
   IMAGE_NAME="${1:?}"
-  
+
+  common_verbose "Deleting image ${IMAGE_NAME}"
   openstack image delete "${IMAGE_NAME}" > /dev/null
 }
 
@@ -547,7 +576,8 @@ create_volume() {
   SOURCE_IMAGE_NAME="${1:?}"
   VOLUME_SIZE="${2:?}"
   BUILDER_VOLUME_NAME="${3:?}"
-  
+
+  common_verbose "Creating volume ${BUILDER_VOLUME_NAME}"
   openstack volume create \
     --image "${SOURCE_IMAGE_NAME}" \
     --size "${VOLUME_SIZE}" \
@@ -574,11 +604,11 @@ replace_volume() {
 
   for VOLUME_ID in ${VOLUME_ARRAY}
   do
-    echo "Deleting volume ${VOLUME_ID}"
+    common_verbose "Deleting volume ${VOLUME_ID}"
     openstack volume delete "${VOLUME_ID}" > /dev/null
   done
 
-  echo "Setting volume name from ${SRC_VOLUME} to ${DST_VOLUME}"
+  common_verbose "Setting volume name from ${SRC_VOLUME} to ${DST_VOLUME}"
   openstack volume set --name "${DST_VOLUME}" "${SRC_VOLUME}" > /dev/null
 }
 
@@ -595,7 +625,7 @@ wait_for_ssh() {
   KEY="${2:?}"
   SERVER="${3:?}"
 
-  echo "Waiting for SSH connection to Host[${SERVER}]"
+  common_verbose "Waiting for SSH connection to host[${SERVER}]"
   until ssh -o ConnectTimeout=2 \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
@@ -604,7 +634,7 @@ wait_for_ssh() {
         do sleep 1
   done
 
-  echo "SSH connection to host[${SERVER}] is up."
+  common_verbose "SSH connection to host[${SERVER}] is up"
 }
 
 # Description:
@@ -617,7 +647,8 @@ delete_sg() {
 
   SG="${1:?}"
 
-  openstack security group delete "${SG}" > /dev/null 2>&1 || true
+  common_verbose "Removing security group ${SG}"
+  common_run -- openstack security group delete "${SG}" > /dev/null || true
 }
 
 # Description:
@@ -630,6 +661,7 @@ share_image() {
   IMAGE_ID="${1:?}"
   PROJECT_ID="${2:?}"
 
+  common_verbose "Sharing image ${IMAGE_ID} with ${PROJECT_ID}"
   openstack image set --shared "${IMAGE_ID}"
   openstack image add project "${IMAGE_ID}" "${PROJECT_ID}" > /dev/null 2>&1 || true
 }
@@ -642,6 +674,7 @@ accept_shared_image() {
   local IMAGE_ID
 
   IMAGE_ID="${1:?}"
+  common_verbose "Accepting image ${IMAGE_ID}"
   openstack image set --accept "${IMAGE_ID}"
 }
 
