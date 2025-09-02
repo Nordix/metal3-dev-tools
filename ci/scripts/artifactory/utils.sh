@@ -1,5 +1,15 @@
 #! /usr/bin/env bash
 
+CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
+COMMON_SCRIPTS_DIR="${CI_DIR}/scripts/common"
+
+# shellcheck source=ci/scripts/common/utils.sh
+. "${COMMON_SCRIPTS_DIR}/utils.sh"
+
+# Artifactory configuration
+RT_METAL3_DIR="metal3"
+RT_USERS_DIR="${RT_METAL3_DIR}/users"
+
 # ================ Generic Artifactory Helper Functions ===============
 
 # Description:
@@ -16,16 +26,19 @@
 #   rt_upload_artifact <src_file_path> <dest_file_path> <anonymous:0/1>
 #
 rt_upload_artifact() {
+  local SRC_PATH DST_PATH ANONYMOUS ARGS
+
   SRC_PATH="${1:?}"
   DST_PATH="${2:?}"
   ANONYMOUS="${3:-1}"
 
-  _CMD="curl \
-    $( ([[ "${ANONYMOUS}" != 1 ]] && echo " -u${RT_USER:?}:${RT_TOKEN:?}") || true) \
-    ${RT_URL}/${DST_PATH} \
-    -T ${SRC_PATH}"
+  ARGS=(
+    -T "${SRC_PATH}"
+  )
+  [[ "${ANONYMOUS}" != 1 ]] && { ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}"); }
 
-  eval "${_CMD}"
+  common_verbose "Upload artifact: ${SRC_PATH},${DST_PATH},${ANONYMOUS}"
+  common_run -- curl "${ARGS[@]}" "${RT_URL}/${DST_PATH}"
 }
 
 # Description:
@@ -45,6 +58,7 @@ rt_download_artifact() {
   DST_PATH="${2:?}"
   ANONYMOUS="${3:-1}"
 
+  common_verbose "Download artifact: ${SRC_PATH},${DST_PATH},${ANONYMOUS}"
   _CMD="curl -s \
     $( ([[ "${ANONYMOUS}" != 1 ]] && echo " -u${RT_USER:?}:${RT_TOKEN:?}") || true) \
     -XGET \
@@ -70,6 +84,7 @@ rt_cat_artifact() {
   SRC_PATH="${1:?}"
   ANONYMOUS="${2:-1}"
 
+  common_verbose "Cat artifact: ${SRC_PATH},${ANONYMOUS}"
   _CMD="curl -s \
     $( ([[ "${ANONYMOUS}" != 1 ]] && echo " -u${RT_USER:?}:${RT_TOKEN:?}") || true) \
     -XGET \
@@ -88,18 +103,22 @@ rt_cat_artifact() {
 #   RT_TOKEN: artifactory password or api token
 #
 # Usage:
-#   rt_cat_artifact <dst_file_path> <anonymous:0/1>
+#   rt_delete_artifact <dst_file_path> <anonymous:0/1>
 #
 rt_delete_artifact() {
+  local DST_PATH ANONYMOUS
+
   DST_PATH="${1:?}"
   ANONYMOUS="${2:-1}"
 
-  _CMD="curl -s \
-    $( ([[ "${ANONYMOUS}" != 1 ]] && echo " -u${RT_USER:?}:${RT_TOKEN:?}") || true) \
-    -XDELETE \
-    ${RT_URL}/${DST_PATH}"
+  ARGS=(
+    -s
+    -XDELETE
+  )
+  [[ "${ANONYMOUS}" != 1 ]] && { ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}"); }
 
-  eval "${_CMD}" > /dev/null 2>&1
+  common_verbose "Delete artifact: ${DST_PATH},${ANONYMOUS}"
+  common_run -- curl "${ARGS[@]}" "${RT_URL}/${DST_PATH}"
 }
 
 # Description:
@@ -119,6 +138,7 @@ rt_list_directory() {
   DST_PATH="${1:?}"
   ANONYMOUS="${2:-1}"
 
+  common_verbose "List artifact: ${DST_PATH},${ANONYMOUS}"
   _CMD="curl -s \
     $( ([[ "${ANONYMOUS}" != 1 ]] && echo " -u${RT_USER:?}:${RT_TOKEN:?}") || true) \
     -XGET \
@@ -130,7 +150,7 @@ rt_list_directory() {
 # Description:
 # Deletes the artifacts in a directory. The function excludes the last x number of
 # artifacts from deletion where x is specified by the 3rd argument. The artifacts
-# specificed in the file that's path is passed as the second argument will be also
+# specified in the file that's path is passed as the second argument will be also
 # excluded from deletion.
 #    DIR_TO_CLEAN: the directory where the artifact deletion will take place.
 #    ANONYMOUS: enable/disable anonymous artifactory access
@@ -179,19 +199,18 @@ rt_delete_multiple_artifacts() {
 
 # ================ Users Artifactory Helper Functions ===============
 
-RT_METAL3_DIR="metal3"
-RT_USERS_DIR="${RT_METAL3_DIR}/users"
-
 # Description:
 # Gets all the keys for a user from metal3/users/<username>
-# directory.
+# directory. If `keyname` is set 1, also the keyname will
+# be included in the output.
 #
 # Usage:
-#   rt_get_user_public_keys <username>
+#   rt_get_user_public_keys <username> <keyname:0/1>
 #
 rt_get_user_public_keys() {
 
   USER="${1:?}"
+  KEYNAME="${2:-0}"
   USER_KEY_FILES="$(rt_list_directory "${RT_USERS_DIR}/${USER}" \
     | jq -r '.children[]? |select(.folder==false) |.uri')" > /dev/null 2>&1
 
@@ -199,7 +218,9 @@ rt_get_user_public_keys() {
   for PUB_KEY_FILE in ${USER_KEY_FILES}
   do
     _KEY="$(rt_cat_artifact "${RT_USERS_DIR}/${USER}${PUB_KEY_FILE}")"
-    USER_KEYS="$(printf '%s\n%s' "${USER_KEYS}" "${_KEY}")"
+    NAME=
+    [[ ${KEYNAME} -eq 1 ]] && { NAME="${PUB_KEY_FILE//\//}: "; }
+    USER_KEYS="$(printf '%s\n%s' "${USER_KEYS}" "${NAME}${_KEY}")"
   done
 
   echo "${USER_KEYS}"
@@ -213,7 +234,7 @@ rt_get_user_public_keys() {
 #   RT_TOKEN: artifactory password or api token
 #
 # Usage:
-#   rt_add_user_public_key <user> <public_key_name> <public_key>
+#   rt_add_user_public_key <user> <public_key_name> <public_key_file>
 #
 rt_add_user_public_key() {
 
@@ -222,9 +243,10 @@ rt_add_user_public_key() {
   USER_PUB_KEY="${3:?}"
 
   USER_PUB_KEY_FILE="$(mktemp)"
-  echo "${USER_PUB_KEY}" > "${USER_PUB_KEY_FILE}"
+  cat "${USER_PUB_KEY}" > "${USER_PUB_KEY_FILE}"
 
   rt_upload_artifact "${USER_PUB_KEY_FILE}" "${RT_USERS_DIR}/${USER}/${USER_PUB_KEY_NAME}" 0
+  rm -f "${USER_PUB_KEY_FILE}"
 }
 
 # Description:
@@ -243,18 +265,25 @@ rt_del_user_public_key() {
   USER_PUB_KEY_NAME="${2:?}"
 
   USER_KEY_STAT="$(rt_list_directory "${RT_USERS_DIR}/${USER}/${USER_PUB_KEY_NAME}" \
-    | jq -r '.children[]? |select(.folder==false) |.uri')" > /dev/null 2>&1
+    | jq -r '.uri')" > /dev/null 2>&1
 
-  if [ -n "${USER_KEY_STAT}" ]
+  if [ "${USER_KEY_STAT}" != "null" ]
   then
     rt_delete_artifact "${RT_USERS_DIR}/${USER}/${USER_PUB_KEY_NAME}" 0
+  else
+    common_verbose "No such key: ${RT_USERS_DIR}/${USER}/${USER_PUB_KEY_NAME}"
+    return
   fi
 
   # Delete the user directory if there are no more keys
-  KEYS="$(rt_get_user_public_keys "test")"
+  KEYS="$(rt_get_user_public_keys "${USER}")"
 
+  # Dry-mode will not detect an empty directory because the key is
+  # still in the artifactory
   if [ -z "${KEYS}" ]
   then
     rt_delete_artifact "${RT_USERS_DIR}/${USER}" 0
+  else
+    common_verbose "Retaining artifact ${RT_USERS_DIR}/${USER}"
   fi
 }

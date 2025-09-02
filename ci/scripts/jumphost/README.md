@@ -1,71 +1,141 @@
-# Dev Jumphost management
+# Jumphost management
 
-The scripts in this folder are aimed at managing the dev environment jumphost
+Author: [Tero Kauppinen](mailto:tero.kauppinen@est.tech)
 
-## User keys management
+The scripts in this folder are aimed at managing jumphosts.
 
-All users that will be using the jumphost need to have their public keys on
-Artifactory. In order to upload the user keys, use the add_new_user_key.sh
-script
+## Requirements
 
-### Requirements
+- Management key must be created. Further details in
+[inject the management key][management].
+- Public keys for the users must be registered to
+the artificatory. Further details in
+[adding public keys][artifactory].
+- Infrastructure must in place. Further details in
+[creating infrastructure][infra].
 
-Some environment variables need to be set
+[management]: ../openstack/README.md#inject-the-management-key
+[infra]: ../openstack/README.md#create-infrastructure
+[artifactory]: ../artifactory/README.md#adding-public-keys
 
-- RT_USER: Artifactory username
-- RT_TOKEN: Artifactory token
-- RT_URL: Artifactory URL
+## Create the jumphost
 
-### Key management usage
+Jumphost can be created with the following command:
 
-   ```bash
-     add_user_key.sh <user_name> <user_key_name> <user_public_key>
-   ```
+```console
+$ ./create_or_rebuild_jumphost.sh
 
-The public key should be given as content, not as a file.
+Usage:
 
-## Create the Jumphost
+  create_or_rebuild_jumphost.sh [opts]
 
-### Create requirements
+Create or rebuild a jumphost in openstack environment.
 
-Some environment variables need to be set
+Use the `-h` option to list all available options.
+```
 
-- RT_URL: Artifactory URL
-- METAL3_CI_USER: CI username for the jumphost
-- METAL3_CI_USER_KEY: CI user private key path
+It should be noted that in this context, `key-file` and `user`
+options are used to specify the management user's credentials to access
+the jumphost with SSH once the VM is created. Upon creation, the admin
+user is created as `user` and *the management key* will be injected as the
+key pair.
 
-### Creation Usage
+The command does not require options if the default values meet
+the user's requirements.
 
-   ./create_or_update_dev_jumphost.sh
+## Register public keys registered in the artificatory
 
-## Update the Jumphost
+When the jumphost is created, the next step is usually to create
+users and inject public keys with the following script:
 
-### Update requirements
+```console
+$ ./update_jumphost_users.sh
 
-Some environment variables need to be set
+Usage:
 
-- RT_URL: Artifactory URL
-- METAL3_CI_USER: CI username for the jumphost
-- METAL3_CI_USER_KEY: CI user private key path
+  update_jumphost_users.sh [opts] <user>
 
-### Update usage
+Add public keys for the users found in the artifactory to the jumphost.
 
-  ./create_or_update_dev_jumphost.sh
+Use the `-h` option to list all available options.
+```
 
-## Delete the Jumphost
+This script will fetch either a specific user's (if `<user>` is specified) or
+all users (if no `<user>` is specified or the value is *all*) information from
+the artificatory at `rt-url` and creates or updates these users' information
+in the jumphost.
 
-   ./delete_dev_jumphost.sh
+It should be noted that in this context, `key-file` and `user`
+options are used to specify the management user's credentials to access the
+jumphost.
 
-## Update the user keys on the jumphost
+## Inject a custom authorized keys file
 
-### Delete requirements
+If there is need to inject a custom authorized keys file for a specific user,
+use the following script:
 
-Some environment variables need to be set
+```console
+$ ./add_jumphost_user.sh
 
-- RT_URL: Artifactory URL
-- METAL3_CI_USER: CI username for the jumphost
-- METAL3_CI_USER_KEY: CI user private key path
+Usage:
 
-### Delete usage
+  add_jumphost_user.sh [opts] <new-user> <authorized-keys-file>
 
-   ./update_dev_jumphost_users.sh
+Create a user to the jumphost.
+
+Use the `-h` option to list all available options.
+```
+
+This script is also used by *update_jumphost_users.sh*.
+
+It should be noted that in this context, `key-file` and `user`
+options are use to specify the management user's credentials to access the
+jumphost.
+
+## Deleting a user
+
+Users can removed with the following script:
+
+```console
+$ ./del_jumphost_user.sh
+
+Usage:
+
+  del_jumphost_user.sh [opts] <user>
+
+Remove a user to the jumphost.
+
+Use the `-h` option to list all available options.
+```
+
+This script will remove the user specified by `<user>`. For safety reasons,
+only a single user can be removed at a time.
+
+It should be noted that in this context, `key-file` and `user`
+options are used to specify the management user's credentials to access
+the jumphost.
+
+## Deleting the jumphost
+
+Jumphost can removed with the following command:
+
+```console
+$ ./delete_jumphost.sh
+
+Usage:
+
+  delete_jumphost.sh [opts]
+
+Delete a jumphost in openstack environment.
+
+Use the `-h` option to list all available options.
+```
+
+This script will remove a previously created jumphost and disassociates the
+allocated floating IP address. However, the allocated floating IP address
+is kept to be reused later.
+
+Warning! If a previously used jumphost floating IP address is associated
+with another instance without clearing the *tag* field of the IP address,
+creating a new jumphost instance with the same configuration
+will *hijack* the address from the instance.
