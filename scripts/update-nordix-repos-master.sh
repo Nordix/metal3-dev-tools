@@ -202,13 +202,13 @@ for repo in ${UPDATE_REPO}; do
 done
 
 # Sync non default branches on selected repos
-CAPM3_RELEASE_BRANCHES="release-1.8 release-1.9 release-1.10"
+CAPM3_RELEASE_BRANCHES="release-1.9 release-1.10 release-1.11"
 update_custom_branch "${CAPM3_RELEASE_BRANCHES}" "${LOCAL_CAPM3_REPO}" "${NORDIX_CAPM3_REPO}"
 
-IPAM_RELEASE_BRANCHES="release-1.8 release-1.9 release-1.10"
+IPAM_RELEASE_BRANCHES="release-1.9 release-1.10 release-1.11"
 update_custom_branch "${IPAM_RELEASE_BRANCHES}" "${LOCAL_IPAM_REPO}" "${NORDIX_IPAM_REPO}"
 
-BMO_RELEASE_BRANCHES="release-0.8 release-0.9 release-0.10"
+BMO_RELEASE_BRANCHES="release-0.9 release-0.10 release-0.11"
 update_custom_branch "${BMO_RELEASE_BRANCHES}" "${LOCAL_BMO_REPO}" "${NORDIX_BMO_REPO}"
 
 CAPI_RELEASE_BRANCHES="release-1.9 release-1.10 release-1.11"
