@@ -17,6 +17,8 @@ export COMMON_OPT_RTURL_VALUE="https://artifactory.nordix.org/artifactory"
 export COMMON_OPT_KEYNAME_VALUE
 export COMMON_OPT_RTUSER_VALUE
 export COMMON_OPT_DRYRUN_VALUE=false
+export COMMON_OPT_KEEPUSERS_VALUE=false
+export COMMON_OPT_PURGE_VALUE=false
 
 # All available options including parameter and description information
 #
@@ -33,6 +35,8 @@ export _OPT_HELP=("h" "help"       ""        "display this help and exit" "")
     _OPT_KEYNAME=("n" "key-name"   "=TXT"    "name for the public key" "COMMON_OPT_KEYNAME_VALUE")
      _OPT_RTUSER=("s" "rt-user"    "=USER"   "artifactory user" "COMMON_OPT_RTUSER_VALUE")
      _OPT_DRYRUN=("d" "dry-run"    ""        "do nothing; only show what would happen" "")
+  _OPT_KEEPUSERS=("x" "keep-users" ""        "keep users not found in the artifactory" "")
+      _OPT_PURGE=("p" "purge"      ""        "don't update user; simply purge user" "")
     _OPT_INVALID=(""  ""           ""        "invalid index" "")
 
 # Option array
@@ -48,6 +52,8 @@ _OPT_ARRAY=(
   _OPT_KEYNAME[@]
   _OPT_RTUSER[@]
   _OPT_DRYRUN[@]
+  _OPT_KEEPUSERS[@]
+  _OPT_PURGE[@]
 )
 
 # Option constants: 0 = invalid
@@ -62,6 +68,8 @@ declare -r COMMON_OPT_RTURL=$((_OPT_IDX++))
 declare -r COMMON_OPT_KEYNAME=$((_OPT_IDX++))
 declare -r COMMON_OPT_RTUSER=$((_OPT_IDX++))
 declare -r COMMON_OPT_DRYRUN=$((_OPT_IDX++))
+declare -r COMMON_OPT_KEEPUSERS=$((_OPT_IDX++))
+declare -r COMMON_OPT_PURGE=$((_OPT_IDX++))
 
 # Export constants
 export COMMON_OPT_HELP
@@ -74,6 +82,8 @@ export COMMON_OPT_RTURL
 export COMMON_OPT_KEYNAME
 export COMMON_OPT_RTUSER
 export COMMON_OPT_DRYRUN
+export COMMON_OPT_KEEPUSERS
+export COMMON_OPT_PURGE
 
 # Command line arguments i.e. the remaining part after options
 COMMON_OPT_ARGUMENTS=
@@ -215,6 +225,10 @@ common_parse_options() {
         export COMMON_OPT_KEYNAME_VALUE=${2}
         shift 2
         ;;
+      -p|--purge)
+        export COMMON_OPT_PURGE_VALUE=true
+        shift
+        ;;
       -r|--rt-url)
         export COMMON_OPT_RTURL_VALUE=${2}
         shift 2
@@ -234,6 +248,10 @@ common_parse_options() {
         ;;
       -v|--verbose)
         export COMMON_OPT_VERBOSE_VALUE=true
+        shift
+        ;;
+      -x|--keep-users)
+        export COMMON_OPT_KEEPUSERS_VALUE=true
         shift
         ;;
       --)

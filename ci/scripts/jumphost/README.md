@@ -43,19 +43,20 @@ key pair.
 The command does not require options if the default values meet
 the user's requirements.
 
-## Register public keys registered in the artificatory
+## Updating user information on the jumphost
 
-When the jumphost is created, the next step is usually to create
-users and inject public keys with the following script:
+When the jumphost is created, the next step is usually to sync
+user information. The following script will fetch public key information
+from the artifactory and creates corresponding users to the jumphost.
 
 ```console
-$ ./update_jumphost_users.sh
+$ ./sync_jumphost_users.sh
 
 Usage:
 
-  update_jumphost_users.sh [opts] <user>
+  sync_jumphost_users.sh [opts] <user>
 
-Add public keys for the users found in the artifactory to the jumphost.
+Sync user information on the jumphost.
 
 Use the `-h` option to list all available options.
 ```
@@ -63,57 +64,19 @@ Use the `-h` option to list all available options.
 This script will fetch either a specific user's (if `<user>` is specified) or
 all users (if no `<user>` is specified or the value is *all*) information from
 the artificatory at `rt-url` and creates or updates these users' information
-in the jumphost.
+on the jumphost.
 
 It should be noted that in this context, `key-file` and `user`
 options are used to specify the management user's credentials to access the
 jumphost.
 
-## Inject a custom authorized keys file
+The script can also be used to maintain user information on the jumphost,
+because it will also remove users from the jumphost than no longer have
+public key information in the artifactory.
 
-If there is need to inject a custom authorized keys file for a specific user,
-use the following script:
-
-```console
-$ ./add_jumphost_user.sh
-
-Usage:
-
-  add_jumphost_user.sh [opts] <new-user> <authorized-keys-file>
-
-Create a user to the jumphost.
-
-Use the `-h` option to list all available options.
-```
-
-This script is also used by *update_jumphost_users.sh*.
-
-It should be noted that in this context, `key-file` and `user`
-options are use to specify the management user's credentials to access the
-jumphost.
-
-## Deleting a user
-
-Users can removed with the following script:
-
-```console
-$ ./del_jumphost_user.sh
-
-Usage:
-
-  del_jumphost_user.sh [opts] <user>
-
-Remove a user to the jumphost.
-
-Use the `-h` option to list all available options.
-```
-
-This script will remove the user specified by `<user>`. For safety reasons,
-only a single user can be removed at a time.
-
-It should be noted that in this context, `key-file` and `user`
-options are used to specify the management user's credentials to access
-the jumphost.
+The script can also be used to remove a single user even if the public key
+information is available in the artifactory. For safety reasons, only a single
+user can be removed at a time.
 
 ## Deleting the jumphost
 
