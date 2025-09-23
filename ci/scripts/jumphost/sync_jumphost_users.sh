@@ -44,10 +44,15 @@ add_jumphost_user() {
   common_verbose "Copy SSH key ${USER_AUTHORIZED_KEYS_FILE} to"\
                  "${JUMPHOST_PUBLIC_IP}:/tmp/${USER}_auth_keys..."
 
-  common_run -- scp \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    -i "${COMMON_OPT_KEYFILE_VALUE}" \
+  # Set common SSH options
+  SSH_OPTS=(
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -i "${COMMON_OPT_KEYFILE_VALUE}"
+  )
+
+  common_run -- rsync -avz \
+    -e "ssh ${SSH_OPTS[*]}" \
     "${USER_AUTHORIZED_KEYS_FILE}" \
     "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}:/tmp/${USER}_auth_keys" > /dev/null
 
@@ -55,10 +60,8 @@ add_jumphost_user() {
   common_verbose "Copy ${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh to"\
                  "${JUMPHOST_PUBLIC_IP}:/tmp/..."
 
-  common_run -- scp \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    -i "${COMMON_OPT_KEYFILE_VALUE}" \
+  common_run -- rsync -avz \
+    -e "ssh ${SSH_OPTS[*]}" \
     "${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh" \
     "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}:/tmp/" > /dev/null
 
@@ -66,9 +69,7 @@ add_jumphost_user() {
   common_verbose "Running the script with ${USER} /tmp/${USER}_auth_keys"
 
   common_run -- ssh \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    -i "${COMMON_OPT_KEYFILE_VALUE}" \
+    "${SSH_OPTS[@]}" \
     "${COMMON_OPT_USER_VALUE}"@"${JUMPHOST_PUBLIC_IP}" \
     /tmp/add_proxy_user.sh "${USER}" "/tmp/${USER}_auth_keys" > /dev/null
 
