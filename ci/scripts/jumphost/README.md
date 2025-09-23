@@ -8,15 +8,15 @@ The scripts in this folder are aimed at managing jumphosts.
 
 - Management key must be created. Further details in
 [inject the management key][management].
-- Public keys for the users must be registered to
-the artificatory. Further details in
-[adding public keys][artifactory].
+- Public keys for the users must be in stored to the
+repository. Further details in
+[public keys][public_keys].
 - Infrastructure must in place. Further details in
 [creating infrastructure][infra].
 
 [management]: ../openstack/README.md#inject-the-management-key
 [infra]: ../openstack/README.md#create-infrastructure
-[artifactory]: ../artifactory/README.md#adding-public-keys
+[public_keys]: ../public_keys/README.md
 
 ## Create the jumphost
 
@@ -46,8 +46,9 @@ the user's requirements.
 ## Updating user information on the jumphost
 
 When the jumphost is created, the next step is usually to sync
-user information. The following script will fetch public key information
-from the artifactory and creates corresponding users to the jumphost.
+user information. The following script will collect public key
+information stored in the repository and create corresponding
+users in the jumphost.
 
 ```console
 $ ./sync_jumphost_users.sh
@@ -61,9 +62,8 @@ Sync user information on the jumphost.
 Use the `-h` option to list all available options.
 ```
 
-This script will fetch either a specific user's (if `<user>` is specified) or
-all users (if no `<user>` is specified or the value is *all*) information from
-the artificatory at `rt-url` and creates or updates these users' information
+This script will manage either a specific user's (if `<user>` is specified) or
+all users (if no `<user>` is specified or the value is *all*) information
 on the jumphost.
 
 It should be noted that in this context, `key-file` and `user`
@@ -72,10 +72,10 @@ jumphost.
 
 The script can also be used to maintain user information on the jumphost,
 because it will also remove users from the jumphost than no longer have
-public key information in the artifactory.
+public key information.
 
 The script can also be used to remove a single user even if the public key
-information is available in the artifactory. For safety reasons, only a single
+information is available. For safety reasons, only a single
 user can be removed at a time.
 
 ## Deleting the jumphost
@@ -94,7 +94,7 @@ Delete a jumphost in openstack environment.
 Use the `-h` option to list all available options.
 ```
 
-This script will remove a previously created jumphost and disassociates the
+This script will remove a previously created jumphost and disassociate the
 allocated floating IP address. However, the allocated floating IP address
 is kept to be reused later.
 

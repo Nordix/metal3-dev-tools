@@ -6,16 +6,13 @@
 # Default option values
 COMMON_OPT_TARGET_VALUE="$(whoami | tr '[:lower:]' '[:upper:]')"
 COMMON_OPT_KEYNAME_VALUE="$(whoami)"
-COMMON_OPT_RTUSER_VALUE="$(whoami)"
 
 export COMMON_OPT_VERBOSE_VALUE=false
 export COMMON_OPT_TARGET_VALUE
 export COMMON_OPT_HA_VALUE=false
 export COMMON_OPT_KEYFILE_VALUE="${HOME}/.ssh/id_ed25519.pub"
 export COMMON_OPT_USER_VALUE="metal3admin"
-export COMMON_OPT_RTURL_VALUE="https://artifactory.nordix.org/artifactory"
 export COMMON_OPT_KEYNAME_VALUE
-export COMMON_OPT_RTUSER_VALUE
 export COMMON_OPT_DRYRUN_VALUE=false
 export COMMON_OPT_KEEPUSERS_VALUE=false
 export COMMON_OPT_PURGE_VALUE=false
@@ -31,11 +28,9 @@ export _OPT_HELP=("h" "help"       ""        "display this help and exit" "")
          _OPT_HA=("e" "enable-ha"  ""        "set router as high available" "")
     _OPT_KEYFILE=("k" "key-file"   "=FILE"   "file containing the public key" "COMMON_OPT_KEYFILE_VALUE")
        _OPT_USER=("u" "user"       "=USER"   "username for SSH" "COMMON_OPT_USER_VALUE")
-      _OPT_RTURL=("r" "rt-url"     "=URL"    "artifactory URL" "COMMON_OPT_RTURL_VALUE")
     _OPT_KEYNAME=("n" "key-name"   "=TXT"    "name for the public key" "COMMON_OPT_KEYNAME_VALUE")
-     _OPT_RTUSER=("s" "rt-user"    "=USER"   "artifactory user" "COMMON_OPT_RTUSER_VALUE")
      _OPT_DRYRUN=("d" "dry-run"    ""        "do nothing; only show what would happen" "")
-  _OPT_KEEPUSERS=("x" "keep-users" ""        "keep users not found in the artifactory" "")
+  _OPT_KEEPUSERS=("x" "keep-users" ""        "don't remove users with no public key information" "")
       _OPT_PURGE=("p" "purge"      ""        "don't update user; simply purge user" "")
     _OPT_INVALID=(""  ""           ""        "invalid index" "")
 
@@ -48,9 +43,7 @@ _OPT_ARRAY=(
   _OPT_HA[@]
   _OPT_KEYFILE[@]
   _OPT_USER[@]
-  _OPT_RTURL[@]
   _OPT_KEYNAME[@]
-  _OPT_RTUSER[@]
   _OPT_DRYRUN[@]
   _OPT_KEEPUSERS[@]
   _OPT_PURGE[@]
@@ -64,9 +57,7 @@ declare -r COMMON_OPT_TARGET=$((_OPT_IDX++))
 declare -r COMMON_OPT_HA=$((_OPT_IDX++))
 declare -r COMMON_OPT_KEYFILE=$((_OPT_IDX++))
 declare -r COMMON_OPT_USER=$((_OPT_IDX++))
-declare -r COMMON_OPT_RTURL=$((_OPT_IDX++))
 declare -r COMMON_OPT_KEYNAME=$((_OPT_IDX++))
-declare -r COMMON_OPT_RTUSER=$((_OPT_IDX++))
 declare -r COMMON_OPT_DRYRUN=$((_OPT_IDX++))
 declare -r COMMON_OPT_KEEPUSERS=$((_OPT_IDX++))
 declare -r COMMON_OPT_PURGE=$((_OPT_IDX++))
@@ -78,9 +69,7 @@ export COMMON_OPT_TARGET
 export COMMON_OPT_HA
 export COMMON_OPT_KEYFILE
 export COMMON_OPT_USER
-export COMMON_OPT_RTURL
 export COMMON_OPT_KEYNAME
-export COMMON_OPT_RTUSER
 export COMMON_OPT_DRYRUN
 export COMMON_OPT_KEEPUSERS
 export COMMON_OPT_PURGE
@@ -229,14 +218,6 @@ common_parse_options() {
         export COMMON_OPT_PURGE_VALUE=true
         shift
         ;;
-      -r|--rt-url)
-        export COMMON_OPT_RTURL_VALUE=${2}
-        shift 2
-        ;;
-      -s|--rt-user)
-        export COMMON_OPT_RTUSER_VALUE=${2}
-        shift 2
-        ;;
       -t|--target)
         COMMON_OPT_TARGET_VALUE=$(echo "${2}" | tr '[:lower:]' '[:upper:]')
         export COMMON_OPT_TARGET_VALUE
@@ -325,36 +306,6 @@ common_validate_keyname() {
 }
 
 # Description:
-# Validate RT URL
-#
-# Usage:
-# common_validate_rturl
-#
-common_validate_rturl() {
-  [[ -z "${COMMON_OPT_RTURL_VALUE}" ]] && {
-    echo >&2 "Error: no URL for artifactory"
-    exit 1
-  }
-
-  true
-}
-
-# Description:
-# Validate RT user
-#
-# Usage:
-# common_validate_rtuser
-#
-common_validate_rtuser() {
-  [[ -z "${COMMON_OPT_RTUSER_VALUE}" ]] && {
-    echo >&2 "Error: no user for artifactory"
-    exit 1
-  }
-
-  true
-}
-
-# Description:
 # Validate user
 #
 # Usage:
@@ -363,21 +314,6 @@ common_validate_rtuser() {
 common_validate_user() {
   [[ -z "${COMMON_OPT_USER_VALUE}" ]] && {
     echo >&2 "Error: no user specified"
-    exit 1
-  }
-
-  true
-}
-
-# Description:
-# Validate RT token
-#
-# Usage:
-# common_validate_rttoken
-#
-common_validate_rttoken() {
-  [[ -z "${RT_TOKEN:-""}" ]] && {
-    echo >&2 "Error: environment variable RT_TOKEN not set"
     exit 1
   }
 
