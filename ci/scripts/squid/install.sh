@@ -10,6 +10,7 @@ ALLOWED_NET="10.0.0.0/8"
 R_MIN="0"
 R_PCT="0"
 R_MAX="0"
+PURGE=""
 
 # shellcheck source=ci/scripts/squid/build.sh
 . squid_ver.sh
@@ -48,13 +49,24 @@ to all nodes using the proxy and run 'update-ca-certificates'."
 
 # Reconfigure
 reconfigure_squid() {
-    local INSTR PATTERN INSERT VALUE CONF RULES BLOCK DOMAIN
+    local INSTR PATTERN INSERT VALUE CONF RULES DOMAIN
 
     echo "Stopping squid..."
     systemctl stop squid
 
     CONF="/etc/squid/squid.conf"
 
+    # In the following array the first element is known as PATTERN,
+    # the second as INSERT and the third as VALUE.
+    #
+    # The combination of INSERT and VALUE will be inserted as follows:
+    #
+    # * If no INSERT is starting any of the lines in the configuration file,
+    #   the combination is appended on the line following PATTERN
+    #
+    # * If INSERT is starting a line in the configuration file,
+    #   the matching line is replaced by the combination
+    #
     INSTR=(
         "acl localnet src fe80::/10"
           "acl myacl src " "${ALLOWED_NET}\t\t# Metal3 nodes"
@@ -98,23 +110,22 @@ dynamic_cert_mem_cache_size=${CERT_CACHE_SIZE}"
 
     # remove old refresh patterns
     if grep -q "^# Start of refresh patterns$" "${CONF}"; then
-        sed -i '/^# Start of refresh patterns/,/^# End of refresh patterns/d' \
+        sed -i "/^# Start of refresh patterns/,/^# End of refresh patterns/d" \
                "${CONF}"
     fi
 
     # construct the rules for refresh patterns
-    RULES=(
-        "# Start of refresh patterns\\n"
-    )
+    RULES="# Start of refresh patterns"
     for DOMAIN in "$@"; do
-        RULES+=( "refresh_pattern ^${DOMAIN//./\\.}\t${R_MIN}\t${R_PCT}%\t\
-${R_MAX}\trefresh-ims\\n" )
+        RULES=$(printf "%s\\\n%s" \
+                "${RULES}" \
+                "refresh_pattern ^${DOMAIN//./\\.}\t${R_MIN}\t${R_PCT}%\t\
+${R_MAX}\trefresh-ims")
     done
-    RULES+=( "# End of refresh patterns" )
+    RULES=$(printf "%s\\\n%s" "${RULES}" "# End of refresh patterns")
 
     # append refresh patterns
-    BLOCK=$(printf "%s" "${RULES[@]}")
-    sed -i "\|^refresh_pattern -i (/cgi-bin/|a ${BLOCK}" "${CONF}"
+    sed -i "\|^refresh_pattern -i (/cgi-bin/|a ${RULES}" "${CONF}"
 
     # append header processing rules
     if ! grep -q "^# Always include validation headers in backend requests" \
@@ -132,6 +143,25 @@ reply_header_access Last-Modified allow all
 reply_header_access X-Checksum-Sha1 allow all
 reply_header_access X-Checksum-Sha256 allow all
 reply_header_access X-Checksum-Md5 allow all
+EOF
+    fi
+
+    # remove old purge rules
+    if grep -q "^# Start of purge rules$" "${CONF}"; then
+        sed -i "/^# Start of purge rules/,/^# End of purge rules/d" \
+               "${CONF}"
+    fi
+
+    # allow purging?
+    if [[ -n "${PURGE}" ]]; then
+        cat >> "${CONF}" << EOF
+
+# Start of purge rules
+acl purge method PURGE
+acl purge_group src ${PURGE}
+http_access allow purge purge_group
+http_access deny purge
+# End of purge rules
 EOF
     fi
 
@@ -160,6 +190,9 @@ Options are as follows:
 
   -c, --cache-size=SIZE
     size of the cache in MB; default '${CACHE_SIZE}'
+
+  -e, --enable-purge=SITE
+    enable purging of Squid cache elements from SITE
 
   -h, --help
     display this help and exit
@@ -208,10 +241,10 @@ main() {
     SITE=()
     RECONFIGURE_ONLY=0
     OPTS=$(getopt \
-           -o "a:c:hi:p:m:rs:v:" \
-           --long "allowed-net:,cache-size:,help,include-site:,squid-port:,\
+           -o "a:c:e:hi:p:m:rs:v:" \
+           --long "allowed-net:,cache-size:,ehelp,include-site:,squid-port:,\
                    maximum-object-size:,reconfigure-only,\
-                   cert-cache-size:,r-min:,r-pct:,r-max:version:" \
+                   cert-cache-size:,r-min:,r-pct:,r-max:version:enable-purge:" \
            -n "${0}" -- "$@")
     # shellcheck disable=SC2181
     if [ $? != 0 ]; then print_usage; fi
@@ -224,6 +257,10 @@ main() {
                 ;;
             -c|--cache-size)
                 CACHE_SIZE="${2}"
+                shift 2
+                ;;
+            -e|--enable-purge)
+                PURGE="${2}"
                 shift 2
                 ;;
             -h|--help)
