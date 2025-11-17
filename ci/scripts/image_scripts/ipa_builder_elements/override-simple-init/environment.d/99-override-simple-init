@@ -1,4 +1,0 @@
-#!/bin/bash
-
-export DIB_SIMPLE_INIT_CONFIG_DRIVE_LABEL="${DIB_SIMPLE_INIT_CONFIG_DRIVE_LABEL:-ir-vfd-dev}"
-
