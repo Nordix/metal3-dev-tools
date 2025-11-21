@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -53,18 +53,27 @@ JUMPHOST_FLAVOR="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_FLAVOR"
 JUMPHOST_FLOATING_IP_TAG="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_FLOATING_IP_TAG"
 
 # Create or rebuild jumphost image
-JUMPHOST_SERVER_ID="$(openstack server list --name "${!JUMPHOST_NAME}" -f json \
+ARGS=(
+  server list
+  --name "${!JUMPHOST_NAME}"
+  -f json
+)
+
+JUMPHOST_SERVER_ID="$(openstack "${ARGS[@]}" \
   | jq -r 'map(.ID) | @csv' \
   | tr ',' '\n' \
   | tr -d '"')"
 
-if [ -n "${JUMPHOST_SERVER_ID}" ]
-then
+if [[ -n "${JUMPHOST_SERVER_ID}" ]]; then
+  ARGS=(
+    openstack server rebuild
+    --image "${!JUMPHOST_IMAGE}"
+    "${JUMPHOST_SERVER_ID}"
+  )
   common_verbose "Rebuilding the jumphost ${!JUMPHOST_NAME}"\
                  "image=${!JUMPHOST_IMAGE},"\
                  "id=${JUMPHOST_SERVER_ID}..."
-  common_run -- openstack server rebuild --image "${!JUMPHOST_IMAGE}" \
-    "${JUMPHOST_SERVER_ID}" > /dev/null
+  common_run -- "${ARGS[@]}" > /dev/null
 else
   # Cleanup any stale ports
   delete_port "${JUMPOST_EXT_PORT_NAME}"
@@ -75,13 +84,24 @@ else
   # Create a new security group
   common_verbose "Creating a new security group name=${!JUMPHOST_EXT_SG}..."
 
-  SG_ID="$(common_run -o "{ \"id\": \"<SG-ID>\" }" -- \
-    openstack security group create -f json "${!JUMPHOST_EXT_SG}" | \
-    jq -r '.id')"
-  common_run -- \
-    openstack security group rule create --ingress --description ssh \
-    --ethertype IPv4 --protocol tcp --dst-port 22 "${SG_ID}" > /dev/null
+  ARGS=(
+    openstack security group create -f json "${!JUMPHOST_EXT_SG}"
+  )
+  OPTS=(
+    -o "{ \"id\": \"<SG-ID>\" }"
+  )
+  SG_ID="$(common_run "${OPTS[@]}" -- "${ARGS[@]}" | jq -r '.id')"
 
+  ARGS=(
+    openstack security group rule create
+    --ingress
+    --description ssh
+    --ethertype IPv4
+    --protocol tcp
+    --dst-port 22
+    "${SG_ID}"
+  )
+  common_run -- "${ARGS[@]}" > /dev/null
   common_verbose "ID: ${SG_ID}"
 
   # Create a new port
@@ -90,14 +110,19 @@ else
                  "security-group=${SG_ID},"\
                  "name=${JUMPOST_EXT_PORT_NAME}..."
 
-  EXT_PORT_ID="$(common_run -o "{ \"id\": \"<EXT-PORT-ID>\" }" -- \
-    openstack port create -f json \
-    --network "${!NETWORK}" \
-    --fixed-ip subnet="$(get_subnet_name "${!NETWORK}")" \
-    --enable-port-security \
-    --security-group "${SG_ID}" \
-    "${JUMPOST_EXT_PORT_NAME}" | jq -r '.id')"
-
+  ARGS=(
+    openstack port create
+    -f json
+    --network "${!NETWORK}"
+    --fixed-ip subnet="$(get_subnet_name "${!NETWORK}")"
+    --enable-port-security
+    --security-group "${SG_ID}"
+    "${JUMPOST_EXT_PORT_NAME}"
+  )
+  OPTS=(
+    -o "{ \"id\": \"<PORT-ID>\" }"
+  )
+  EXT_PORT_ID="$(common_run "${OPTS[@]}" -- "${ARGS[@]}" | jq -r '.id')"
   common_verbose "ID: ${EXT_PORT_ID}"
 
   CLOUD_INIT="$(mktemp)"
@@ -117,61 +142,83 @@ EOF
                  "port=${EXT_PORT_ID},"\
                  "name=${!JUMPHOST_NAME}..."
 
-  JUMPHOST_SERVER_ID="$(common_run -o "{ \"id\": \"<SERVER-ID>\" }" -- \
-    openstack server create -f json \
-    --image "${!JUMPHOST_IMAGE}" \
-    --flavor "${!JUMPHOST_FLAVOR}" \
-    --key-name "${!KEYPAIR_NAME}" \
-    --user-data "${CLOUD_INIT}" \
-    --port "${EXT_PORT_ID}" \
-    "${!JUMPHOST_NAME}" | jq -r '.id')"
-  rm -f "${CLOUD_INIT}"
-
+  ARGS=(
+    openstack server create
+    -f json
+    --image "${!JUMPHOST_IMAGE}"
+    --flavor "${!JUMPHOST_FLAVOR}"
+    --key-name "${!KEYPAIR_NAME}"
+    --user-data "${CLOUD_INIT}"
+    --port "${EXT_PORT_ID}"
+    "${!JUMPHOST_NAME}"
+  )
+  OPTS=(
+    -o "{ \"id\": \"<SERVER-ID>\" }"
+  )
+  JUMPHOST_SERVER_ID="$(common_run "${OPTS[@]}" -- "${ARGS[@]}" | jq -r '.id')"
   common_verbose "ID: ${JUMPHOST_SERVER_ID}"
+
+  rm -f "${CLOUD_INIT}"
 fi
 
 # Recycle or create floating IP and assign it to jumphost port
-FLOATING_IP_ID="$(openstack floating ip list --tags "${!JUMPHOST_FLOATING_IP_TAG}" -f json \
+FLOATING_IP_ID="$(openstack \
+    floating ip list --tags "${!JUMPHOST_FLOATING_IP_TAG}" -f json \
     | jq -r 'map(.ID) | @csv' \
     | tr ',' '\n' \
     | tr -d '"')"
 
-ARGS=()
-if [ -n "${FLOATING_IP_ID}" ]
-then
+CMD=()
+if [[ -n "${FLOATING_IP_ID}" ]]; then
+  ARGS=(
+    openstack floating ip unset --port "${FLOATING_IP_ID}"
+  )
   common_verbose "Disassociate floating IP (${FLOATING_IP_ID})..."
-  common_run -- openstack floating ip unset --port "${FLOATING_IP_ID}" \
-    > /dev/null
+  common_run -- "${ARGS[@]}" > /dev/null
 
   common_verbose "Associate floating IP to new jumphost port"\
                  "port=${JUMPOST_EXT_PORT_NAME},"\
                  "id=${FLOATING_IP_ID}..."
 
-  common_run -- openstack floating ip set --port "${JUMPOST_EXT_PORT_NAME}" \
-    "${FLOATING_IP_ID}" > /dev/null
+  ARGS=(
+    openstack floating ip set
+    --port "${JUMPOST_EXT_PORT_NAME}"
+    "${FLOATING_IP_ID}"
+  )
+  common_run -- "${ARGS[@]}" > /dev/null
 else
   common_verbose "Creating a new jumphost floating IP"\
                  "port=${JUMPOST_EXT_PORT_NAME},"\
                  "tag=${!JUMPHOST_FLOATING_IP_TAG},"\
                  "net=${!EXT_NETWORK}..."
 
-  FLOATING_IP_ID="$(common_run -o "{ \"id\": \"<FLOATING-IP-ID>\" }" -- \
-    openstack floating ip create -f json \
-    --port "${JUMPOST_EXT_PORT_NAME}" \
-    --description \"Reserved for "${!JUMPHOST_NAME}"\" \
-    --tag "${!JUMPHOST_FLOATING_IP_TAG}" \
-    "${!EXT_NETWORK}" | jq -r '.id')"
-
+  ARGS=(
+    openstack floating ip create
+    -f json
+    --port "${JUMPOST_EXT_PORT_NAME}"
+    --description "\"Reserved for ${!JUMPHOST_NAME}\""
+    --tag "${!JUMPHOST_FLOATING_IP_TAG}"
+    "${!EXT_NETWORK}"
+  )
+  OPTS=(
+    -o "{ \"id\": \"<FLOATING-IP-ID>\" }"
+  )
+  FLOATING_IP_ID="$(common_run "${OPTS[@]}" -- "${ARGS[@]}" | jq -r '.id')"
   common_verbose "ID: ${FLOATING_IP_ID}"
-  ARGS+=("common_run" "-o" "[ { \"Floating IP Address\": \"<IP>\" } ]" --)
+  CMD=("common_run" "-o" "[ { \"Floating IP Address\": \"<IP>\" } ]" --)
 fi
 
-FLOATING_IP_ADDRESS="$("${ARGS[@]}" \
+FLOATING_IP_ADDRESS="$("${CMD[@]}" \
   openstack floating ip list --tags "${!JUMPHOST_FLOATING_IP_TAG}" -f json \
   | jq -r 'map(."Floating IP Address") | @csv' \
   | tr ',' '\n' \
   | tr -d '"')"
 
 echo "Jumphost public IP: ${FLOATING_IP_ADDRESS}"
-common_run -- wait_for_ssh "${COMMON_OPT_USER_VALUE}" \
-  "${COMMON_OPT_KEYFILE_VALUE}" "${FLOATING_IP_ADDRESS}"
+ARGS=(
+  wait_for_ssh
+  "${COMMON_OPT_USER_VALUE}"
+  "${COMMON_OPT_KEYFILE_VALUE}"
+  "${FLOATING_IP_ADDRESS}"
+)
+common_run -- "${ARGS[@]}"

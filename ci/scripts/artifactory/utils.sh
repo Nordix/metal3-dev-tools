@@ -1,10 +1,4 @@
-#! /usr/bin/env bash
-
-CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
-COMMON_SCRIPTS_DIR="${CI_DIR}/scripts/common"
-
-# shellcheck source=ci/scripts/common/utils.sh
-. "${COMMON_SCRIPTS_DIR}/utils.sh"
+#!/usr/bin/env bash
 
 # ================ Generic Artifactory Helper Functions ===============
 
@@ -31,10 +25,13 @@ rt_upload_artifact() {
   ARGS=(
     -T "${SRC_PATH}"
   )
-  [[ "${ANONYMOUS}" != 1 ]] && { ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}"); }
 
-  common_verbose "Upload artifact: ${SRC_PATH},${DST_PATH},${ANONYMOUS}"
-  common_run -- curl "${ARGS[@]}" "${RT_URL}/${DST_PATH}"
+  if [[ "${ANONYMOUS}" != 1 ]]; then
+    ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}");
+  fi
+
+  echo "Upload artifact: ${SRC_PATH},${DST_PATH},${ANONYMOUS}"
+  curl "${ARGS[@]}" "${RT_URL}/${DST_PATH}"
 }
 
 # Description:
@@ -50,7 +47,7 @@ rt_upload_artifact() {
 #   rt_delete_artifact <dst_file_path> <anonymous:0/1>
 #
 rt_delete_artifact() {
-  local DST_PATH ANONYMOUS
+  local DST_PATH ANONYMOUS ARGS
 
   DST_PATH="${1:?}"
   ANONYMOUS="${2:-1}"
@@ -59,10 +56,13 @@ rt_delete_artifact() {
     -s
     -XDELETE
   )
-  [[ "${ANONYMOUS}" != 1 ]] && { ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}"); }
 
-  common_verbose "Delete artifact: ${DST_PATH},${ANONYMOUS}"
-  common_run -- curl "${ARGS[@]}" "${RT_URL}/${DST_PATH}"
+  if [[ "${ANONYMOUS}" != 1 ]]; then
+    ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}");
+  fi
+
+  echo "Delete artifact: ${DST_PATH},${ANONYMOUS}"
+  curl "${ARGS[@]}" "${RT_URL}/${DST_PATH}"
 }
 
 # Description:
@@ -79,42 +79,54 @@ rt_delete_artifact() {
 #   rt_list_directory <dst_dir_path> <anonymous:0/1>
 #
 rt_list_directory() {
+  local DST_PATH ANONYMOUS ARGS
+
   DST_PATH="${1:?}"
   ANONYMOUS="${2:-1}"
 
-  common_verbose "List artifact: ${DST_PATH},${ANONYMOUS}"
-  _CMD="curl -s \
-    $( ([[ "${ANONYMOUS}" != 1 ]] && echo " -u${RT_USER:?}:${RT_TOKEN:?}") || true) \
-    -XGET \
-    ${RT_URL}/api/storage/${DST_PATH}"
+  ARGS=(
+    -s
+    -XGET
+  )
 
-  eval "${_CMD}"
+  if [[ "${ANONYMOUS}" != 1 ]]; then
+    ARGS+=("-u${RT_USER:?}:${RT_TOKEN:?}");
+  fi
+
+  echo "List artifact: ${DST_PATH},${ANONYMOUS}"
+  curl "${ARGS[@]}" "${RT_URL}/api/storage/${DST_PATH}"
 }
 
 # Description:
-# Deletes the artifacts in a directory. The function excludes the last x number of
-# artifacts from deletion where x is specified by the 3rd argument. The artifacts
-# specified in the file that's path is passed as the second argument will be also
-# excluded from deletion.
+# Deletes the artifacts in a directory. The function excludes the last x number
+# of artifacts from deletion where x is specified by the 3rd argument. The
+# artifacts specified in the file that's path is passed as the second argument
+# will be also excluded from deletion.
 #    DIR_TO_CLEAN: the directory where the artifact deletion will take place.
 #    ANONYMOUS: enable/disable anonymous artifactory access
 #    PINNED_ARTIFACTS: a file path that points to a text file that contains the
 #        list artifact in "DIR_TO_CLEAN" that should not be deleted.
 #    RETENTION_NUM: in addition to the artifacts specified in "PINNED_ARTIFACTS"
 #        the newest x number of artifacts should be kept in the directory.
-#    DRY_RUN: boolean that makes the function print out the name of the artifacts
-#        instead of cleaning them.
+#    DRY_RUN: boolean that makes the function print out the name of the
+#        artifacts instead of cleaning them.
 #
-#    Note: By default only the "DIR_TO_CLEAN" is requird. As the default behaviour
-#        "DIR_TO_CLEAN" will be cleaned and the last 10 artifact will be excluded from deletion.
+#    Note: By default only the "DIR_TO_CLEAN" is required. As the default
+#        behaviour "DIR_TO_CLEAN" will be cleaned and the last 10 artifact
+#        will be excluded from deletion.
 #
-#    Note: The function expects artifacts to have unique timestamp in their names. Timestamp
-#       format that is recommended could be created in bash with this command: "date --utc +"%Y%m%dT%H%MZ".
+#    Note: The function expects artifacts to have unique timestamp in their
+#       names. Timestamp format that is recommended could be created in bash
+#       with this command: "date --utc +"%Y%m%dT%H%MZ".
 #
 #    Usage:
-#      delete_multiple_artifacts <dir_to_clean> <anonymous:0/1> <dry_run:false/true> <pinned_artifacts_path> <retention_num>
+#      delete_multiple_artifacts <dir_to_clean> <anonymous:0/1>
+#                                <dry_run:false/true>
+#                                <pinned_artifacts_path> <retention_num>
 #
 rt_delete_multiple_artifacts() {
+  local DIR_TO_CLEAN ANONYMOUS DRY_RUN PINNED_ARTIFACTS RETENTION_NUM
+
   DIR_TO_CLEAN="${1:?}"
   ANONYMOUS="${2:-0}"
   DRY_RUN="${3:-false}"
@@ -122,17 +134,16 @@ rt_delete_multiple_artifacts() {
   RETENTION_NUM="${5:-10}"
 
   # Create an array of the artifacts that should be deleted
-  mapfile -t < <(rt_list_directory "${DIR_TO_CLEAN}" "${ANONYMOUS}" |\
-    jq '.children | .[] | .uri' | \
-    sed -e 's/\"\/\([^"]*\)"/\1/g' | \
-    diff --suppress-common-lines - "${PINNED_ARTIFACTS}" | \
-    sed -ne 's/< //p' | \
-    head -n "-${RETENTION_NUM}")
+  mapfile -t < <(rt_list_directory "${DIR_TO_CLEAN}" "${ANONYMOUS}" \
+    | jq '.children | .[] | .uri' \
+    | sed -e 's/\"\/\([^"]*\)"/\1/g' \
+    | diff --suppress-common-lines - "${PINNED_ARTIFACTS}" \
+    | sed -ne 's/< //p' \
+    | head -n "-${RETENTION_NUM}")
 
   # Delete the artifacts
-  for item in "${MAPFILE[@]}"
-  do
-    if "${DRY_RUN}"; then
+  for item in "${MAPFILE[@]}"; do
+    if [[ "${DRY_RUN}" == "true" ]]; then
       echo "INFO:DRY_RUN:${DIR_TO_CLEAN}/${item} has been deleted!"
     else
       rt_delete_artifact "${DIR_TO_CLEAN}/${item}" "${ANONYMOUS}"

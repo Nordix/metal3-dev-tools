@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -41,29 +41,29 @@ JUMPHOST_FLOATING_IP_TAG="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_FLOATING_IP_TAG"
 JUMPHOST_EXT_SG="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_EXT_SG"
 
 # Get the jumphost ID
-JUMPHOST_SERVER_ID="$(openstack server list --name "${!JUMPHOST_NAME}" -f json \
+JUMPHOST_SERVER_ID="$(openstack \
+  server list --name "${!JUMPHOST_NAME}" -f json \
   | jq -r 'map(.ID) | @csv' \
   | tr ',' '\n' \
   | tr -d '"')"
 common_verbose "JUMPHOST_SERVER_ID=${JUMPHOST_SERVER_ID}"
 
 # Get the floating IP
-FLOATING_IP_ID="$(openstack floating ip list --tags "${!JUMPHOST_FLOATING_IP_TAG}" -f json \
+FLOATING_IP_ID="$(openstack \
+    floating ip list --tags "${!JUMPHOST_FLOATING_IP_TAG}" -f json \
     | jq -r 'map(.ID) | @csv' \
     | tr ',' '\n' \
     | tr -d '"')"
 common_verbose "FLOATING_IP_ID=${FLOATING_IP_ID}"
 
 # Delete the jumphost
-if [ -n "${JUMPHOST_SERVER_ID}" ]
-then
+if [[ -n "${JUMPHOST_SERVER_ID}" ]]; then
   common_verbose "Deleting server name=${!JUMPHOST_NAME}..."
   common_run -- openstack server delete "${!JUMPHOST_NAME}"
 fi
 
 # Unset the floating ip, keep it to reuse later
-if [ -n "${FLOATING_IP_ID}" ]
-then
+if [[ -n "${FLOATING_IP_ID}" ]]; then
   common_verbose "Disassociate floating IP id=${FLOATING_IP_ID}..."
   common_run -- openstack floating ip unset --port "${FLOATING_IP_ID}"
 fi
