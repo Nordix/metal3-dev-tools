@@ -1,7 +1,9 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 # Source only once
-[[ "${_OPT_HELP:-false}" != "false" ]] && { return; }
+if [[ "${_OPT_HELP:-false}" != "false" ]]; then
+  return
+fi
 
 # Default option values
 COMMON_OPT_TARGET_VALUE="$(whoami | tr '[:lower:]' '[:upper:]')"
@@ -88,7 +90,7 @@ COMMON_OPT_ARGUMENTS=
 # common_make_usage_string -o "ONE-LINER" -a "ARGUMENTS" <option contants>...
 #
 common_make_usage_string() {
-  local ONELINER ARGS I OPT SOPT LOPT PARAM DESC DEFAULT
+  local ONELINER ARGS I OPT SOPT LOPT PARAM DESC DEFAULT VALUE
 
   # Parse options
   ONELINER="<NO ONE-LINER?>"
@@ -131,15 +133,18 @@ common_make_usage_string() {
     OPT=${_OPT_ARRAY[${!I}]}
     SOPT=${!OPT:0:1}
     # _OPT_INVALID?
-    [[ -z "${SOPT}" ]] && continue
+    if [[ -z "${SOPT}" ]]; then
+      continue
+    fi
     LOPT=${!OPT:1:1}
     PARAM=${!OPT:2:1}
     DESC=${!OPT:3:1}
     DEFAULT=${!OPT:4:1}
-    [[ -n "${DEFAULT}" ]] && [[ -n "${!DEFAULT}" ]] && {
-      DEFAULT=". Default value: '${!DEFAULT}'."
-    } || DEFAULT=""
-    echo -e "  -${SOPT}, --${LOPT}${PARAM}\n      ${DESC}${DEFAULT}\n"
+    VALUE=
+    if [[ -n "${DEFAULT}" ]] && [[ -n "${!DEFAULT}" ]]; then
+      VALUE=". Default value: '${!DEFAULT}'."
+    fi
+    echo -e "  -${SOPT}, --${LOPT}${PARAM}\n      ${DESC}${VALUE}\n"
   done
 }
 
@@ -175,11 +180,13 @@ common_parse_options() {
   for OPT in "${_OPT_ARRAY[@]}"; do
 
     # _OPT_INVALID?
-    [[ -z "${!OPT:0:1}" ]] && continue
+    if [[ -z "${!OPT:0:1}" ]]; then
+      continue
+    fi
 
     # Is there a parameter for this option?
     PARAM=
-    if [ -n "${!OPT:2:1}" ]; then
+    if [[ -n "${!OPT:2:1}" ]]; then
       PARAM=":"
     fi
     S_OPTS+="${!OPT:0:1}${PARAM}"
@@ -187,11 +194,14 @@ common_parse_options() {
   done
 
   # Parse options
-  OPTS=$(getopt -o "${S_OPTS}" \
-                --long "$(printf "%s," "${L_OPTS[@]}")" \
-                -n "${0}" -- "$@")
+  OPTS=$(getopt \
+         -o "${S_OPTS}" \
+         --long "$(printf "%s," "${L_OPTS[@]}")" \
+         -n "${0}" -- "$@")
   # shellcheck disable=SC2181
-  if [ $? != 0 ]; then common_print_usage "${USAGE}"; fi
+  if [[ $? -ne 0 ]]; then
+    common_print_usage "${USAGE}"
+  fi
   eval set -- "${OPTS}"
   while true; do
     case "$1" in
@@ -255,18 +265,18 @@ common_parse_options() {
 # common_validate_target
 #
 common_validate_target() {
-  [[ -z "${COMMON_OPT_TARGET_VALUE}" ]] && {
+  if [[ -z "${COMMON_OPT_TARGET_VALUE}" ]]; then
     echo >&2 "Error: target not specified"
     exit 1
-  }
+  fi
 
   # Validate target: must have a router defined
   VAR="${COMMON_OPT_TARGET_VALUE}_ROUTER_NAME"
   VALUE=${!VAR:-"invalid"}
-  [[ "${VALUE}" == "invalid" ]] && {
+  if [[ "${VALUE}" == "invalid" ]]; then
     echo >&2 "Error: invalid target - ${VAR} not defined"
     exit 1
-  }
+  fi
 
   true
 }
@@ -278,14 +288,14 @@ common_validate_target() {
 # common_validate_keyfile
 #
 common_validate_keyfile() {
-  [[ -z "${COMMON_OPT_KEYFILE_VALUE}" ]] && {
+  if [[ -z "${COMMON_OPT_KEYFILE_VALUE}" ]]; then
     echo >&2 "Error: no key file specified"
     exit 1
-  }
-  [[ ! -r "${COMMON_OPT_KEYFILE_VALUE}" ]] && {
+  fi
+  if [[ ! -r "${COMMON_OPT_KEYFILE_VALUE}" ]]; then
     echo >&2 "Error: ${COMMON_OPT_KEYFILE_VALUE} not readable"
     exit 1
-  }
+  fi
 
   true
 }
@@ -297,10 +307,10 @@ common_validate_keyfile() {
 # common_validate_keyname
 #
 common_validate_keyname() {
-  [[ -z "${COMMON_OPT_KEYNAME_VALUE}" ]] && {
+  if [[ -z "${COMMON_OPT_KEYNAME_VALUE}" ]]; then
     echo >&2 "Error: no key name specified"
     exit 1
-  }
+  fi
 
   true
 }
@@ -312,10 +322,10 @@ common_validate_keyname() {
 # common_validate_user
 #
 common_validate_user() {
-  [[ -z "${COMMON_OPT_USER_VALUE}" ]] && {
+  if [[ -z "${COMMON_OPT_USER_VALUE}" ]]; then
     echo >&2 "Error: no user specified"
     exit 1
-  }
+  fi
 
   true
 }
