@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 # Description:
 # Get the public IP of jumphost.
@@ -15,11 +15,11 @@ get_jumphost_public_ip() {
 
   TAG=${1:-"I-HAVE-NO-TAG"}
 
-  FLOATING_IP_ADDRESS="$(openstack floating ip list -f json \
-  --tags "${TAG}" \
-  | jq -r 'map(."Floating IP Address") | @csv' \
-  | tr ',' '\n' \
-  | tr -d '"')"
+  FLOATING_IP_ADDRESS="$(openstack \
+    floating ip list -f json --tags "${TAG}" \
+    | jq -r 'map(."Floating IP Address") | @csv' \
+    | tr ',' '\n' \
+    | tr -d '"')"
 
   echo "${FLOATING_IP_ADDRESS}"
 }

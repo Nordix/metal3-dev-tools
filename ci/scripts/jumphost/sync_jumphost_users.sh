@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -47,9 +47,10 @@ get_user_public_keys() {
   for _KEY in "${DIR}/${USER}/"*; do
     _KEY=$(basename "${_KEY}")
     if [[ "${_KEY}" == "*" ]]; then
-       return
+      return
     fi
-    USER_KEYS="$(printf '%s\n%s' "$(cat "${DIR}/${USER}/${_KEY}")" "${USER_KEYS}")"
+    USER_KEYS="$(printf '%s\n%s' \
+      "$(cat "${DIR}/${USER}/${_KEY}")" "${USER_KEYS}")"
   done
 
   echo "${USER_KEYS}"
@@ -65,7 +66,7 @@ get_user_public_keys() {
 #   add_jumphost_user <username> <authorized_keys_file> <opts>
 #
 add_jumphost_user() {
-  local USER USER_AUTHORIZED_KEYS_FILE
+  local USER USER_AUTHORIZED_KEYS_FILE ARGS OPTS
 
   USER=${1:?}
   USER_AUTHORIZED_KEYS_FILE=${2:?}
@@ -73,32 +74,130 @@ add_jumphost_user() {
   OPTS=("${@:?}")
 
   # Send the user's SSH keys to jumphost
+  ARGS=(
+    rsync
+    -avz
+    -e "ssh ${OPTS[*]}"
+    "${USER_AUTHORIZED_KEYS_FILE}"
+    "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}:/tmp/${USER}_auth_keys"
+  )
   common_verbose "Copy SSH key ${USER_AUTHORIZED_KEYS_FILE} to"\
                  "${JUMPHOST_PUBLIC_IP}:/tmp/${USER}_auth_keys..."
 
-  common_run -- rsync -avz \
-    -e "ssh ${OPTS[*]}" \
-    "${USER_AUTHORIZED_KEYS_FILE}" \
-    "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}:/tmp/${USER}_auth_keys" > /dev/null
+  common_run -- "${ARGS[@]}" > /dev/null
 
   # Send the remote script to jumphost
+  ARGS=(
+    rsync -avz
+    -e "ssh ${OPTS[*]}"
+    "${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh"
+    "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}:/tmp/"
+  )
   common_verbose "Copy ${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh to"\
                  "${JUMPHOST_PUBLIC_IP}:/tmp/..."
 
-  common_run -- rsync -avz \
-    -e "ssh ${OPTS[*]}" \
-    "${JUMPHOST_SCRIPTS_DIR}/files/add_proxy_user.sh" \
-    "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}:/tmp/" > /dev/null
+  common_run -- "${ARGS[@]}" > /dev/null
 
-  # Execute the remote scrip
+  # Execute the remote script
+  ARGS=(
+    ssh
+    "${OPTS[@]}"
+    "${COMMON_OPT_USER_VALUE}"@"${JUMPHOST_PUBLIC_IP}"
+    /tmp/add_proxy_user.sh "${USER}" "/tmp/${USER}_auth_keys"
+  )
   common_verbose "Running the script with ${USER} /tmp/${USER}_auth_keys"
 
-  common_run -- ssh \
-    "${OPTS[@]}" \
-    "${COMMON_OPT_USER_VALUE}"@"${JUMPHOST_PUBLIC_IP}" \
-    /tmp/add_proxy_user.sh "${USER}" "/tmp/${USER}_auth_keys" > /dev/null
+  common_run -- "${ARGS[@]}" > /dev/null
 
   echo "User[${USER}] updated"
+}
+
+# Description:
+# Check if the given user matches with the user given as an argument
+# (ARG_USER), which may also not be set or is 'all'.
+#
+# For safety reasons if the user matches with the admin user the
+# function return always "false" in order to prevent actions on the
+# admin user account.
+#
+# The function returns "true" in case of a match otherwise "false" is
+# returned.
+#
+# Usage:
+#   is_selected_user <user_to_match>
+#
+is_selected_user() {
+  local USER
+
+  USER=${1:?}
+
+  # Paranoid: exclude the admin user
+  if [[ "${COMMON_OPT_USER_VALUE}" == "${USER}" ]]; then
+    echo "false"
+    return
+  fi
+
+  if [[ -n "${ARG_USER}" ]] \
+     && [[ "${ARG_USER}" != "all" ]] \
+     && [[ "${USER}" != "${ARG_USER}" ]]; then
+    echo "false"
+    return
+  fi
+
+  echo "true"
+}
+
+# Description:
+# Remove a specified SSH user from the jumphost.
+#
+# Usage:
+#   remove_ssh_user <user_to_remove>
+#
+remove_ssh_user() {
+  local SSH_USER ARGS
+
+  SSH_USER=${1:?}
+
+  ARGS=(
+    ssh
+    "${SSH_OPTS[@]}"
+    "${COMMON_OPT_USER_VALUE}"@"${JUMPHOST_PUBLIC_IP}"
+    "sudo deluser --remove-all-files ${SSH_USER}"
+  )
+  common_verbose "Removing user ${SSH_USER}..."
+  common_run -- "${ARGS[@]}"
+}
+
+# Description:
+# Process users in the jumphost.
+#
+# If USERS list was specified, this function will remove either
+# a single user that is not on the USERS list if the user was specified on the
+# command line. If no user or 'all' users was specified on the command line,
+# this function will remove all such users that are not on the USERS list.
+#
+# If no list of USERS is given, only the selected user(s) will be removed.
+#
+# Usage:
+#   remove_ssh_users <user_list>
+#
+remove_ssh_users() {
+  local USERS SSH_USER
+
+  USERS=${1:-}
+
+  for SSH_USER in ${JUMPHOST_USERS}; do
+
+    # If a user name is given, process only the specified user
+    if [[ "$(is_selected_user "${SSH_USER}")" == "false" ]]; then
+      continue
+    fi
+
+    if [[ -z "${USERS}" ]] \
+       || [[ ! " ${USERS[*]} " =~ [[:space:]]${SSH_USER}[[:space:]] ]]; then
+      remove_ssh_user "${SSH_USER}"
+    fi
+  done
 }
 
 USAGE=$(common_make_usage_string \
@@ -115,7 +214,7 @@ USAGE=$(common_make_usage_string \
 common_parse_options "${USAGE}" "$@"
 
 # Arguments
-SELECTED_USER=${COMMON_OPT_ARGUMENTS[0]:-"all"}
+ARG_USER=${COMMON_OPT_ARGUMENTS[0]:-"all"}
 
 # Sanity checks
 # =============
@@ -124,7 +223,7 @@ common_validate_keyfile
 common_validate_user
 
 if [[ "${COMMON_OPT_PURGE_VALUE}" == "true" ]]; then
-  if [[ "${SELECTED_USER}" == "all" ]]; then
+  if [[ "${ARG_USER}" == "all" ]]; then
     echo >&2 "Error: unable to purge all users"
     exit 1
   fi
@@ -173,29 +272,39 @@ JUMPHOST_USERS="$(ssh \
   "${COMMON_OPT_USER_VALUE}@${JUMPHOST_PUBLIC_IP}" \
   "${CMD}")"
 
+# Purge users?
+if [[ "${COMMON_OPT_PURGE_VALUE}" == "true" ]]; then
+  remove_ssh_users
+  exit 0
+fi
+
 # Iterate over the public key directory
 FOUND_USERS=()
-
 for USER in "${PUBLIC_KEY_DIR}/"*; do
+
+  # Extract the username
   USER=$(basename "${USER}")
+
   # Not a user directory?
   if [[ "${USER}" == "*" ]] || [[ ! -d "${PUBLIC_KEY_DIR}/${USER}" ]]; then
     continue
   fi
 
   # If a user name is given, process only the specified user
-  [[ -n "${SELECTED_USER}" ]] && \
-     [[ "${SELECTED_USER}" != "all" ]] && \
-     [[ "${USER}" != "${SELECTED_USER}" ]] && continue
+  if [[ "$(is_selected_user "${USER}")" == "false" ]]; then
+    continue
+  fi
+
   common_verbose "Retrieving public keys for ${USER}..."
   _USER_KEYS="$(get_user_public_keys "${PUBLIC_KEY_DIR}" "${USER}")"
   if [[ -z "${_USER_KEYS}" ]]; then
     common_verbose "User ${USER} doesn't have keys"
     continue
   fi
+
+  common_verbose "Injecting public key for ${USER}..."
   USER_KEY_FILE="$(mktemp)"
   echo "${_USER_KEYS}" > "${USER_KEY_FILE}"
-  common_verbose "Injecting public key for ${USER}..."
   add_jumphost_user "${USER}" "${USER_KEY_FILE}" "${SSH_OPTS[@]}"
   rm -f "${USER_KEY_FILE}"
   FOUND_USERS+=("${USER}")
@@ -203,25 +312,5 @@ done
 
 # Remove users without public keys but still present on the jumphost
 if [[ "${COMMON_OPT_KEEPUSERS_VALUE}" == "false" ]]; then
-  for SSH_USER in ${JUMPHOST_USERS}; do
-
-    # Paranoid: don't remove the admin user
-    if [[ "${COMMON_OPT_USER_VALUE}" == "${SSH_USER}" ]]; then
-      continue
-    fi
-
-    # If a user name is given, process only the specified user
-    [[ -n "${SELECTED_USER}" ]] && \
-    [[ "${SELECTED_USER}" != "all" ]] && \
-    [[ "${SSH_USER}" != "${SELECTED_USER}" ]] && continue
-
-    # If the user has no keys, remove the user
-    if [[ ! " ${FOUND_USERS[*]} " =~ [[:space:]]${SSH_USER}[[:space:]] ]]; then
-      common_verbose "Removing user ${SSH_USER}..."
-      common_run -- ssh \
-        "${SSH_OPTS[@]}" \
-        "${COMMON_OPT_USER_VALUE}"@"${JUMPHOST_PUBLIC_IP}" \
-        "sudo deluser --remove-all-files ${SSH_USER}"
-    fi
-  done
+  remove_ssh_users "${FOUND_USERS[*]}"
 fi

@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 CI_DIR="$(dirname "$(readlink -f "${0}")")/../.."
 COMMON_SCRIPTS_DIR="${CI_DIR}/scripts/common"
@@ -13,7 +13,9 @@ COMMON_SCRIPTS_DIR="${CI_DIR}/scripts/common"
 # common_verbose "message"
 #
 common_verbose() {
-  [[ "${COMMON_OPT_VERBOSE_VALUE}" == "true" ]] && echo >&2 "$@"
+  if [[ "${COMMON_OPT_VERBOSE_VALUE}" == "true" ]]; then
+    echo >&2 "$@"
+  fi
   return 0
 }
 
