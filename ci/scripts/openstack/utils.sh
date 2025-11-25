@@ -98,17 +98,6 @@ render_user_data() {
 }
 
 # Description:
-# Generates subnet name from Network name.
-#
-# Example:
-#   Input: "metal3-network"
-#   Output: "metal3-network-subnet"
-#
-get_subnet_name() {
-  echo "${1:?}-subnet"
-}
-
-# Description:
 # Generates External Port name from Network name.
 #
 # Example:

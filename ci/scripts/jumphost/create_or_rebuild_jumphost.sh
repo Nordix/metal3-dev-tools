@@ -45,6 +45,7 @@ common_validate_user
 KEYPAIR_NAME="${COMMON_OPT_TARGET_VALUE}_KEYPAIR_NAME"
 EXT_NETWORK="${COMMON_OPT_TARGET_VALUE}_EXT_NETWORK"
 NETWORK="${COMMON_OPT_TARGET_VALUE}_NETWORK"
+SUBNET="${COMMON_OPT_TARGET_VALUE}_SUBNET"
 JUMPHOST_NAME="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_NAME"
 JUMPHOST_IMAGE="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_IMAGE"
 JUMPHOST_EXT_SG="${COMMON_OPT_TARGET_VALUE}_JUMPHOST_EXT_SG"
@@ -106,7 +107,7 @@ else
 
   # Create a new port
   common_verbose "Creating new jumphost port"\
-                 "subnet=$(get_subnet_name "${!NETWORK}"),"\
+                 "subnet=${!SUBNET},"\
                  "security-group=${SG_ID},"\
                  "name=${JUMPOST_EXT_PORT_NAME}..."
 
@@ -114,8 +115,9 @@ else
     openstack port create
     -f json
     --network "${!NETWORK}"
-    --fixed-ip subnet="$(get_subnet_name "${!NETWORK}")"
+    --fixed-ip subnet="${!SUBNET}"
     --enable-port-security
+    --security-group default
     --security-group "${SG_ID}"
     "${JUMPOST_EXT_PORT_NAME}"
   )
@@ -196,7 +198,7 @@ else
     openstack floating ip create
     -f json
     --port "${JUMPOST_EXT_PORT_NAME}"
-    --description "\"Reserved for ${!JUMPHOST_NAME}\""
+    --description "'Reserved for ${!JUMPHOST_NAME}'"
     --tag "${!JUMPHOST_FLOATING_IP_TAG}"
     "${!EXT_NETWORK}"
   )
