@@ -1,40 +1,29 @@
 ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
 ci_git_branch = "main"
-ci_git_credential_id = "nordix-metal3-github-ssh"
+// Jenkins credential: secret text containing a GitHub PAT with repo scope
+ci_gh_token_credential_id = "nordix-metal3-github-fork-sync-token"
 
 pipeline {
-  agent { label 'metal3ci-8c16gb-ubuntu' }
-  environment {
-    CURRENT_DIR = sh (
-                      script: 'pwd',
-                      returnStdout: true
-                     ).trim()
-    MAKE_CMD = "make update-remote-repos"
-  }
-  stages {
-    stage('SCM') {
-      steps {
-        /* Checkout CI Repo */
-        checkout([$class: 'GitSCM',
-                 branches: [[name: ci_git_branch]],
-                 doGenerateSubmoduleConfigurations: false,
-                 extensions: [[$class: 'WipeWorkspace'],
-                 [$class: 'CleanCheckout'],
-                 [$class: 'CleanBeforeCheckout']],
-                 submoduleCfg: [],
-                 userRemoteConfigs: [[credentialsId: ci_git_credential_id,
-                 url: ci_git_url]]])
-      }
-    }
-    stage('Run update Nordix repos') {
-      steps {
-        sshagent (credentials: [ci_git_credential_id]) {
-          sh """
-            export GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
-            ${MAKE_CMD}
-          """
+    agent { label 'metal3ci-8c16gb-ubuntu' }
+    stages {
+        stage('SCM') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: ci_git_branch]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'WipeWorkspace'],
+                        [$class: 'CleanCheckout'],
+                        [$class: 'CleanBeforeCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[url: ci_git_url]]])
+            }
         }
-      }
+        stage('Sync Nordix repos') {
+            steps {
+                withCredentials([string(credentialsId: ci_gh_token_credential_id, variable: 'GH_TOKEN')]) {
+                    sh 'make update-remote-repos'
+                }
+            }
+        }
     }
-  }
 }
