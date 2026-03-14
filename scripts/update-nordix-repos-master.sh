@@ -44,20 +44,25 @@ declare -A REPOS=(
     [topolvm/topolvm]="topolvm"
 )
 
-# Extra branches to sync beyond the default branch (please keep sorted by source)
-declare -A EXTRA_BRANCHES=(
-    [kubernetes-sigs/cluster-api]="release-1.10 release-1.11 release-1.12"
-    [kubernetes-sigs/cluster-api-provider-openstack]="release-0.11 release-0.12 release-0.13"
-    [metal3-io/baremetal-operator]="release-0.10 release-0.11 release-0.12"
-    [metal3-io/cluster-api-provider-metal3]="release-1.10 release-1.11 release-1.12"
-    [metal3-io/ip-address-manager]="release-1.10 release-1.11 release-1.12"
-    [metal3-io/ironic-image]="release-30.0 release-31.0 release-32.0 release-33.0"
-    [metal3-io/ironic-standalone-operator]="release-0.6 release-0.7 release-0.8"
+# When a repo is listed here, ONLY these branches are synced (overrides
+# the default-branch sync).  Include main/master when you still want
+# the default branch synced.  (please keep sorted by source)
+# NOTE: kubernetes/kubernetes is here as the default fork branch is "nordix-dev"
+declare -A OVERRIDE_BRANCHES=(
+    [kubernetes-sigs/cluster-api]="main release-1.10 release-1.11 release-1.12"
+    [kubernetes-sigs/cluster-api-provider-openstack]="main release-0.11 release-0.12 release-0.13"
+    [kubernetes/kubernetes]="master"
+    [metal3-io/baremetal-operator]="main release-0.10 release-0.11 release-0.12"
+    [metal3-io/cluster-api-provider-metal3]="main release-1.10 release-1.11 release-1.12"
+    [metal3-io/ip-address-manager]="main release-1.10 release-1.11 release-1.12"
+    [metal3-io/ironic-image]="main release-30.0 release-31.0 release-32.0 release-33.0"
+    [metal3-io/ironic-standalone-operator]="main release-0.6 release-0.7 release-0.8"
 )
 
 FAILED=0
 
-sync_branch() {
+sync_branch()
+{
     local source="$1"
     local fork="${NORDIX_ORG}/${REPOS[${source}]}"
     local branch="${2:-}"
@@ -70,22 +75,27 @@ sync_branch() {
     fi
 
     echo "Syncing ${source} -> ${fork} (${label})"
-    if ! gh repo sync "${fork}" --force "${branch_flag[@]}"; then
-        echo "  FAILED: ${fork} (${label})"
-        FAILED=$((FAILED + 1))
+    # Try the fast API-based sync first.  Fall back to --source (git
+    # fetch+push) which can create missing branches in the fork and does
+    # not require the 'workflow' token scope.
+    if ! gh repo sync "${fork}" --force "${branch_flag[@]}" 2>/dev/null; then
+        if ! gh repo sync "${fork}" --source "${source}" --force "${branch_flag[@]}"; then
+            echo "  FAILED: ${fork} (${label})"
+            FAILED=$((FAILED + 1))
+        fi
     fi
 }
 
-# Sync default branch for all repos
+# Sync repos: use explicit BRANCHES list when present, otherwise sync the
+# default branch only.
 for source in $(printf '%s\n' "${!REPOS[@]}" | sort); do
-    sync_branch "${source}"
-done
-
-# Sync extra branches
-for source in $(printf '%s\n' "${!EXTRA_BRANCHES[@]}" | sort); do
-    for branch in ${EXTRA_BRANCHES[${source}]}; do
-        sync_branch "${source}" "${branch}"
-    done
+    if [[ -n "${OVERRIDE_BRANCHES[${source}]+x}" ]]; then
+        for branch in ${OVERRIDE_BRANCHES[${source}]}; do
+            sync_branch "${source}" "${branch}"
+        done
+    else
+        sync_branch "${source}"
+    fi
 done
 
 if [[ "${FAILED}" -gt 0 ]]; then
