@@ -14,8 +14,6 @@ NORDIX_ORG="Nordix"
 declare -A REPOS=(
     [containers/nri-plugins]="nri-plugins"
     [falcosecurity/falco]="falco"
-    [falcosecurity/falco-website]="falco-website"
-    [falcosecurity/falcoctl]="falcoctl"
     [falcosecurity/libs]="libs"
     [k8s-operatorhub/community-operators]="community-operators"
     [k8snetworkplumbingwg/sriov-cni]="sriov-cni"
@@ -50,12 +48,12 @@ declare -A REPOS=(
 # NOTE: kubernetes/kubernetes is here as the default fork branch is "nordix-dev"
 declare -A OVERRIDE_BRANCHES=(
     [kubernetes-sigs/cluster-api]="main release-1.10 release-1.11 release-1.12"
-    [kubernetes-sigs/cluster-api-provider-openstack]="main release-0.11 release-0.12 release-0.13"
-    [kubernetes/kubernetes]="master"
+    [kubernetes-sigs/cluster-api-provider-openstack]="main release-0.12 release-0.13 release-0.14"
+    [kubernetes/kubernetes]="master release-1.33 release-1.34 release-1.35"
     [metal3-io/baremetal-operator]="main release-0.10 release-0.11 release-0.12"
     [metal3-io/cluster-api-provider-metal3]="main release-1.10 release-1.11 release-1.12"
     [metal3-io/ip-address-manager]="main release-1.10 release-1.11 release-1.12"
-    [metal3-io/ironic-image]="main release-30.0 release-31.0 release-32.0 release-33.0"
+    [metal3-io/ironic-image]="main release-29.0 release-31.0 release-32.0 release-33.0 release-34.0"
     [metal3-io/ironic-standalone-operator]="main release-0.6 release-0.7 release-0.8"
 )
 
