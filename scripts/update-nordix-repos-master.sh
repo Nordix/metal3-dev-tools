@@ -5,7 +5,10 @@ set -euo pipefail
 #------------------------------------------
 # Sync Nordix fork repos from their upstream sources using the GitHub CLI.
 # Uses `gh repo sync` which calls the GitHub merge-upstream API,
-# eliminating the need to clone repos locally.
+# falling back to clone/push via SSH for missing branches.
+#
+# Requires: GH_TOKEN (PAT with repo+workflow scopes) and SSH key for
+# git push.
 #------------------------------------------
 
 NORDIX_ORG="Nordix"
@@ -75,11 +78,17 @@ sync_branch()
     fi
 
     echo "Syncing ${source} -> ${fork} (${label})"
-    # Try the fast API-based sync first.  Fall back to --source (git
-    # fetch+push) which can create missing branches in the fork and does
-    # not require the 'workflow' token scope.
+    # Try API sync first; fall back to clone/push via SSH for missing branches
     if ! gh repo sync "${fork}" --force "${branch_flag[@]}" 2>/dev/null; then
-        if ! gh repo sync "${fork}" --source "${source}" --force "${branch_flag[@]}"; then
+        if [[ -n "${branch}" ]]; then
+            echo "  API sync failed, falling back to clone/push"
+            local tmpdir="/tmp/${REPOS[${source}]}-${branch}"
+            if ! git clone --bare --single-branch --no-tags --branch "${branch}" "https://github.com/${source}.git" "${tmpdir}" \
+                || ! git -C "${tmpdir}" push --force "git@github.com:${fork}.git" "refs/heads/${branch}:refs/heads/${branch}"; then
+                echo "  FAILED: ${fork} (${label})"
+                FAILED=$((FAILED + 1))
+            fi
+        else
             echo "  FAILED: ${fork} (${label})"
             FAILED=$((FAILED + 1))
         fi

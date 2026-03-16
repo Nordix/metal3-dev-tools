@@ -1,6 +1,7 @@
 ci_git_url = "https://github.com/Nordix/metal3-dev-tools.git"
 ci_git_branch = "main"
-// Jenkins credential: secret text containing a GitHub PAT with repo scope
+// Jenkins credentials for repo sync: PAT (repo+workflow scopes) and SSH key for git push fallback
+ci_git_credential_id = "nordix-metal3-github-ssh"
 ci_gh_token_credential_id = "nordix-metal3-github-fork-sync-token"
 
 pipeline {
@@ -21,7 +22,12 @@ pipeline {
         stage('Sync Nordix repos') {
             steps {
                 withCredentials([string(credentialsId: ci_gh_token_credential_id, variable: 'GH_TOKEN')]) {
-                    sh 'make update-remote-repos'
+                    sshagent(credentials: [ci_git_credential_id]) {
+                        sh """
+                            export GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+                            make update-remote-repos
+                        """
+                    }
                 }
             }
         }
