@@ -77,16 +77,14 @@ sync_branch()
 
     echo "Syncing ${source} -> ${fork} (${label})"
     # Try API sync first; fall back to clone/push via SSH for missing branches
-    if ! gh repo sync "${fork}" --force "${branch_flag[@]}" 2>/dev/null; then
-        if [[ -n "${branch}" ]]; then
-            echo "  API sync failed, falling back to clone/push"
-            local tmpdir="/tmp/${REPOS[${source}]}-${branch}"
-            if ! git clone --bare --single-branch --no-tags --branch "${branch}" "https://github.com/${source}.git" "${tmpdir}" \
-                || ! git -C "${tmpdir}" push --force "git@github.com:${fork}.git" "refs/heads/${branch}:refs/heads/${branch}"; then
-                echo "  FAILED: ${fork} (${label})"
-                FAILED=$((FAILED + 1))
-            fi
-        else
+    if ! gh repo sync "${fork}" --force "${branch_flag[@]}"; then
+        if [[ -z "${branch}" ]]; then
+            branch=$(gh repo view "${source}" --json defaultBranchRef --jq '.defaultBranchRef.name')
+        fi
+        echo "  API sync failed, falling back to clone/push"
+        local tmpdir="/tmp/${REPOS[${source}]}-${branch}"
+        if ! git clone --bare --single-branch --no-tags --branch "${branch}" "https://github.com/${source}.git" "${tmpdir}" \
+            || ! git -C "${tmpdir}" push --force "git@github.com:${fork}.git" "refs/heads/${branch}:refs/heads/${branch}"; then
             echo "  FAILED: ${fork} (${label})"
             FAILED=$((FAILED + 1))
         fi
