@@ -10,7 +10,7 @@ make update-remote-repos
 
 ## Ways of working
 
-* [Github Workflow](wow/github-workflow.md)
+* [Github Workflow](getting-started.md)
 
 ## Useful links
 
