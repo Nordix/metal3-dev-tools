@@ -37,7 +37,6 @@ declare -A REPOS=(
     [metal3-io/ironic-image]="ironic-image"
     [metal3-io/ironic-ipa-downloader]="ironic-ipa-downloader"
     [metal3-io/ironic-standalone-operator]="ironic-standalone-operator"
-    [metal3-io/mariadb-image]="mariadb-image"
     [metal3-io/metal3-dev-env]="metal3-dev-env"
     [metal3-io/metal3-docs]="metal3-docs"
     [metal3-io/metal3-io.github.io]="metal3-io.github.io"
@@ -60,8 +59,8 @@ declare -A OVERRIDE_BRANCHES=(
     [metal3-io/baremetal-operator]="main release-0.11 release-0.12 release-0.13"
     [metal3-io/cluster-api-provider-metal3]="main release-1.11 release-1.12 release-1.13"
     [metal3-io/ip-address-manager]="main release-1.11 release-1.12 release-1.13"
-    [metal3-io/ironic-image]="main release-31.0 release-32.0 release-33.0 release-34.0 release-35.0"
-    [metal3-io/ironic-standalone-operator]="main release-0.6 release-0.7 release-0.8 release-0.9"
+    [metal3-io/ironic-image]="main release-31.0 release-32.0 release-33.0 release-34.0 release-35.0 release-37.0"
+    [metal3-io/ironic-standalone-operator]="main release-0.8 release-0.9 release-0.10"
 )
 
 FAILED=0
