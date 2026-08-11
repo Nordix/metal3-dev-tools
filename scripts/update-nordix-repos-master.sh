@@ -30,6 +30,7 @@ declare -A REPOS=(
     [kubernetes-sigs/node-local-dns]="node-local-dns"
     [kubernetes/kubernetes]="kubernetes"
     [metal3-io/.github]="metal3-dot-github"
+    [metal3-io/.project]="metal3-dot-project"
     [metal3-io/baremetal-operator]="baremetal-operator"
     [metal3-io/cluster-api-provider-metal3]="cluster-api-provider-metal3"
     [metal3-io/community]="metal3-community"
