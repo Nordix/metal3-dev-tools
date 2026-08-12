@@ -15,6 +15,7 @@ NORDIX_ORG="Nordix"
 
 # Upstream source → Nordix fork repo name (please keep sorted by source)
 declare -A REPOS=(
+    [ceph/ceph]="ceph"
     [containers/nri-plugins]="nri-plugins"
     [falcosecurity/falco]="falco"
     [falcosecurity/libs]="libs"
@@ -46,6 +47,7 @@ declare -A REPOS=(
     [nmstate/nmstate]="nmstate"
     [openstack/ironic-python-agent]="ironic-python-agent"
     [openstack/ironic-python-agent-builder]="ironic-python-agent-builder"
+    [rook/rook]="rook"
     [topolvm/topolvm]="topolvm"
 )
 
