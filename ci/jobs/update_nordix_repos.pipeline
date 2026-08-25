@@ -5,7 +5,7 @@ ci_git_credential_id = "nordix-metal3-github-ssh"
 ci_gh_token_credential_id = "nordix-metal3-github-fork-sync-token"
 
 pipeline {
-    agent { label 'metal3ci-8c16gb-ubuntu' }
+    agent { label 'metal3ci-8c32gb-ubuntu-oci' }
     stages {
         stage('SCM') {
             steps {
