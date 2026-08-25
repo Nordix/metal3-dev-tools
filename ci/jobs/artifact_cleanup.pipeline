@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'metal3ci-8c16gb-ubuntu' }
+  agent { label 'metal3ci-8c32gb-ubuntu-oci' }
   environment {
     RT_URL="https://artifactory.nordix.org/artifactory"
     CURRENT_DIR = sh (
